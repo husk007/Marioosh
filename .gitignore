@@ -1,0 +1,14 @@
+node_modules/
+dist/
+public/fonts/
+coverage/
+*.log
+.DS_Store
+desktop/node_modules/
+desktop/app/
+desktop/out/
+desktop/dist/
+mobile/node_modules/
+mobile/www/
+e2e/out/
+.vite/

@@ -1,0 +1,1988 @@
+{
+  "version": "0.2",
+  "data_status": "szkic level design – sekcje i budżety, nie kompletne mapy kafelków",
+  "coordinate_system": "x w jednostkach kafelków 32 px; sekcje są obszarami planistycznymi",
+  "levels": [
+    {
+      "level_id": "W1-L1",
+      "planet": "Lumenia – Świecące Lasy",
+      "world": 1,
+      "stage": 1,
+      "title": "Pierwszy Kontakt",
+      "width_tiles": 160,
+      "time_limit_seconds": 260,
+      "collectibles": {
+        "pet": 18,
+        "cans": 12,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Roguś": 6,
+        "Żukoróg": 2
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            40
+          ],
+          "beat": "Bezpieczna łąka, ruch i pierwszy skok; PET w widocznej linii, pierwsza skrzynka z bezpiecznikiem i pojedynczy Roguś."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            40,
+            80
+          ],
+          "beat": "Schody z transformatorów, dwa Rogusie rozdzielone platformą, zielony przewód do małej komnaty i posąg przy rozdzielni."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            80,
+            120
+          ],
+          "beat": "Pierwszy Żukoróg pokazuje rogi skierowane w górę; podskok i atak kluczem po przewróceniu; checkpoint oraz widoczna skrytka."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            120,
+            160
+          ],
+          "beat": "Dwie przepaście po 2 kafelki, sekwencja Żukoróg + Roguś z bezpiecznym obejściem, trzeci mieszkaniec i końcowy wyłącznik."
+        }
+      ],
+      "checkpoint_x_tile": 88,
+      "petrified_residents_x_tile": [
+        29,
+        83,
+        126
+      ],
+      "secret": "Niewidoczna skrzynka nad kamieniem w okolicy x=61, y=7: Zielona Bateria Życia. Bonus przez zielony kabel x=40.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": "Wprowadzenie do zbiórki opakowań, klucza i ochrony. Trzech mieszkańców: x=29, 83, 126."
+    },
+    {
+      "level_id": "W1-L2",
+      "planet": "Lumenia – Świecące Lasy",
+      "world": 1,
+      "stage": 2,
+      "title": "Podziemna Kablownia",
+      "width_tiles": 190,
+      "time_limit_seconds": 320,
+      "collectibles": {
+        "pet": 24,
+        "cans": 22,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Roguś": 8,
+        "Żukoróg": 4
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            48
+          ],
+          "beat": "Wejście do kanałów i pierwszy niebieski przewód; prosta para wejście–wyjście przenosi gracza przez zamkniętą przegrodę."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            48,
+            95
+          ],
+          "beat": "Ceglane szyby i pionowe windy, rozdzielnia z dwoma przełącznikami oraz ukryta zielona skrytka z puszkami."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            95,
+            142
+          ],
+          "beat": "Sekwencja ruchomych platform, żółte wejście w suficie, opcjonalne niebo z PET; przy checkpointcie instrukcja kolorów kabli."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            142,
+            190
+          ],
+          "beat": "Wysokie półki nad końcowym korytarzem: łatwe wyjście standardowe i wymagający skok na fioletowe rozgałęzienia."
+        }
+      ],
+      "checkpoint_x_tile": 105,
+      "petrified_residents_x_tile": [
+        34,
+        99,
+        150
+      ],
+      "secret": "Żółty przewód x=118 prowadzi do komnaty z 15 puszkami; ukryty przewód x=151 do W0.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": "Warp Zone: x=174 → początek W2 lub x=182 → W3. Gniazda są aktywowane osobnymi przełącznikami; nie blokują standardowego wyjścia."
+    },
+    {
+      "level_id": "W1-L3",
+      "planet": "Lumenia – Świecące Lasy",
+      "world": 1,
+      "stage": 3,
+      "title": "Mosty Wysokiego Napięcia",
+      "width_tiles": 175,
+      "time_limit_seconds": 300,
+      "collectibles": {
+        "pet": 15,
+        "cans": 12,
+        "golden_cans": 1
+      },
+      "enemy_budget": {
+        "Roguś": 3,
+        "Ćmoróg": 4,
+        "Rogowróbel": 3
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            44
+          ],
+          "beat": "Trzy statyczne mostki nad doliną uczą skakania między platformami na tle widocznej przepaści."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            44,
+            88
+          ],
+          "beat": "Dwie platformy poruszające się w pionie, pojedynczy Ćmoróg sygnalizuje nurkowanie; boczna półka ze statuą."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            88,
+            131
+          ],
+          "beat": "Długi most z ruchomym przekaźnikiem i opcjonalnym przewodem do wyższej ścieżki; pośrodku checkpoint."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            131,
+            175
+          ],
+          "beat": "Naprzemienne latające Rogowróble i Ćmorogi, końcowa platforma z przełącznikiem. Ostatni mieszkaniec za boczną wysepką."
+        }
+      ],
+      "checkpoint_x_tile": 96,
+      "petrified_residents_x_tile": [
+        32,
+        91,
+        138
+      ],
+      "secret": "Wysoka zielona końcówka kabla x=102: skrytka z pięcioma puszkami i rzadką Gwiazdą Napięcia.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": "Złota puszka na wąskiej platformie x=145."
+    },
+    {
+      "level_id": "W1-L4",
+      "planet": "Lumenia – Świecące Lasy",
+      "world": 1,
+      "stage": 4,
+      "title": "Przetwornia Żukoroga",
+      "width_tiles": 135,
+      "time_limit_seconds": 360,
+      "collectibles": {
+        "pet": 12,
+        "cans": 10,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Roguś": 3,
+        "Żukoróg": 4
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            34
+          ],
+          "beat": "Półciemna przetwornia, podnoszone drzwi i dwa bezpieczne patrole Żukorogów."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            34,
+            68
+          ],
+          "beat": "Obrotowe ramiona kabli i jeden ruchomy stół, z boku posąg technika i skrytka."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            68,
+            101
+          ],
+          "beat": "Trzy zawory-przekaźniki do otwarcia hali, checkpoint tuż przed areną, ostatnia statua przy wejściu."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            101,
+            135
+          ],
+          "beat": "Arena Rogomira: sygnał rogów → szarża → uderzenie w osłonę → 2 sekundy odsłoniętego brzucha; powtórzyć trzykrotnie."
+        }
+      ],
+      "checkpoint_x_tile": 97,
+      "petrified_residents_x_tile": [
+        24,
+        70,
+        89
+      ],
+      "secret": "Sekretna skrzynka x=58 z Bezpiecznikiem XL.",
+      "completion": "Pokonaj Rogomira, zabierz fragment I i uruchom fioletowy przewód",
+      "special": "Po walce wiadomość Scarlet wyświetlana na ścianie. Pierwszy Węzeł Energii aktywny."
+    },
+    {
+      "level_id": "W2-L1",
+      "planet": "Złomaria – Metal i Odpady",
+      "world": 2,
+      "stage": 1,
+      "title": "Aluminiowe Wzgórza",
+      "width_tiles": 185,
+      "time_limit_seconds": 320,
+      "collectibles": {
+        "pet": 12,
+        "cans": 34,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Roguś": 4,
+        "Ślimoróg": 6,
+        "Baranitor": 2
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            46
+          ],
+          "beat": "Wejście na górę z ogromnych puszek, śliskie metalowe zjazdy i pierwsze Ślimorogi."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            46,
+            92
+          ],
+          "beat": "Dwa metalowe koryta prowadzą tocące się pancerze; można skierować je w Rogusie, ale i w siebie."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            92,
+            139
+          ],
+          "beat": "Połączenie górek ze zjazdami, pierwszy Baranitor ostrzega rykiem przed szarżą, checkpoint."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            139,
+            185
+          ],
+          "beat": "Duża hałda złomu z trzema platformami; droga główna do rozdzielni, boczna do gniazda kradzieży puszek."
+        }
+      ],
+      "checkpoint_x_tile": 102,
+      "petrified_residents_x_tile": [
+        33,
+        96,
+        146
+      ],
+      "secret": "Żółta wnęka x=142 pod wielką puszką: 12 dodatkowych puszek.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": "Pierwsza scena ze znalezionym EcoPortem."
+    },
+    {
+      "level_id": "W2-L2",
+      "planet": "Złomaria – Metal i Odpady",
+      "world": 2,
+      "stage": 2,
+      "title": "Wielka Sortownia",
+      "width_tiles": 205,
+      "time_limit_seconds": 350,
+      "collectibles": {
+        "pet": 20,
+        "cans": 46,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Ślimoróg": 5,
+        "Żukoróg": 4,
+        "Baranitor": 3
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            51
+          ],
+          "beat": "Taśmociągi wolne i szybkie; PET i puszki trafiają na rozdzielone przenośniki."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            51,
+            102
+          ],
+          "beat": "Trzy zwrotnice sortowania; ustawienie poprawnej ścieżki odblokowuje EcoPort i pozwala zdobyć premię."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            102,
+            154
+          ],
+          "beat": "Pierwsza prasa pracująca w czytelnym rytmie, checkpoint i alternatywne górne przejście."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            154,
+            205
+          ],
+          "beat": "Baranitor szarżuje po taśmie i może zepchnąć Żukoroga do niszczyciela; rozdzielnia za sortownią."
+        }
+      ],
+      "checkpoint_x_tile": 113,
+      "petrified_residents_x_tile": [
+        37,
+        107,
+        162
+      ],
+      "secret": "Zepsuty EcoPort x=94: ukryta bateria po wykonaniu dodatkowej sekwencji.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": "Nie karać punktowo gracza za błędne skierowanie obiegu; reset zwrotnic przyciskiem."
+    },
+    {
+      "level_id": "W2-L3",
+      "planet": "Złomaria – Metal i Odpady",
+      "world": 2,
+      "stage": 3,
+      "title": "Magnetyczne Przepaście",
+      "width_tiles": 195,
+      "time_limit_seconds": 340,
+      "collectibles": {
+        "pet": 14,
+        "cans": 39,
+        "golden_cans": 1
+      },
+      "enemy_budget": {
+        "Ślimoróg": 6,
+        "Pszczółrog": 4,
+        "Baranitor": 2
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            49
+          ],
+          "beat": "Platformy na magnesach; przełącznik zmienia biegun i przybliża most."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            49,
+            98
+          ],
+          "beat": "Pierwsza Magnetyczna Wtyczka w widocznym miejscu, lecz podstawowa trasa posiada ręczny przełącznik."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            98,
+            146
+          ],
+          "beat": "Przepaście 2–4 kafelków, ruchome metalowe belki i Pszczółrogi patrolujące szczeliny; checkpoint."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            146,
+            195
+          ],
+          "beat": "Końcowy ciąg magnesów przełącza się w rytmie, wyżej ukryty skarbiec z puszkami."
+        }
+      ],
+      "checkpoint_x_tile": 107,
+      "petrified_residents_x_tile": [
+        35,
+        101,
+        154
+      ],
+      "secret": "Żółty kabel x=161: tajny skarbiec wymagający Magnetycznej Wtyczki lub trzech przełączników.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": "Złota puszka za skarbcem, nie na trasie obowiązkowej."
+    },
+    {
+      "level_id": "W2-L4",
+      "planet": "Złomaria – Metal i Odpady",
+      "world": 2,
+      "stage": 4,
+      "title": "Fort Złomotaura",
+      "width_tiles": 145,
+      "time_limit_seconds": 390,
+      "collectibles": {
+        "pet": 10,
+        "cans": 18,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Ślimoróg": 3,
+        "Baranitor": 3,
+        "Żukoróg": 2
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            36
+          ],
+          "beat": "Wejście do fortu po zardzewiałych mostkach; na ścianach schemat dwóch dźwigów."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            36,
+            72
+          ],
+          "beat": "Brama z dwoma przekaźnikami; pierwszy dźwig magnetyczny użyty do usunięcia pancernej przeszkody."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            72,
+            109
+          ],
+          "beat": "Próba z drugim dźwigiem, kamienni mieszkańcy i checkpoint w bezpiecznej wnęce."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            109,
+            145
+          ],
+          "beat": "Złomotaur: szarża i zrzut złomu; dwa dźwigi zdejmują pancerz, potem trzy trafienia w pieczęć."
+        }
+      ],
+      "checkpoint_x_tile": 104,
+      "petrified_residents_x_tile": [
+        26,
+        75,
+        96
+      ],
+      "secret": "Ukryte 8 puszek za wyłączonym dźwigiem x=76.",
+      "completion": "Pokonaj Złomotaura i zabierz fragment II",
+      "special": ""
+    },
+    {
+      "level_id": "W3-L1",
+      "planet": "Florion – Rogate Rośliny",
+      "world": 3,
+      "stage": 1,
+      "title": "Las Rogopnączy",
+      "width_tiles": 185,
+      "time_limit_seconds": 330,
+      "collectibles": {
+        "pet": 30,
+        "cans": 14,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Rogopnącze": 8,
+        "Roguś": 4,
+        "Ćmoróg": 3
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            46
+          ],
+          "beat": "Dżungla i pnącza użyte jako drabiny, pierwsze nieruchome Rogopnącze pokazuje chwytający atak."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            46,
+            92
+          ],
+          "beat": "Pnie z bezpiecznymi półkami, opadające liany i rośliny blokujące przejście."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            92,
+            139
+          ],
+          "beat": "Dwa pnącza sterowane impulsem; checkpoint po odkryciu mechanizmu wspinania."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            139,
+            185
+          ],
+          "beat": "Kombinacja roślin i latających Ćmorogów; finałowa rozdzielnia na drzewie."
+        }
+      ],
+      "checkpoint_x_tile": 102,
+      "petrified_residents_x_tile": [
+        33,
+        96,
+        146
+      ],
+      "secret": "Zielona końcówka kabla w koronie x=141: 10 PET i fragment zapisku Scarlet.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": ""
+    },
+    {
+      "level_id": "W3-L2",
+      "planet": "Florion – Rogate Rośliny",
+      "world": 3,
+      "stage": 2,
+      "title": "Kaktusowy Kanion",
+      "width_tiles": 195,
+      "time_limit_seconds": 350,
+      "collectibles": {
+        "pet": 34,
+        "cans": 10,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Kakturożec": 7,
+        "Rogoskoczek": 4,
+        "Roguś": 3
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            49
+          ],
+          "beat": "Pustynia, pierwsza kolczasta roślina pokazuje odporność na stomp."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            49,
+            98
+          ],
+          "beat": "Przesuwające się wydmy i Rogoskoczek chwytający PET językiem, który wypuszcza po trafieniu."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            98,
+            146
+          ],
+          "beat": "Pola kaktusów i bezpieczna trasa nad nimi, checkpoint przy oazie."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            146,
+            195
+          ],
+          "beat": "Szybko opadające kamienie i naprzemienne skoki Rogoskoczków; wąski finałowy kanion."
+        }
+      ],
+      "checkpoint_x_tile": 107,
+      "petrified_residents_x_tile": [
+        35,
+        101,
+        154
+      ],
+      "secret": "Pod oazą x=110 ukryty EcoPort z bonusowymi opakowaniami.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": ""
+    },
+    {
+      "level_id": "W3-L3",
+      "planet": "Florion – Rogate Rośliny",
+      "world": 3,
+      "stage": 3,
+      "title": "Słoneczne Ogrody",
+      "width_tiles": 210,
+      "time_limit_seconds": 360,
+      "collectibles": {
+        "pet": 32,
+        "cans": 13,
+        "golden_cans": 1
+      },
+      "enemy_budget": {
+        "Rogoróża": 5,
+        "Rogopnącze": 5,
+        "Pszczółrog": 4
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            52
+          ],
+          "beat": "Płaszczyzny słoneczne przesuwają się po naciśnięciu przełącznika; światło sygnalizowane kolorem i symbolem."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            52,
+            105
+          ],
+          "beat": "Dwa lustra otwierają pierwszy obwód; w pobliżu Rogoróża strzela cierniami w regularnym rytmie."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            105,
+            158
+          ],
+          "beat": "Kolejne trzy lustra i połączenie ze źródłem światła; checkpoint przed ostatnim układem."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            158,
+            210
+          ],
+          "beat": "Dwie drogi: prosta z przekaźnikami i trudna górna z dodatkowymi PET; meta w ogrodzie."
+        }
+      ],
+      "checkpoint_x_tile": 116,
+      "petrified_residents_x_tile": [
+        38,
+        109,
+        166
+      ],
+      "secret": "Zwierciadła ustawione w sekwencji L-P-L otwierają złoty przewód przy x=166.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": "Złota puszka w bonusowym ogrodzie."
+    },
+    {
+      "level_id": "W3-L4",
+      "planet": "Florion – Rogate Rośliny",
+      "world": 3,
+      "stage": 4,
+      "title": "Oranżeria Kaktogóra",
+      "width_tiles": 145,
+      "time_limit_seconds": 390,
+      "collectibles": {
+        "pet": 20,
+        "cans": 8,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Rogoróża": 3,
+        "Rogopnącze": 5,
+        "Kakturożec": 3
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            36
+          ],
+          "beat": "Wejście do przeszklonej szklarni z korzeniami przechodzącymi przez ściany."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            36,
+            72
+          ],
+          "beat": "Pierwszy korzeń blokuje drzwi; impuls odcina jego zasilanie."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            72,
+            109
+          ],
+          "beat": "Dwa kolejne korzenie i odłącznik, checkpoint przed areną; trzeci posąg w niszy."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            109,
+            145
+          ],
+          "beat": "Kaktogór: ciernie, łapanie pnączem, odcięcie trzech korzeni i trzy trafienia w serce."
+        }
+      ],
+      "checkpoint_x_tile": 104,
+      "petrified_residents_x_tile": [
+        26,
+        75,
+        96
+      ],
+      "secret": "Zielony kabel za szkłem x=88, ukryte PET.",
+      "completion": "Pokonaj Kaktogóra i zabierz fragment III",
+      "special": ""
+    },
+    {
+      "level_id": "W4-L1",
+      "planet": "Aqualis – Wody i Zatopione Miasta",
+      "world": 4,
+      "stage": 1,
+      "title": "Mosty Nad Oceanem",
+      "width_tiles": 185,
+      "time_limit_seconds": 320,
+      "collectibles": {
+        "pet": 16,
+        "cans": 18,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Rogopłetw": 8,
+        "Rogowróbel": 4,
+        "Roguś": 3
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            46
+          ],
+          "beat": "Pierwszy most i wyskakująca ryba; ostrzeżenie przez widoczną falę na wodzie."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            46,
+            92
+          ],
+          "beat": "Trzy wąskie mostki i drabiny; łatwa trasa dla początkujących pod górnymi premiami."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            92,
+            139
+          ],
+          "beat": "Sekwencja ryb i Rogowróbli, checkpoint przy latarni."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            139,
+            185
+          ],
+          "beat": "Ruchome drewniane platformy, finałowa rozdzielnia na wysepce."
+        }
+      ],
+      "checkpoint_x_tile": 102,
+      "petrified_residents_x_tile": [
+        33,
+        96,
+        146
+      ],
+      "secret": "Pod pomostem x=132 zielone gniazdo do komnaty ze skarbem.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": ""
+    },
+    {
+      "level_id": "W4-L2",
+      "planet": "Aqualis – Wody i Zatopione Miasta",
+      "world": 4,
+      "stage": 2,
+      "title": "Zatopione Obwody",
+      "width_tiles": 200,
+      "time_limit_seconds": 390,
+      "collectibles": {
+        "pet": 22,
+        "cans": 20,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Rogopłetw": 8,
+        "Ośmioróg": 5,
+        "Bazalisk": 1
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            50
+          ],
+          "beat": "Łagodne wprowadzenie do pływania; pęcherzyki pokazują prąd wody, nie ma ograniczenia tlenu."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            50,
+            100
+          ],
+          "beat": "Podwodne ruiny i brama z prostym przełącznikiem; pierwsze Ośmiorogi pływają skokowo."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            100,
+            150
+          ],
+          "beat": "Korytarz z osłoną przed krótkim promieniem Bazaliska i checkpoint w komorze powietrznej."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            150,
+            200
+          ],
+          "beat": "Podwodny labirynt czterech przewodów, jeden wybór jest sekretnym przejściem na Vesperę."
+        }
+      ],
+      "checkpoint_x_tile": 110,
+      "petrified_residents_x_tile": [
+        36,
+        104,
+        158
+      ],
+      "secret": "Fioletowy przewód x=177 → W6-L1; ukryta komnata 12 puszek przy x=149.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": "Alternatywny route prowadzi na W6, ale główne wyjście zostaje otwarte."
+    },
+    {
+      "level_id": "W4-L3",
+      "planet": "Aqualis – Wody i Zatopione Miasta",
+      "world": 4,
+      "stage": 3,
+      "title": "Prądy Głębinowe",
+      "width_tiles": 215,
+      "time_limit_seconds": 390,
+      "collectibles": {
+        "pet": 24,
+        "cans": 22,
+        "golden_cans": 1
+      },
+      "enemy_budget": {
+        "Ośmioróg": 7,
+        "Rogopłetw": 9,
+        "Bazalisk": 2
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            54
+          ],
+          "beat": "Prąd wodny przesuwa bohatera powoli w prawo; pierwsze pęcherzyki wprowadzają mechanikę."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            54,
+            108
+          ],
+          "beat": "Nurt w przeciwnym kierunku, rury odcinające strumień i zawory do przełączania."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            108,
+            161
+          ],
+          "beat": "Komory z bezpieczną wysepką, jeden Ośmioróg i checkpoint; ukryta trasa przez szczelinę."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            161,
+            215
+          ],
+          "beat": "Wiry i naprzemienne prądy, ostatnia śluza otwierana dwoma przełącznikami."
+        }
+      ],
+      "checkpoint_x_tile": 118,
+      "petrified_residents_x_tile": [
+        39,
+        112,
+        170
+      ],
+      "secret": "Żółty zawór x=164 otwiera jaskinię z PET i złotą puszką.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": ""
+    },
+    {
+      "level_id": "W4-L4",
+      "planet": "Aqualis – Wody i Zatopione Miasta",
+      "world": 4,
+      "stage": 4,
+      "title": "Latarnia Rogopłetwa",
+      "width_tiles": 155,
+      "time_limit_seconds": 420,
+      "collectibles": {
+        "pet": 15,
+        "cans": 12,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Rogopłetw": 5,
+        "Ośmioróg": 3,
+        "Bazalisk": 2
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            39
+          ],
+          "beat": "Ruiny latarni pod wodą i pierwsze lustro używane do odbijania bezpiecznego promienia ćwiczebnego."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            39,
+            78
+          ],
+          "beat": "Przewody prowadzą przez zatopiony komin, blokowane przez dwa rogopłetwy."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            78,
+            116
+          ],
+          "beat": "Ustawienie dwóch luster w śluzie; checkpoint przy komorze wejściowej."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            116,
+            155
+          ],
+          "beat": "Rogopłetw Wielki: nurkowania, wiry, kamienne oko; odbić trzy promienie własnym układem luster."
+        }
+      ],
+      "checkpoint_x_tile": 112,
+      "petrified_residents_x_tile": [
+        28,
+        81,
+        102
+      ],
+      "secret": "Zielona kieszeń przy x=78 kryje Cewkę Iskrową.",
+      "completion": "Pokonaj Rogopłetwa Wielkiego i zabierz fragment IV",
+      "special": ""
+    },
+    {
+      "level_id": "W5-L1",
+      "planet": "Skaltria – Kamienne Pustkowia",
+      "world": 5,
+      "stage": 1,
+      "title": "Kamienne Wydmy",
+      "width_tiles": 205,
+      "time_limit_seconds": 360,
+      "collectibles": {
+        "pet": 18,
+        "cans": 14,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Gekoróg": 7,
+        "Baranitor": 4,
+        "Bazalisk": 2
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            51
+          ],
+          "beat": "Piaszczyste przesmyki, sypiące się pod stopami platformy i pierwszy Gekoróg na ścianie."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            51,
+            102
+          ],
+          "beat": "Bloki ze skały osuwające się po aktywacji przełącznika; gra wyraźnie oznacza strefę spadku."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            102,
+            154
+          ],
+          "beat": "Baranitor i dwie skały do wykorzystania jako tarcze; checkpoint przed długą przełęczą."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            154,
+            205
+          ],
+          "beat": "Pierwszy Bazalisk za niską osłoną i schodzące wydmy prowadzące do wyjścia."
+        }
+      ],
+      "checkpoint_x_tile": 113,
+      "petrified_residents_x_tile": [
+        37,
+        107,
+        162
+      ],
+      "secret": "Niewidoczna skrzynka x=117 pod skałą: Lampa Odklęcia.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": ""
+    },
+    {
+      "level_id": "W5-L2",
+      "planet": "Skaltria – Kamienne Pustkowia",
+      "world": 5,
+      "stage": 2,
+      "title": "Jaskinie Bazalisków",
+      "width_tiles": 215,
+      "time_limit_seconds": 410,
+      "collectibles": {
+        "pet": 16,
+        "cans": 18,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Bazalisk": 8,
+        "Gekoróg": 6,
+        "Kamienioróg": 2
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            54
+          ],
+          "beat": "Jaskinia z kolumnami pokazującymi, jak przerwać linię widzenia Bazaliska."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            54,
+            108
+          ],
+          "beat": "Dwa Bazaliski działają na zmianę, a lustrzane odbicia promieni otwierają opcjonalną bramkę."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            108,
+            161
+          ],
+          "beat": "Sześć krótkich korytarzy z osłonami, checkpoint w bezpiecznej grocie."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            161,
+            215
+          ],
+          "beat": "Kamienioróg kontroluje końcowy przekaźnik; zamknięcie obwodu usuwa jego pancerz i otwiera wyjście."
+        }
+      ],
+      "checkpoint_x_tile": 118,
+      "petrified_residents_x_tile": [
+        39,
+        112,
+        170
+      ],
+      "secret": "Żółta rysa w ścianie x=130: komnata z dwoma posągami? Nie: dodatkowe opakowania i wskazówka; trzy główne posągi pozostają według listy.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": ""
+    },
+    {
+      "level_id": "W5-L3",
+      "planet": "Skaltria – Kamienne Pustkowia",
+      "world": 5,
+      "stage": 3,
+      "title": "Dolina Spadających Głazów",
+      "width_tiles": 220,
+      "time_limit_seconds": 410,
+      "collectibles": {
+        "pet": 17,
+        "cans": 19,
+        "golden_cans": 1
+      },
+      "enemy_budget": {
+        "Gekoróg": 6,
+        "Kamienioróg": 5,
+        "Bykobieg": 3
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            55
+          ],
+          "beat": "Wstęp z wolno spadającymi głazami i widocznymi cieniami na ziemi."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            55,
+            110
+          ],
+          "beat": "Mechanizm kieruje kamienne kule na kruche ściany; wprowadzony Bykobieg jako zagrożenie frontalne."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            110,
+            165
+          ],
+          "beat": "Podwójna lawina i checkpoint w bocznej jaskini, opcjonalna górna droga."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            165,
+            220
+          ],
+          "beat": "Finałowy tor głazów otwiera Bramę Rozdzielni tylko po poprawnym przekierowaniu dwóch kul."
+        }
+      ],
+      "checkpoint_x_tile": 121,
+      "petrified_residents_x_tile": [
+        40,
+        114,
+        174
+      ],
+      "secret": "Za kruchą ścianą x=171 znajduje się rzadki Bezpiecznik XL i złota puszka.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": ""
+    },
+    {
+      "level_id": "W5-L4",
+      "planet": "Skaltria – Kamienne Pustkowia",
+      "world": 5,
+      "stage": 4,
+      "title": "Twierdza Ceratopsora",
+      "width_tiles": 160,
+      "time_limit_seconds": 430,
+      "collectibles": {
+        "pet": 12,
+        "cans": 11,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Bykobieg": 4,
+        "Gekoróg": 5,
+        "Bazalisk": 3
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            40
+          ],
+          "beat": "Kamienna twierdza z potężnymi filarami i płytami naciskowymi."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            40,
+            80
+          ],
+          "beat": "Dwie sekwencje szarż Bykobiegu uczą prowadzenia go na ściany."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            80,
+            120
+          ],
+          "beat": "Płyty i osłony przed Bazaliskiem; checkpoint na końcu krużganku."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            120,
+            160
+          ],
+          "beat": "Ceratopsor: trzy cykle szarży w przygotowaną ścianę, falę od tupnięcia trzeba przeskoczyć, po wbiciu rogów atak na bok."
+        }
+      ],
+      "checkpoint_x_tile": 115,
+      "petrified_residents_x_tile": [
+        29,
+        83,
+        106
+      ],
+      "secret": "Czerwony przewód za kolumną x=99: trudniejsza trasa z dodatkowym PET.",
+      "completion": "Pokonaj Ceratopsora i zabierz fragment V",
+      "special": ""
+    },
+    {
+      "level_id": "W6-L1",
+      "planet": "Vespera – Wieczna Noc",
+      "world": 6,
+      "stage": 1,
+      "title": "Nocne Dachy",
+      "width_tiles": 195,
+      "time_limit_seconds": 370,
+      "collectibles": {
+        "pet": 14,
+        "cans": 22,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Rogowróbel": 7,
+        "Ćmoróg": 8,
+        "Krukoróg": 2
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            49
+          ],
+          "beat": "Latarnia przy wejściu oświetla dach, pierwsze ptaki widoczne jako sylwetki przed atakiem."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            49,
+            98
+          ],
+          "beat": "Cienie kominów i dachy na różnych poziomach, dwa źródła światła do aktywacji."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            98,
+            146
+          ],
+          "beat": "Krótki odcinek w mroku z bezpiecznymi platformami oznaczonymi krawędzią, checkpoint."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            146,
+            195
+          ],
+          "beat": "Dachy połączone przewodami i nurkujące ptaki; finał przy wielkiej latarni."
+        }
+      ],
+      "checkpoint_x_tile": 107,
+      "petrified_residents_x_tile": [
+        35,
+        101,
+        154
+      ],
+      "secret": "Niebieski przewód przy x=127 prowadzi na dach z zapiskami Scarlet.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": ""
+    },
+    {
+      "level_id": "W6-L2",
+      "planet": "Vespera – Wieczna Noc",
+      "world": 6,
+      "stage": 2,
+      "title": "Wieża Chmur",
+      "width_tiles": 175,
+      "time_limit_seconds": 400,
+      "collectibles": {
+        "pet": 18,
+        "cans": 20,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Ćmoróg": 8,
+        "Rogowróbel": 6,
+        "Pszczółrog": 4
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            44
+          ],
+          "beat": "Pionowe wspinanie po ruchomych platformach; kamera pokazuje kilka platform przed skokiem."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            44,
+            88
+          ],
+          "beat": "Pierwsza winda pionowa z bezpiecznymi przystankami, potem Pszczółrogi patrolujące półki."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            88,
+            131
+          ],
+          "beat": "Dwie windy krzyżowe, checkpoint na platformie serwisowej w środku wysokości."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            131,
+            175
+          ],
+          "beat": "Końcowa sekwencja trzech platform i rozdzielnia na szczycie wieży."
+        }
+      ],
+      "checkpoint_x_tile": 96,
+      "petrified_residents_x_tile": [
+        32,
+        91,
+        138
+      ],
+      "secret": "Żółta końcówka kabla wysoko w wieży: złota puszka i bezpiecznik.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": "W tym etapie `width_tiles` oznacza szerokość rozwiniętego szlaku; faktyczna tilemapa jest wysoka i węższa."
+    },
+    {
+      "level_id": "W6-L3",
+      "planet": "Vespera – Wieczna Noc",
+      "world": 6,
+      "stage": 3,
+      "title": "Gniazda Rogoptaków",
+      "width_tiles": 205,
+      "time_limit_seconds": 400,
+      "collectibles": {
+        "pet": 12,
+        "cans": 31,
+        "golden_cans": 1
+      },
+      "enemy_budget": {
+        "Krukoróg": 8,
+        "Rogowróbel": 7,
+        "Ćmoróg": 5
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            51
+          ],
+          "beat": "Pierwsze gniazdo pokazuje, że Krukoróg kradnie niepodniesione puszki i odkłada je w gnieździe."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            51,
+            102
+          ],
+          "beat": "Przejście przez trzy gniazda, pojedyncze przegony i lokalne bezpieczne platformy."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            102,
+            154
+          ],
+          "beat": "Checkpoint na dachu; ponad nim można odnaleźć żółty przewód prowadzący do skarbca."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            154,
+            205
+          ],
+          "beat": "Dwa fioletowe przewody: jeden otwiera skrót na Ferroks, drugi po zagadce na Katoblis."
+        }
+      ],
+      "checkpoint_x_tile": 113,
+      "petrified_residents_x_tile": [
+        37,
+        107,
+        162
+      ],
+      "secret": "Fioletowe gniazdo x=166 → W7-L1; drugie x=195 → W8-L1 po sekwencji dwóch przełączników.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": "Złota puszka po odzyskaniu skradzionego skarbu; wyjście standardowe nadal działa."
+    },
+    {
+      "level_id": "W6-L4",
+      "planet": "Vespera – Wieczna Noc",
+      "world": 6,
+      "stage": 4,
+      "title": "Obserwatorium Krukoroga",
+      "width_tiles": 150,
+      "time_limit_seconds": 420,
+      "collectibles": {
+        "pet": 12,
+        "cans": 11,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Krukoróg": 5,
+        "Ćmoróg": 5,
+        "Rogowróbel": 3
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            38
+          ],
+          "beat": "Most do obserwatorium, reflektor ćwiczebny służy do oświetlenia niszy."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            38,
+            75
+          ],
+          "beat": "Dwie platformy wewnątrz kopuły i podmuchy wiatru z widoczną animacją."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            75,
+            112
+          ],
+          "beat": "Zasilenie dwóch reflektorów oraz checkpoint na obrzeżu areny."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            112,
+            150
+          ],
+          "beat": "Krukoróg Królewski: rzuty kamieni, podmuchy, lot; celne oświetlenie zmusza do lądowania, trzy trafienia w znamię."
+        }
+      ],
+      "checkpoint_x_tile": 108,
+      "petrified_residents_x_tile": [
+        27,
+        78,
+        99
+      ],
+      "secret": "Górny taras x=96: zielona bateria, dostępna normalnym skokiem przy umiejętnym podejściu.",
+      "completion": "Pokonaj Krukoroga Królewskiego i zabierz fragment VI",
+      "special": ""
+    },
+    {
+      "level_id": "W7-L1",
+      "planet": "Ferroks – Żelazne Maszyny",
+      "world": 7,
+      "stage": 1,
+      "title": "Fabryka Rogatych Maszyn",
+      "width_tiles": 210,
+      "time_limit_seconds": 400,
+      "collectibles": {
+        "pet": 14,
+        "cans": 29,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Kamienioróg": 5,
+        "Żukoróg": 6,
+        "Rogodron-minion": 5
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            52
+          ],
+          "beat": "Taśmy z mechanicznymi rogami, ruchome tłoki o czytelnym cyklu pracy."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            52,
+            105
+          ],
+          "beat": "Pierwsze małe drony Rogodrona patrolują przestrzeń nad platformami i atakują na sygnał."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            105,
+            158
+          ],
+          "beat": "Dwie automatyczne bramy sterowane przekaźnikami; checkpoint za halą montażową."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            158,
+            210
+          ],
+          "beat": "Finałowy przenośnik i chwytaki mechaniczne, które można zatrzymać ręcznym odłącznikiem."
+        }
+      ],
+      "checkpoint_x_tile": 116,
+      "petrified_residents_x_tile": [
+        38,
+        109,
+        166
+      ],
+      "secret": "Zielona wnęka x=176 pozwala ominąć fragment hali, ale traci się dostęp do opakowań.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": ""
+    },
+    {
+      "level_id": "W7-L2",
+      "planet": "Ferroks – Żelazne Maszyny",
+      "world": 7,
+      "stage": 2,
+      "title": "Burza Energetyczna",
+      "width_tiles": 220,
+      "time_limit_seconds": 430,
+      "collectibles": {
+        "pet": 14,
+        "cans": 21,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Pszczółrog": 7,
+        "Kamienioróg": 5,
+        "Rogodron-minion": 4
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            55
+          ],
+          "beat": "Pierwsze wyłączające się platformy błyskają dwa razy przed zniknięciem."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            55,
+            110
+          ],
+          "beat": "Okresowe pola energii, które można zatrzymać przełącznikiem w bezpiecznej strefie."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            110,
+            165
+          ],
+          "beat": "Burza przerywa zasilanie mostu co pięć sekund, checkpoint na osłoniętej stacji."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            165,
+            220
+          ],
+          "beat": "Dwie trasy: wolniejsza pod burzą i szybsza przez górną sieć platform do rozdzielni."
+        }
+      ],
+      "checkpoint_x_tile": 121,
+      "petrified_residents_x_tile": [
+        40,
+        114,
+        174
+      ],
+      "secret": "Czerwony przewód x=168: trudny pokój z 15 puszkami i Gwiazdą Napięcia.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": ""
+    },
+    {
+      "level_id": "W7-L3",
+      "planet": "Ferroks – Żelazne Maszyny",
+      "world": 7,
+      "stage": 3,
+      "title": "Reaktor Bez Dna",
+      "width_tiles": 235,
+      "time_limit_seconds": 450,
+      "collectibles": {
+        "pet": 10,
+        "cans": 27,
+        "golden_cans": 1
+      },
+      "enemy_budget": {
+        "Kamienioróg": 8,
+        "Rogodron-minion": 6,
+        "Baranitor": 4
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            59
+          ],
+          "beat": "Wielkie przepaście i pierwszy przekaźnik tworzący most na 8 sekund."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            59,
+            118
+          ],
+          "beat": "Platformy na zmiennym zasilaniu, po każdym przeskoku widoczna stacja stabilizacji."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            118,
+            176
+          ],
+          "beat": "Checkpoint w środku reaktora; trzeba uruchomić trzy przekaźniki w podanej kolejności."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            176,
+            235
+          ],
+          "beat": "Finałowe dwa mosty na czas, Baranitor może przypadkiem nacisnąć płytę; rozdzielnia bez wymuszonej walki."
+        }
+      ],
+      "checkpoint_x_tile": 129,
+      "petrified_residents_x_tile": [
+        42,
+        122,
+        186
+      ],
+      "secret": "Żółty przewód za przekaźnikiem x=201: skrytka z alternatywną ścieżką do końca i złotą puszką.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": ""
+    },
+    {
+      "level_id": "W7-L4",
+      "planet": "Ferroks – Żelazne Maszyny",
+      "world": 7,
+      "stage": 4,
+      "title": "Hala Rogodrona",
+      "width_tiles": 165,
+      "time_limit_seconds": 450,
+      "collectibles": {
+        "pet": 9,
+        "cans": 12,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Kamienioróg": 5,
+        "Rogodron-minion": 6,
+        "Żukoróg": 3
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            41
+          ],
+          "beat": "Wejście do hali napraw, pierwsze małe drony ujawniają wspólny rytm ich ataku."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            41,
+            82
+          ],
+          "beat": "Pierwszy i drugi generator mają oddzielne obwody; można je testować bez walki."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            82,
+            124
+          ],
+          "beat": "Trzeci generator i checkpoint tuż za szkłem bezpieczeństwa."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            124,
+            165
+          ],
+          "beat": "Rogodron: lot, drony, brak zasilania platform; trzy generatory należy wyłączyć, następnie trafić rdzeń podczas odsłonięcia."
+        }
+      ],
+      "checkpoint_x_tile": 119,
+      "petrified_residents_x_tile": [
+        30,
+        86,
+        109
+      ],
+      "secret": "Nad halą x=107: zielony EcoPort.",
+      "completion": "Pokonaj Rogodrona i zabierz fragment VII",
+      "special": ""
+    },
+    {
+      "level_id": "W8-L1",
+      "planet": "Katoblis – Kamienna Planeta",
+      "world": 8,
+      "stage": 1,
+      "title": "Deszcz Kamieni",
+      "width_tiles": 240,
+      "time_limit_seconds": 450,
+      "collectibles": {
+        "pet": 12,
+        "cans": 12,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Kamienioróg": 8,
+        "Bykobieg": 5,
+        "Bazalisk": 4
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            60
+          ],
+          "beat": "Zrujnowana planeta i pierwsze odłamki z ostrzegającymi cieniami na ziemi."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            60,
+            120
+          ],
+          "beat": "Sekwencja kamiennych mostów i Bykobiegów, które mogą rozbijać przeszkody."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            120,
+            180
+          ],
+          "beat": "Checkpoint w schronie przed deszczem, po nim podwójny promień Bazaliska."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            180,
+            240
+          ],
+          "beat": "Bieg przez rozległe rumowisko z ruchomymi skałami, końcowa rozdzielnia pod czarnym niebem."
+        }
+      ],
+      "checkpoint_x_tile": 132,
+      "petrified_residents_x_tile": [
+        43,
+        125,
+        190
+      ],
+      "secret": "Czerwony przewód x=194 pozwala wejść do skarbca z zapasową baterią życia.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": ""
+    },
+    {
+      "level_id": "W8-L2",
+      "planet": "Katoblis – Kamienna Planeta",
+      "world": 8,
+      "stage": 2,
+      "title": "Wielki Przewód",
+      "width_tiles": 210,
+      "time_limit_seconds": 460,
+      "collectibles": {
+        "pet": 14,
+        "cans": 15,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Kamienioróg": 7,
+        "Gekoróg": 7,
+        "Bazalisk": 4
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            52
+          ],
+          "beat": "Wejście do sieci kabli, tablice pokazują symbole kolejnych czterech przekaźników."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            52,
+            105
+          ],
+          "beat": "Pierwszy rozgałęźnik ma trzy wyjścia; błąd cofa do bezpiecznej pętli, nie zabija."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            105,
+            158
+          ],
+          "beat": "Dwa przekaźniki w korytarzu z Gekorogami, checkpoint po rozwiązaniu drugiego rozgałęzienia."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            158,
+            210
+          ],
+          "beat": "Sekwencja czterech symboli w przewodach, ostatnie czarne wejście odblokowuje trasę do sali posągów."
+        }
+      ],
+      "checkpoint_x_tile": 116,
+      "petrified_residents_x_tile": [
+        38,
+        109,
+        166
+      ],
+      "secret": "Żółty przewód za symetryczną ścianą x=122: szkatuła Scarlet i opakowania.",
+      "completion": "Aktywuj Główną Rozdzielnię",
+      "special": "Prawidłowa sekwencja znaków: błyskawica → księżyc → liść → gwiazda. Zawsze podana wcześniej w dekoracjach."
+    },
+    {
+      "level_id": "W8-L3",
+      "planet": "Katoblis – Kamienna Planeta",
+      "world": 8,
+      "stage": 3,
+      "title": "Sala Tysiąca Posągów",
+      "width_tiles": 225,
+      "time_limit_seconds": 470,
+      "collectibles": {
+        "pet": 10,
+        "cans": 16,
+        "golden_cans": 1
+      },
+      "enemy_budget": {
+        "Kamienioróg": 10,
+        "Bazalisk": 5,
+        "Rogoróża": 4
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            56
+          ],
+          "beat": "Rozległa galeria skamieniałych mieszkańców i pierwsze lustro odklęcia."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            56,
+            112
+          ],
+          "beat": "Trzy filary energii trzeba zasilić przez dostępne przekaźniki; mieszkańcy dają wskazówki po uwolnieniu."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            112,
+            169
+          ],
+          "beat": "Checkpoint w archiwum, tu odkrywany jest ósmy fragment Kryształu Życia pozostawiony przez Scarlet."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            169,
+            225
+          ],
+          "beat": "Wielka Latarnia Scarlet odwraca lokalną klątwę, uwolnieni mieszkańcy otwierają czarny przewód do tronu."
+        }
+      ],
+      "checkpoint_x_tile": 124,
+      "petrified_residents_x_tile": [
+        40,
+        117,
+        178
+      ],
+      "secret": "Ukryty zapisek Scarlet za czwartym, opcjonalnym filarem x=185.",
+      "completion": "Uruchom Wielką Latarnię Scarlet i odzyskaj fragment VIII",
+      "special": "Ostatnia komnata dziennika stanowi zapisek VIII. Uratowanych trzech mieszkańców poziomu liczymy niezależnie od posągów tła."
+    },
+    {
+      "level_id": "W8-L4",
+      "planet": "Katoblis – Kamienna Planeta",
+      "world": 8,
+      "stage": 4,
+      "title": "Tron Katoblepasa",
+      "width_tiles": 265,
+      "time_limit_seconds": 600,
+      "collectibles": {
+        "pet": 8,
+        "cans": 10,
+        "golden_cans": 0
+      },
+      "enemy_budget": {
+        "Kamienioróg": 8,
+        "Bazalisk": 5,
+        "Bykobieg": 4
+      },
+      "sections": [
+        {
+          "section": 1,
+          "x_tiles": [
+            0,
+            66
+          ],
+          "beat": "Wejście do mrocznej twierdzy i powtórka znanych mechanik: wrogowie, przekaźniki, osłony przed promieniem."
+        },
+        {
+          "section": 2,
+          "x_tiles": [
+            66,
+            132
+          ],
+          "beat": "Labirynt trzech czarnych przewodów; fałszywe przejścia cofają do czytelnych punktów, nie tworzą nieskończonego softlocku."
+        },
+        {
+          "section": 3,
+          "x_tiles": [
+            132,
+            199
+          ],
+          "beat": "Ostatni checkpoint i więzienie Scarlet na tle Wielkiego Kamienizatora; trzy skamieniałe postacie do uwolnienia przed areną."
+        },
+        {
+          "section": 4,
+          "x_tiles": [
+            199,
+            265
+          ],
+          "beat": "Arena Katoblepasa: (I) szarże i filary; (II) odbijanie spojrzenia trzema lustrami; (III) aktywowanie ośmiu węzłów, uwolnienie Scarlet."
+        }
+      ],
+      "checkpoint_x_tile": 191,
+      "petrified_residents_x_tile": [
+        48,
+        138,
+        175
+      ],
+      "secret": "Sekretna nisza x=175: ostatni duży pakiet PET i puszek, dostępny po znalezieniu przełącznika.",
+      "completion": "Pokonaj Katoblepasa i uwolnij Scarlet",
+      "special": "Po walce standardowe lub sekretne zakończenie zależne od stanu kolekcji, bez twardej blokady skrótów."
+    }
+  ]
+}
