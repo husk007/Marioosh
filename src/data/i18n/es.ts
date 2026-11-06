@@ -9,7 +9,7 @@ const es: Dict = {
   'slots.title': 'Elige una ranura de guardado', 'slots.empty': 'Ranura vacía', 'slots.slot': 'Ranura {n}', 'slots.delete': 'Borrar partida', 'slots.confirm': '¿Seguro que quieres borrar? Pulsa otra vez.',
   'slots.info': '{p}% · {s} pts · {c} envases',
   'mode.title': 'Modo de juego', 'mode.solo': 'Un jugador', 'mode.coop': 'Dos jugadores', 'mode.soloDesc': 'Alterna entre los hermanos', 'mode.coopDesc': 'Pantalla compartida, fianza compartida',
-  'mode.classic': 'Clásico', 'mode.night': 'Turno de noche', 'mode.nightDesc': 'Enemigos más rápidos y rutas más difíciles',
+  'mode.classic': 'Clásico', 'mode.night': 'Turno de noche', 'mode.nightDesc': 'Todo más rápido y menos tiempo',
   'intro.1': 'Un día normal en una central eléctrica polaca. Marioosh y Darioosh, dos hermanos electricistas, hacen la revisión rutinaria de una vieja sala de distribución.',
   'intro.2': 'De la pared sale un cable misterioso que no aparece en ningún esquema. De pronto brilla en violeta: «Conexión interplanetaria detectada. Destinatario: LUMENIA.»',
   'intro.3': 'Un torbellino de energía engulle a los dos hermanos y los escupe por un enorme enchufe en un planeta desconocido.',

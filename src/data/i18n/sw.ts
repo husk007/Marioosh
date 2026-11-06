@@ -9,7 +9,7 @@ const sw: Dict = {
   'slots.title': 'Chagua nafasi ya kuhifadhi', 'slots.empty': 'Nafasi tupu', 'slots.slot': 'Nafasi {n}', 'slots.delete': 'Futa hifadhi', 'slots.confirm': 'Una uhakika? Bonyeza tena.',
   'slots.info': '{p}% · pointi {s} · vifungashio {c}',
   'mode.title': 'Aina ya mchezo', 'mode.solo': 'Mchezaji mmoja', 'mode.coop': 'Wachezaji wawili', 'mode.soloDesc': 'Badilisha kati ya ndugu', 'mode.coopDesc': 'Skrini moja, amana moja',
-  'mode.classic': 'Kawaida', 'mode.night': 'Zamu ya Usiku', 'mode.nightDesc': 'Maadui wepesi zaidi na njia ngumu zaidi',
+  'mode.classic': 'Kawaida', 'mode.night': 'Zamu ya Usiku', 'mode.nightDesc': 'Kila kitu kwa kasi zaidi na muda mfupi',
   'intro.1': 'Siku ya kawaida katika kituo cha umeme cha Poland. Marioosh na Darioosh, ndugu wawili mafundi umeme, wanakagua chumba cha zamani cha kusambaza umeme.',
   'intro.2': 'Kebo ya ajabu inatoka ukutani, haipo kwenye mchoro wowote. Ghafla inang\'aa rangi ya zambarau: "Muunganisho wa sayari umegunduliwa. Mpokeaji: LUMENIA."',
   'intro.3': 'Kimbunga cha nishati kinawavuta ndugu wote wawili na kuwatupa kutoka soketi kubwa ya umeme kwenye sayari isiyojulikana.',

@@ -9,7 +9,7 @@ const en: Dict = {
   'slots.title': 'Choose a save slot', 'slots.empty': 'Empty slot', 'slots.slot': 'Slot {n}', 'slots.delete': 'Delete save', 'slots.confirm': 'Really delete? Press again.',
   'slots.info': '{p}% · {s} pts · {c} pkgs',
   'mode.title': 'Game mode', 'mode.solo': 'One player', 'mode.coop': 'Two players', 'mode.soloDesc': 'Switch between the brothers', 'mode.coopDesc': 'Shared screen, shared deposit',
-  'mode.classic': 'Classic', 'mode.night': 'Night Shift', 'mode.nightDesc': 'Faster enemies and tougher routes',
+  'mode.classic': 'Classic', 'mode.night': 'Night Shift', 'mode.nightDesc': 'Faster everything and less time',
   'intro.1': 'An ordinary day at a Polish power plant. Marioosh and Darioosh, two electrician brothers, are doing a routine check of an old switchgear room.',
   'intro.2': 'A mysterious cable sticks out of the wall — it is on no wiring diagram. It starts glowing purple: "Interplanetary connection detected. Recipient: LUMENIA."',
   'intro.3': 'A vortex of energy sucks both brothers in and spits them out of a giant power socket on an unknown planet.',

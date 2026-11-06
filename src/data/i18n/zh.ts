@@ -9,7 +9,7 @@ const zh: Dict = {
   'slots.title': '选择存档位', 'slots.empty': '空存档', 'slots.slot': '存档 {n}', 'slots.delete': '删除存档', 'slots.confirm': '确定删除？请再按一次。',
   'slots.info': '{p}% · {s} 分 · {c} 个容器',
   'mode.title': '游戏模式', 'mode.solo': '单人', 'mode.coop': '双人', 'mode.soloDesc': '在两兄弟之间切换', 'mode.coopDesc': '同屏合作，共享押金',
-  'mode.classic': '经典', 'mode.night': '夜班模式', 'mode.nightDesc': '敌人更快，路线更难',
+  'mode.classic': '经典', 'mode.night': '夜班模式', 'mode.nightDesc': '一切更快，时间更少',
   'intro.1': '波兰一座发电厂里的普通一天。电工兄弟马里奥什和达里奥什正在例行检查一间老旧的配电室。',
   'intro.2': '墙里伸出一根神秘的电缆，任何线路图上都没有它。它忽然泛起紫光：“检测到星际连接。接收方：LUMENIA。”',
   'intro.3': '能量漩涡把两兄弟卷了进去，又从一个巨大的电源插座里把他们甩到一颗陌生的星球上。',

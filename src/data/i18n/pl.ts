@@ -10,7 +10,7 @@ const pl = {
   'slots.title': 'Wybierz slot zapisu', 'slots.empty': 'Pusty slot', 'slots.slot': 'Slot {n}', 'slots.delete': 'Usuń zapis', 'slots.confirm': 'Na pewno usunąć? Naciśnij jeszcze raz.',
   'slots.info': '{p}% · {s} pkt · {c} opak.',
   'mode.title': 'Tryb gry', 'mode.solo': 'Jeden gracz', 'mode.coop': 'Dwóch graczy', 'mode.soloDesc': 'Przełączaj się między braćmi', 'mode.coopDesc': 'Wspólny ekran, wspólna kaucja',
-  'mode.classic': 'Klasyczny', 'mode.night': 'Nocna Zmiana', 'mode.nightDesc': 'Szybsi wrogowie i trudniejsze trasy',
+  'mode.classic': 'Klasyczny', 'mode.night': 'Nocna Zmiana', 'mode.nightDesc': 'Wszystko szybsze i mniej czasu',
   'intro.1': 'Zwyczajny dzień w polskiej elektrowni. Marioosh i Darioosh, dwaj bracia elektrycy, robią rutynowy przegląd starej rozdzielni.',
   'intro.2': 'Ze ściany wychodzi tajemniczy przewód, którego nie ma na żadnym schemacie. Nagle zaczyna świecić na fioletowo: „Wykryto połączenie międzyplanetarne. Odbiorca: LUMENIA.”',
   'intro.3': 'Wir energii wciąga obu braci i wyrzuca ich z wielkiego gniazda elektrycznego na nieznanej planecie.',
