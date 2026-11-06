@@ -85,7 +85,7 @@ tests/ e2e/   testy                   .github/    CI, Pages, Release
 ## Stan i ograniczenia
 Wersja **0.1.0** — pierwsza kompletna, grywalna implementacja projektu z etapu 2. Uczciwie:
 - Poziomy są **generowane proceduralnie** z blueprintu (`src/data/levels.json`) deterministycznym ziarnem, a nie ręcznie projektowane; ich przejezdność weryfikują testy geometrii oraz bot, ale **7 poziomów** (W3-L4, W6-L2, W7-L1…L4, W8-L4) jest poza zasięgiem bota i wymaga testu ręcznego. Balans (prędkości, HP bossów) to wartości startowe.
-- Wersje **Android/iOS są budowane w CI, ale nie były uruchamiane na urządzeniach** w trakcie tworzenia (brak SDK/Xcode w środowisku autora); wersja web i testy przeglądarkowe zostały uruchomione.
+- Paczki Windows/Linux/Android/iOS **kompilują się w CI** (GitHub Actions), ale **nie były uruchamiane** na docelowych systemach/urządzeniach; uruchomiono i przetestowano wersję web (Chromium, e2e).
 - Tryb *Night Shift* jest wdrożony tylko częściowo: +12% prędkości gry, −10% czasu, nocna poświata i ciemny strój. Nie zmienia układu tras ani nie dodaje poziomów bonusowych z roadmapy.
 - Tłumaczenia wykonane maszynowo/redakcyjnie — zalecana weryfikacja przez rodzimych użytkowników (zwłaszcza suahili i arabski). Zob. [`docs/LOCALIZATION.md`](docs/LOCALIZATION.md).
 

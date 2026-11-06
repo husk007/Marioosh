@@ -1,12 +1,12 @@
 # Platformy: stan i uwagi
 
-| Platforma | Sposób | Zweryfikowane lokalnie przez autora | Do zrobienia przez właściciela |
+| Platforma | Sposób | Stan weryfikacji | Do zrobienia przez właściciela |
 |---|---|---|---|
 | www / PWA | Vite build, `public/sw.js`, manifest | ✅ build, test e2e w Chromium (6 języków, wejście do gry, brak błędów konsoli) | włączyć GitHub Pages |
-| Windows | Electron + electron-builder (NSIS, zip) | ❌ nie uruchamiano (brak Windows/Electron w środowisku) — konfiguracja w `desktop/`, budowana w CI | opcjonalnie podpisać kod (certyfikat) |
-| Linux | Electron (AppImage, deb, tar.gz) | ❌ nie uruchamiano powłoki Electron; ten sam build webowy działa w Chromium | — |
-| Android | Capacitor 7, projekt `mobile/android` (pozioma orientacja) | ❌ nie budowano (brak Android SDK); projekt wygenerowany przez `cap add android` | keystore + Google Play; test na urządzeniu |
-| iOS | Capacitor 7, projekt `mobile/ios` | ❌ nie budowano (brak macOS/Xcode); CI buduje symulator bez podpisu | konto Apple Developer, podpis, TestFlight/App Store |
+| Windows | Electron + electron-builder (NSIS, zip) | ⚠️ paczka **zbudowana w CI** (Windows, GitHub Actions), ale nie uruchamiana | opcjonalnie podpisać kod (certyfikat) |
+| Linux | Electron (AppImage, deb, tar.gz) | ⚠️ paczki (AppImage/deb/tar.gz) **zbudowane w CI**, nie uruchamiane; ten sam build webowy działa w Chromium | — |
+| Android | Capacitor 7, projekt `mobile/android` (pozioma orientacja) | ⚠️ APK/AAB **zbudowane w CI** (debug APK), nie instalowane na urządzeniu ani emulatorze | keystore + Google Play; test na urządzeniu |
+| iOS | Capacitor 7, projekt `mobile/ios` | ⚠️ build na symulator **zbudowany w CI** (macOS runner), nie uruchamiany | konto Apple Developer, podpis, TestFlight/App Store |
 
 ## Uwagi techniczne
 - **Dźwięk** wymaga gestu użytkownika (polityka przeglądarek/WebView) — ekran tytułowy czeka na pierwsze naciśnięcie.
