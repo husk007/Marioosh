@@ -83,13 +83,15 @@ export class Pix {
 }
 
 export function hexToRgb(h: string): [number, number, number] {
+  if (h.startsWith('rgb')) { const m = h.match(/[\d.]+/g) ?? ['0', '0', '0']; return [Math.round(+m[0]), Math.round(+m[1]), Math.round(+m[2])]; }
   const s = h.replace('#', '');
   const n = parseInt(s.length === 3 ? s.split('').map((c) => c + c).join('') : s, 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
+/** Mnożnik jasności: f < 1 przyciemnia (np. 0.7), f > 1 rozjaśnia w stronę bieli (np. 1.25 = +25%). */
 export function shade(h: string, f: number): string {
   const [r, g, b] = hexToRgb(h);
-  const m = (v: number) => Math.max(0, Math.min(255, Math.round(f >= 0 ? v + (255 - v) * f : v * (1 + f))));
+  const m = (v: number) => Math.max(0, Math.min(255, Math.round(f >= 1 ? v + (255 - v) * (f - 1) : v * f)));
   return `rgb(${m(r)},${m(g)},${m(b)})`;
 }
 export function mix(a: string, b: string, t: number): string {
