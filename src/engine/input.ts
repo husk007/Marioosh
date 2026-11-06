@@ -127,7 +127,7 @@ export class Input {
     }
     // menu
     const m = { up: false, down: false, left: false, right: false, ok: false, back: false, pause: false };
-    const anyKey = (...codes: string[]) => codes.some((c) => this.keys.has(c));
+    const anyKey = (...codes: string[]) => codes.some((c) => this.kd(c));   // kd = trzymany LUB nacisnięty od ostatniego kroku (krótkie tapnięcia nie giną)
     const pd = padStates;
     m.up = anyKey('ArrowUp', 'KeyW') || pd.some((p) => p.up);
     m.down = anyKey('ArrowDown', 'KeyS') || pd.some((p) => p.down);

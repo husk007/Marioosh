@@ -1,4 +1,4 @@
-import { runBot } from './bot';
+import { runBot } from '../tests/bot';
 const id = process.argv[2] ?? 'W2-L1';
 let lastRi = 0;
 const r = runBot(id, +(process.argv[3] ?? 60), +(process.argv[4] ?? 0), (w, t) => {

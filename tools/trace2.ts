@@ -1,4 +1,4 @@
-import { runBot } from './bot';
+import { runBot } from '../tests/bot';
 const id = process.argv[2] ?? 'W2-L2'; const x0 = +process.argv[3], x1 = +process.argv[4]; let n = 0;
 runBot(id, 40, 0, (w, t) => {
   const b = w.players[0].mv.body; const tx = b.x / 32;

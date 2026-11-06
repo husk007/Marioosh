@@ -12,3 +12,10 @@ mobile/node_modules/
 mobile/www/
 e2e/out/
 .vite/
+mobile/android/app/src/main/assets/public/
+mobile/android/app/src/main/assets/capacitor.*.json
+mobile/android/capacitor-cordova-android-plugins/
+mobile/ios/App/App/public/
+mobile/ios/App/App/capacitor.config.json
+mobile/ios/App/Pods/
+mobile/ios/DerivedData/

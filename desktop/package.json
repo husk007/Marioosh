@@ -1,0 +1,27 @@
+{
+  "name": "marioosh-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Marioosh & Darioosh: Klątwa Katoblepasa — wersja na Windows i Linux (Electron)",
+  "author": "Erwin Słabuszewski <erwin.slabuszewski@gmail.com>",
+  "license": "MIT",
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "dist:win": "electron-builder --win --x64",
+    "dist:linux": "electron-builder --linux --x64"
+  },
+  "devDependencies": {
+    "electron": "^39.0.0",
+    "electron-builder": "^26.0.0"
+  },
+  "build": {
+    "appId": "pl.husk007.marioosh",
+    "productName": "Marioosh",
+    "artifactName": "Marioosh-${version}-${os}-${arch}.${ext}",
+    "directories": { "output": "out" },
+    "files": ["main.cjs", "app/**/*", "package.json"],
+    "win": { "target": ["nsis", "zip"], "icon": "icon.png" },
+    "linux": { "target": ["AppImage", "deb", "tar.gz"], "category": "Game", "icon": "icon.png", "maintainer": "husk007" }
+  }
+}

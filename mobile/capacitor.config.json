@@ -1,0 +1,10 @@
+{
+  "appId": "pl.husk007.marioosh",
+  "appName": "Marioosh",
+  "webDir": "www",
+  "backgroundColor": "#0b0d1a",
+  "server": { "androidScheme": "https" },
+  "ios": { "contentInset": "never", "backgroundColor": "#0b0d1a" },
+  "android": { "backgroundColor": "#0b0d1a", "allowMixedContent": false },
+  "plugins": { "SplashScreen": { "launchAutoHide": true, "backgroundColor": "#0b0d1a", "showSpinner": false }, "StatusBar": { "overlaysWebView": true, "style": "DARK" } }
+}

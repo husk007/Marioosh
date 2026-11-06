@@ -1,0 +1,132 @@
+name: Release
+# Uruchamia się po wypchnięciu tagu vX.Y.Z (lub ręcznie). Buduje: web (zip), Windows, Linux, Android (APK/AAB), iOS (symulator .app + archiwum).
+on:
+  push: { tags: ['v*'] }
+  workflow_dispatch:
+permissions: { contents: write }
+env:
+  VERSION: ${{ github.ref_name }}
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: cd dist && zip -r ../Marioosh-web-${{ github.ref_name }}.zip .
+      - uses: actions/upload-artifact@v4
+        with: { name: web, path: "Marioosh-web-*.zip" }
+      - uses: actions/upload-artifact@v4
+        with: { name: dist, path: dist }
+
+  desktop:
+    needs: web
+    strategy:
+      matrix:
+        include:
+          - { os: windows-latest, script: dist:win, name: windows }
+          - { os: ubuntu-latest, script: dist:linux, name: linux }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run build
+      - run: node scripts/prepare-desktop.mjs
+      - run: npx playwright-core install chromium
+        if: ${{ !hashFiles('desktop/icon.png') }}
+      - working-directory: desktop
+        run: npm install --no-audit --no-fund
+      - working-directory: desktop
+        run: npm run ${{ matrix.script }}
+        env: { CSC_IDENTITY_AUTO_DISCOVERY: "false" }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.name }}
+          path: |
+            desktop/out/*.exe
+            desktop/out/*.zip
+            desktop/out/*.AppImage
+            desktop/out/*.deb
+            desktop/out/*.tar.gz
+
+  android:
+    needs: web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - uses: android-actions/setup-android@v3
+      - run: npm ci
+      - run: npm run build
+      - run: node scripts/prepare-mobile.mjs
+      - working-directory: mobile
+        run: npm install --no-audit --no-fund && npx cap sync android
+      - name: Ustaw wersję
+        working-directory: mobile/android
+        run: |
+          V="${GITHUB_REF_NAME#v}"; [ -z "$V" ] && V=0.1.0
+          CODE=$(( $(date +%s) / 60 ))
+          sed -i "s/versionCode [0-9]*/versionCode $CODE/; s/versionName \"[^\"]*\"/versionName \"$V\"/" app/build.gradle
+      - name: Zbuduj APK (debug) i AAB/APK (release, niepodpisane)
+        working-directory: mobile/android
+        run: ./gradlew --no-daemon assembleDebug assembleRelease bundleRelease
+      - name: Podpisz (jeśli ustawiono sekrety ANDROID_KEYSTORE_*)
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          mkdir -p out
+          cp mobile/android/app/build/outputs/apk/debug/app-debug.apk out/Marioosh-android-debug.apk
+          if [ -n "$KS_B64" ]; then
+            echo "$KS_B64" | base64 -d > ks.jks
+            BT=$(ls $ANDROID_HOME/build-tools | sort -V | tail -1)
+            $ANDROID_HOME/build-tools/$BT/apksigner sign --ks ks.jks --ks-pass pass:$KS_PASS --ks-key-alias $KEY_ALIAS --out out/Marioosh-android-release.apk mobile/android/app/build/outputs/apk/release/app-release-unsigned.apk
+            cp mobile/android/app/build/outputs/bundle/release/app-release.aab out/Marioosh-android-release.aab
+          else
+            echo "Brak keystore — publikuję tylko APK debug (instalowalny, podpisany kluczem debug)."
+          fi
+      - uses: actions/upload-artifact@v4
+        with: { name: android, path: out }
+
+  ios:
+    needs: web
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run build
+      - run: node scripts/prepare-mobile.mjs
+      - working-directory: mobile
+        run: npm install --no-audit --no-fund && npx cap sync ios
+      - name: Build na symulator (bez podpisu)
+        working-directory: mobile/ios/App
+        run: |
+          xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -sdk iphonesimulator -derivedDataPath build CODE_SIGNING_ALLOWED=NO build
+          mkdir -p ../../../out && cd build/Build/Products/Release-iphonesimulator && zip -r ../../../../../../../out/Marioosh-ios-simulator.zip App.app
+      - uses: actions/upload-artifact@v4
+        with: { name: ios, path: out }
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [web, desktop, android, ios]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: artifacts, pattern: "{web,desktop-*,android,ios}", merge-multiple: true }
+      - run: ls -la artifacts
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
+          generate_release_notes: true
+          draft: false

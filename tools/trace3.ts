@@ -1,4 +1,4 @@
-import { runBot } from './bot';
+import { runBot } from '../tests/bot';
 const id = process.argv[2], T0 = +process.argv[3]; let done = false;
 runBot(id, T0 + 1, 0, (w, t) => {
   if (!done && t > T0) { done = true; const b = w.players[0].mv.body;
