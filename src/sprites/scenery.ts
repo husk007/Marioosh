@@ -277,13 +277,13 @@ function orb(g: G, x: number, y: number, r: number, col: string, hi = 1.3, lo = 
 
 export function parallaxLayer(world: number, layer: 0 | 1 | 2): Img {
   return memo(`bg2:${world}:${layer}`, () => {
-    const t = WORLDS[world] ?? WORLDS[1]; const rng = new Rng(`bg2:${world}:${layer}`);
+    const t = WORLDS[world] ?? WORLDS[1]; const base = new Rng(`bg2:${world}:${layer}`); let rng = base;
     const { c, g } = hiCanvas(VW, VH + 40);
     const haze = [0.62, 0.34, 0.08][layer];
     const tone = (col: string, dk = 1) => mix(shade(col, dk), t.sky2, haze);
     const horizon = [206, 258, 300][layer];
     const sc = [0.8, 1, 1.25][layer];
-    const place = (fn: (x: number) => void, step: number, jitter: number) => { for (let x = -step; x < VW + step; x += step) { const xx = x + rng.range(0, jitter); fn(xx); if (xx > VW - 140) fn(xx - VW); if (xx < 140) fn(xx + VW); } };
+    const place = (fn: (x: number) => void, step: number, jitter: number) => { for (let x = -step; x < VW + step; x += step) { const xx = x + base.range(0, jitter); const seed = `bg2:${world}:${layer}:${Math.round(x)}`; rng = new Rng(seed); fn(xx); if (xx > VW - 140) { rng = new Rng(seed); fn(xx - VW); } if (xx < 140) { rng = new Rng(seed); fn(xx + VW); } } rng = base; };
     switch (t.deco) {
       case 'forest': case 'jungle': {
         const jungle = t.deco === 'jungle';
