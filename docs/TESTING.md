@@ -5,13 +5,13 @@ npm run typecheck      # tsc --noEmit
 npm test               # Vitest (jednostkowe + generator + bot osiągalności) ≈ 2 s
 npm run build && npm run test:e2e   # Playwright (Chromium) — zrzuty w e2e/out/
 ```
-Własna przeglądarka dla e2e: `PW_CHROMIUM=/ścieżka/do/chrome npm run test:e2e`; w CI: `npx playwright install --with-deps chromium`.
+Własna przeglądarka dla e2e: `PW_CHROMIUM=/ścieżka/do/chrome npm run test:e2e`; w CI: `npx playwright-core install --with-deps chromium`.
 
 ## Co pokrywają testy
 | Plik | Zakres |
 |---|---|
 | `tests/movement.test.ts` | kontroler ruchu: skok ≥ 2 i 4 kafelki (kryterium M1) dla obu braci, coyote, bufor skoku, przepaść 8 kafli w biegu, kolizje |
-| `tests/levelgen.test.ts` | 32 poziomy × kontrole: wymiary, spawn, wyjście/arena, budżety (PET/puszki/mieszkańcy), brak przepaści > 6 kafli (z platformami), unikalne id, przewody mają parę |
+| `tests/levelgen.test.ts` | 32 poziomy × kontrole: wymiary, spawn, wyjście/arena, budżety (PET/puszki/mieszkańcy), brak przepaści > 6 kafli (z platformami), unikalne id, przewody mają cel w istniejącym pokoju |
 | `tests/session.test.ts` | licznik opakowań 99/100/101, antyduplikacja, złota puszka, kaucja, limit żyć; zapis/odczyt/migracja/uszkodzony JSON; odblokowania i rekordy |
 | `tests/world.test.ts` | tarcza i nietykalność, śmierć/respawn, stomp, skamienienie (miernik, opóźnienie, zanik, śmierć/posąg), co-op |
 | `tests/i18n.test.ts` | 6 języków: komplet kluczy, brak pustych, zgodne `{parametry}`, RTL tylko arabski, właściwe pismo |
