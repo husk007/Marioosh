@@ -9,7 +9,7 @@ npm run dev                # http://localhost:5173 (generuje podzbiory czcionek 
 npm run build              # dist/  (typecheck + vite build)
 npm run preview
 ```
-`dist/` można wgrać na dowolny hosting statyczny; `base: './'` pozwala na podkatalogi. Workflow **Pages** publikuje `dist/` na GitHub Pages po każdym pushu do `main` (włącz *Settings → Pages → Source: GitHub Actions*).
+`dist/` można wgrać na dowolny hosting statyczny; `base: './'` pozwala na podkatalogi. Workflow **Pages** publikuje `dist/` na GitHub Pages po każdym pushu do `main` (włącz *Settings → Pages → Source: GitHub Actions* i ustaw zmienną repozytorium `PAGES_ENABLED=true`; bez tego job jest pomijany).
 
 ## Windows / Linux (Electron)
 ```bash
