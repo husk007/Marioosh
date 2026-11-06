@@ -29,8 +29,8 @@ async function sheet(name, fn, args = {}) {
 // generyczna siatka: rysuje listę obrazków z podpisami
 const GRID = `function grid(items, cols, cell, scale, bg) {
   const rows = Math.ceil(items.length / cols); const cv = document.createElement('canvas'); cv.width = cols * cell; cv.height = rows * (cell + 14);
-  const x = cv.getContext('2d'); x.imageSmoothingEnabled = false; x.fillStyle = bg || '#2a2440'; x.fillRect(0, 0, cv.width, cv.height);
-  items.forEach((it, i) => { const cx = (i % cols) * cell, cy = Math.floor(i / cols) * (cell + 14); const w = it.img.width * scale, h = it.img.height * scale; const k = Math.min(1, (cell - 8) / w, (cell - 8) / h);
+  const x = cv.getContext('2d'); x.imageSmoothingEnabled = true; x.imageSmoothingQuality = 'high'; x.fillStyle = bg || '#2a2440'; x.fillRect(0, 0, cv.width, cv.height);
+  items.forEach((it, i) => { const cx = (i % cols) * cell, cy = Math.floor(i / cols) * (cell + 14); const ss = it.img.ss || 1; const w = it.img.width / ss * scale, h = it.img.height / ss * scale; const k = Math.min(1, (cell - 8) / w, (cell - 8) / h);
     x.drawImage(it.img, cx + (cell - w * k) / 2, cy + 4 + (cell - 8 - h * k), w * k, h * k); x.fillStyle = '#d8d0f0'; x.font = '10px monospace'; x.textAlign = 'center'; x.fillText(it.label, cx + cell / 2, cy + cell + 8); });
   return cv; }`;
 
@@ -56,13 +56,13 @@ await sheet('przedmioty.png', new Function('return ' + `(art) => { ${GRID}
   return grid(items, 8, 96, 3); }`)());
 
 await sheet('kafelki.png', new Function('return ' + `(art) => {
-  const cv = document.createElement('canvas'); cv.width = 8 * 4 * 36 + 10; cv.height = 8 * 40 + 20; const x = cv.getContext('2d'); x.imageSmoothingEnabled = false; x.fillStyle = '#1b1830'; x.fillRect(0, 0, cv.width, cv.height);
+  const cv = document.createElement('canvas'); cv.width = 8 * 4 * 36 + 10; cv.height = 8 * 40 + 20; const x = cv.getContext('2d'); x.imageSmoothingEnabled = true; x.imageSmoothingQuality = 'high'; x.fillStyle = '#1b1830'; x.fillRect(0, 0, cv.width, cv.height);
   for (let w = 0; w <= 8; w++) { const ts = art.tileset(w); const row = [ts.top[0], ts.top[1], ts.fill[0], ts.oneway, ts.hazard[0], ts.ladder, ts.crumble, ts.cracked, ts.conv[0][0], ts.gate];
     row.forEach((im, i) => x.drawImage(im, 6 + i * 36, 6 + w * 40 - (w > 7 ? 0 : 0), 32, 32)); x.fillStyle = '#d8d0f0'; x.font = '10px monospace'; x.fillText('W' + w, 6 + 10 * 36 + 6, 26 + w * 40); }
   const c2 = document.createElement('canvas'); c2.width = 10 * 36 + 50; c2.height = 9 * 40 + 12; const y = c2.getContext('2d'); y.imageSmoothingEnabled = false; y.drawImage(cv, 0, 0); return c2; }`)());
 
 await sheet('tla.png', new Function('return ' + `(art) => {
-  const cv = document.createElement('canvas'); cv.width = 4 * 322; cv.height = 2 * 182; const x = cv.getContext('2d'); x.imageSmoothingEnabled = false;
+  const cv = document.createElement('canvas'); cv.width = 4 * 322; cv.height = 2 * 182; const x = cv.getContext('2d'); x.imageSmoothingEnabled = true; x.imageSmoothingQuality = 'high';
   for (let w = 1; w <= 8; w++) { const ox = ((w - 1) % 4) * 322 + 1, oy = Math.floor((w - 1) / 4) * 182 + 1; x.save(); x.beginPath(); x.rect(ox, oy, 320, 180); x.clip(); x.translate(ox, oy); x.scale(0.5, 0.5);
     x.drawImage(art.skyImage(w, false), 0, 0, 640, 360); for (const l of [0, 1, 2]) x.drawImage(art.parallaxLayer(w, l), 0, 0); x.restore(); x.fillStyle = '#fff'; x.font = '12px monospace'; x.fillText('Świat ' + w, ox + 6, oy + 16); }
   return cv; }`)());

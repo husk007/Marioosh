@@ -38,17 +38,17 @@ export class TitleScene implements Scene {
   draw(app: App, g: Gfx): void {
     skyBackdrop(g, this.t, 1);
     const ctx = g.ctx;
-    for (let l = 0; l < 3; l++) { const img = parallaxLayer(1, l as 0 | 1 | 2); const ox = -((this.t * (8 + l * 10)) % 640); ctx.globalAlpha = 0.9; ctx.drawImage(img, ox, 0); ctx.drawImage(img, ox + 640, 0); ctx.globalAlpha = 1; }
+    for (let l = 0; l < 3; l++) { const img = parallaxLayer(1, l as 0 | 1 | 2); const ox = -((this.t * (8 + l * 10)) % 640); ctx.globalAlpha = 0.9; ctx.drawImage(img, ox, 0, 640, 400); ctx.drawImage(img, ox + 640, 0, 640, 400); ctx.globalAlpha = 1; }
     g.srect(0, VH - 40, VW, 40, '#2b1f2e'); g.srect(0, VH - 40, VW, 6, '#71c878');
     const bob = Math.sin(this.t * 3) * 2;
-    g.spr(heroSprite('M', 'idle', false), 70, VH - 40 - 96 + bob, { w: 64, h: 96, screen: true });
-    g.spr(heroSprite('D', 'idle', false), VW - 140, VH - 40 - 96 - bob, { w: 64, h: 96, screen: true, flip: true });
+    g.spr(heroSprite('M', 'idle', false), 70, VH - 40 - 96 + bob, { w: 80, h: 96, screen: true });
+    g.spr(heroSprite('D', 'idle', false), VW - 140, VH - 40 - 96 - bob, { w: 80, h: 96, screen: true, flip: true });
     title(g, t('game.title'), 38, g.lang === 'zh' || g.lang === 'ar' ? 15 : 14);
     g.text(t('game.subtitle'), VW / 2, 70, { size: 10, align: 'center', color: '#fff3a0' });
     g.wrap(t('game.tagline'), 500, 7).forEach((ln, i) => g.text(ln, VW / 2, 92 + i * g.lineH(7), { size: 7, align: 'center', color: '#e8e8f0' }));
     if (!this.armed) g.text(app.input.touchEnabled ? t('press.tap') : t('press.start'), VW / 2, 190, { size: 9, align: 'center', color: '#ffd23f', alpha: 0.5 + 0.5 * Math.sin(this.t * 5) });
     else this.menu.draw(g, VW / 2, 146, 27, 280, 9);
-    g.text('v0.1.1', VW - 6, VH - 12, { size: 6, align: 'right', color: '#c8c8d8', shadow: null });
+    g.text('v0.1.2', VW - 6, VH - 12, { size: 6, align: 'right', color: '#c8c8d8', shadow: null });
     g.text(t('fs.hint'), 6, VH - 12, { size: 6, color: '#c8c8d8', shadow: null });
   }
 }

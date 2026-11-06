@@ -1,5 +1,12 @@
 # Zmiany
 
+## 0.1.2
+- **Skoki a bonusy:** wszystkie przedmioty są teraz w zasięgu skoku obu braci (fizyka bez zmian — poprawiono rozmieszczenie: niższe łuki, pokoje bonusowe i tajne). Test jednostkowy pilnuje tego dla wszystkich 32 poziomów.
+- **Poprawka:** przy oddawaniu butelek w EcoPorcie zamiast kwoty pojawiało się „n+” (zła nazwa parametru tłumaczenia). Dodano testy parametrów komunikatów we wszystkich 6 językach.
+- **Nowa oprawa graficzna** (koniec z 8-bitami): bracia według Biblii graficznej (pomarańczowy i niebieski kombinezon), ilustrowane tła z paralaksą i chmurami, kafelki z oświetleniem, przedmioty, skrzynie, bossowie, rekwizyty i wszyscy 19 wrogów rysowani wektorowo w podwójnej rozdzielczości; nowy pasek HUD.
+- **Muzyka:** spokojniejsze tempo, miękkie brzmienia (dzwonki, flet), pad z akordami, delikatne arpeggio, pogłos i echo, łagodniejsza perkusja.
+- Odświeżone grafiki w `docs/art/`.
+
 ## 0.1.1
 - **Tryb testera** (do ręcznego sprawdzenia 7 poziomów poza zasięgiem bota): `?debug=1` w adresie albo 5× dotknięcie numeru wersji na ekranie tytułowym → pozycja „TESTER” w menu → mapa ze wszystkimi poziomami odblokowanymi i „god mode” (przełącznik w pauzie). Dane testera idą do osobnego slotu 9. APK z CI bez keystore ma tryb testera włączony domyślnie (`Marioosh-android-tester.apk`).
 - Poprawka: w buildzie produkcyjnym klawisz F (atak) przełączał pełny ekran (wykrywanie sceny po nazwie klasy psuło minifikacja).

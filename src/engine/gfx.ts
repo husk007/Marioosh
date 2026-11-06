@@ -1,6 +1,21 @@
 import { VH, VW } from '../game/constants';
 
-export type Img = HTMLCanvasElement;
+export type Img = HTMLCanvasElement & { ss?: number };
+
+/** Współczynnik supersamplingu grafiki „ilustrowanej”: obrazy z ss=2 mają 2× więcej pikseli niż ich rozmiar logiczny. */
+export const SS = 2;
+/** Rozmiar logiczny obrazu (w pikselach wirtualnych 640×360), niezależnie od jego rozdzielczości. */
+export function lw(img: Img): number { return img.width / (img.ss ?? 1); }
+export function lh(img: Img): number { return img.height / (img.ss ?? 1); }
+
+/** Kanwa wysokiej rozdzielczości: rysujesz w jednostkach logicznych (liczby zmiennoprzecinkowe), a wynik ma SS× więcej pikseli, z antyaliasingiem. */
+export function hiCanvas(w: number, h: number): { c: Img; g: CanvasRenderingContext2D } {
+  const c = makeCanvas(w * SS, h * SS) as Img; c.ss = SS;
+  const g = c.getContext('2d', { willReadFrequently: true })!;
+  g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+  g.scale(SS, SS);
+  return { c, g };
+}
 
 export function makeCanvas(w: number, h: number): Img {
   const c = document.createElement('canvas');
@@ -100,14 +115,14 @@ export function mix(a: string, b: string, t: number): string {
 }
 
 export function flipped(src: Img): Img {
-  const c = makeCanvas(src.width, src.height);
+  const c = makeCanvas(src.width, src.height) as Img; c.ss = src.ss;
   const g = c.getContext('2d')!;
   g.translate(src.width, 0); g.scale(-1, 1); g.drawImage(src, 0, 0);
   return c;
 }
 
 export function tinted(src: Img, color: string, alpha: number): Img {
-  const c = makeCanvas(src.width, src.height);
+  const c = makeCanvas(src.width, src.height) as Img; c.ss = src.ss;
   const g = c.getContext('2d')!;
   g.drawImage(src, 0, 0);
   g.globalCompositeOperation = 'source-atop';
@@ -185,24 +200,30 @@ export class Gfx {
   spr(img: Img, x: number, y: number, o: { flip?: boolean; alpha?: number; w?: number; h?: number; screen?: boolean; rot?: number; ax?: number; ay?: number } = {}): void {
     const c = this.ctx;
     const px = Math.round(x - (o.screen ? 0 : this.camX)), py = Math.round(y - (o.screen ? 0 : this.camY));
-    const w = o.w ?? img.width, h = o.h ?? img.height;
+    const k = img.ss ?? 1;
+    const w = o.w ?? img.width / k, h = o.h ?? img.height / k;
     if (px > VW + 4 || py > VH + 4 || px + w < -4 || py + h < -4) return;
     if (o.alpha !== undefined) c.globalAlpha = o.alpha;
+    if (k > 1) { c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high'; }
     if (o.flip || o.rot) {
       c.save(); c.translate(px + (o.ax ?? w / 2), py + (o.ay ?? h / 2));
       if (o.rot) c.rotate(o.rot);
       if (o.flip) c.scale(-1, 1);
       c.drawImage(img, -(o.ax ?? w / 2), -(o.ay ?? h / 2), w, h); c.restore();
     } else c.drawImage(img, px, py, w, h);
+    if (k > 1) c.imageSmoothingEnabled = false;
     if (o.alpha !== undefined) c.globalAlpha = 1;
   }
   /** wycinek atlasu */
   sub(img: Img, sx: number, sy: number, sw: number, sh: number, x: number, y: number, o: { flip?: boolean; alpha?: number } = {}): void {
     const c = this.ctx; const px = Math.round(x - this.camX), py = Math.round(y - this.camY);
     if (px > VW || py > VH || px + sw < 0 || py + sh < 0) return;
+    const k = img.ss ?? 1;
     if (o.alpha !== undefined) c.globalAlpha = o.alpha;
-    if (o.flip) { c.save(); c.translate(px + sw, py); c.scale(-1, 1); c.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh); c.restore(); }
-    else c.drawImage(img, sx, sy, sw, sh, px, py, sw, sh);
+    if (k > 1) { c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high'; }
+    if (o.flip) { c.save(); c.translate(px + sw, py); c.scale(-1, 1); c.drawImage(img, sx * k, sy * k, sw * k, sh * k, 0, 0, sw, sh); c.restore(); }
+    else c.drawImage(img, sx * k, sy * k, sw * k, sh * k, px, py, sw, sh);
+    if (k > 1) c.imageSmoothingEnabled = false;
     if (o.alpha !== undefined) c.globalAlpha = 1;
   }
 

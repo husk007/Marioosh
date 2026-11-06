@@ -1,8 +1,8 @@
 /** Rysowanie świata gry (bez HUD). Wszystkie współrzędne w px świata, kamera w gfx.camX/camY. */
-import { Gfx, Img, Pix, makeCanvas, tinted } from '../engine/gfx';
+import { Gfx, Img, Pix, lh, lw, makeCanvas, tinted } from '../engine/gfx';
 import { WORLDS } from '../data/worlds';
 import {
-  BOSS_SIZE, HERO_H, HERO_W, LOOK, OUT, bossSprite, bubbleSprite, cableSprite, checkpointSprite, companionSprite, crateSprite, ecoportSprite, enemySprite, exitSprite,
+  BOSS_SIZE, HERO_H, HERO_W, LOOK, TOP_PAD, cloudLayer, OUT, bossSprite, bubbleSprite, cableSprite, checkpointSprite, companionSprite, crateSprite, ecoportSprite, enemySprite, exitSprite,
   freedSprite, glowImage, heroSprite, itemSprite, lampSprite, lanternSprite, parallaxLayer, pulseSprite, rockSprite, shieldSprite, signSprite, skyImage, sparkSprite,
   statueSprite, switchSprite, tileset, type HeroFrame,
 } from '../sprites/art';
@@ -46,12 +46,14 @@ export function drawWorld(w: World, g: Gfx): void {
 
   // niebo + paralaksa
   ctx.drawImage(skyImage(room.world, room.dark), 0, 0, VW, VH);
+  const clouds = cloudLayer(room.world);
+  if (clouds && !room.dark) { const cw = lw(clouds); const ox = -((g.camX * 0.05 + w.time * 4) % cw + cw) % cw; for (const dx of [0, cw]) ctx.drawImage(clouds, Math.round(ox + dx), 10, cw, lh(clouds)); }
   const parF = [0.12, 0.25, 0.45];
   for (let l = 0; l < 3; l++) {
     const img = parallaxLayer(room.world, l as 0 | 1 | 2);
     const ox = -((g.camX * parF[l]) % 640 + 640) % 640; const oy = -Math.round(g.camY * 0.12 * (l + 1) / 3) - 6;
     ctx.globalAlpha = room.dark ? 0.55 : 0.9;
-    ctx.drawImage(img, Math.round(ox), oy); ctx.drawImage(img, Math.round(ox) + 640, oy); ctx.drawImage(img, Math.round(ox) - 640, oy);
+    const ih = lh(img); ctx.drawImage(img, Math.round(ox), oy, VW, ih); ctx.drawImage(img, Math.round(ox) + 640, oy, VW, ih); ctx.drawImage(img, Math.round(ox) - 640, oy, VW, ih);
     ctx.globalAlpha = 1;
   }
 
@@ -63,7 +65,7 @@ export function drawWorld(w: World, g: Gfx): void {
     const t = rt.tiles[ty * room.w + tx]; if (t === T.EMPTY || t === 20) continue;
     const v = (tx * 7 + ty * 13) % 3; const X = tx * TILE, Y = ty * TILE;
     switch (t) {
-      case T.SOLID: { const above = ty > 0 ? rt.tiles[(ty - 1) * room.w + tx] : T.SOLID; g.spr((above === T.SOLID || above === T.CRACKED || above === T.CABLE || above === T.GATE || above === T.CRUMBLE) ? ts.fill[v] : ts.top[v], X, Y); break; }
+      case T.SOLID: { const above = ty > 0 ? rt.tiles[(ty - 1) * room.w + tx] : T.SOLID; g.spr((above === T.SOLID || above === T.CRACKED || above === T.CABLE || above === T.GATE || above === T.CRUMBLE) ? ts.fill[v] : ts.top[v], X, (above === T.SOLID || above === T.CRACKED || above === T.CABLE || above === T.GATE || above === T.CRUMBLE) ? Y : Y - TOP_PAD); break; }
       case T.ONEWAY: g.spr(ts.oneway, X, Y); break;
       case T.HAZARD: g.spr(ts.hazard[fr], X, Y); break;
       case T.LADDER: g.spr(ts.ladder, X, Y); break;
@@ -94,7 +96,7 @@ export function drawWorld(w: World, g: Gfx): void {
   }
 
   // elementy tła
-  for (const d of rt.decor) { const im = decorImg(d.k, d.state); if (im) g.spr(im, d.x - im.width / 2, d.y - im.height); }
+  for (const d of rt.decor) { const im = decorImg(d.k, d.state); if (im) g.spr(im, d.x - lw(im) / 2, d.y - lh(im)); }
   for (const s of rt.signs) g.spr(signSprite(s.symbol), s.x - 12, s.y - 32);
   for (const l of rt.lamps) g.spr(lampSprite(fr), l.x - 8, l.y - 40);
   for (const l of rt.lanterns) g.spr(lanternSprite(l.lit), l.x - 10, l.y - 28);
@@ -201,7 +203,7 @@ function drawEnemy(g: Gfx, e: Enemy, w: World): void {
   let img = enemySprite(e.kind, Math.floor(e.f * 6), state);
   if (e.hurt > 0 && Math.floor(w.time * 30) % 2 === 0) img = tint(img, '#ffffff', 0.9);
   if (e.stun > 0) img = tint(img, '#7fd6ff', 0.5);
-  const x = e.b.x + e.b.w / 2 - img.width / 2, y = e.b.y + e.b.h - img.height + 3;
+  const x = e.b.x + e.b.w / 2 - lw(img) / 2, y = e.b.y + e.b.h - lh(img) + 3;
   g.spr(img, x, y, { flip: e.dir < 0, alpha: e.dead ? Math.max(0, e.deadT / 0.8) : 1, rot: e.dead ? e.deadT * 6 : 0 });
   if (e.st === 'alert' || e.st === 'flash' || e.st === 'open') g.rect(e.b.x + e.b.w / 2 - 2, y - 12, 4, 8, '#ff4a3a'), g.rect(e.b.x + e.b.w / 2 - 2, y - 2, 4, 3, '#ff4a3a');
   void L;

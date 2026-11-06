@@ -82,7 +82,7 @@ export class MapScene implements Scene {
       g.ctx.fillStyle = !open ? '#3a3a4a' : rec?.done ? '#3fbf5a' : th.accent; g.ctx.beginPath(); g.ctx.arc(x, 230, sel ? 17 : 12, 0, Math.PI * 2); g.ctx.fill();
       g.ctx.strokeStyle = sel ? '#fff' : '#0c0a18'; g.ctx.lineWidth = 2; g.ctx.stroke();
       g.text(this.world === 0 ? '0' : st === 4 ? '★' : String(st), x, 223, { size: 9, align: 'center', color: open ? '#0c0a18' : '#8a8a9a', shadow: null });
-      if (sel && open) g.spr(heroSprite(s.data.brother, 'idle', false), x - 16, 230 - 48 - 14 + Math.sin(this.tt * 4) * 2, { screen: true });
+      if (sel && open) g.spr(heroSprite(s.data.brother, 'idle', false), x - 20, 230 - 48 - 14 + Math.sin(this.tt * 4) * 2, { screen: true });
     }
     // opis wybranego poziomu
     const id = this.world === 0 ? 'W0' : levelId(this.world, this.stage); const rec = s.data.levels[id];

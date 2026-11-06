@@ -42,8 +42,8 @@ class PagesScene implements Scene {
 }
 
 const heroes = (g: Gfx, x: number, y: number, tt: number, flipD = false) => {
-  g.spr(heroSprite('M', 'idle', false), x, y + Math.sin(tt * 3) * 2, { w: 64, h: 96, screen: true });
-  g.spr(heroSprite('D', 'idle', false), x + 70, y - Math.sin(tt * 3) * 2, { w: 64, h: 96, screen: true, flip: flipD });
+  g.spr(heroSprite('M', 'idle', false), x, y + Math.sin(tt * 3) * 2, { w: 80, h: 96, screen: true });
+  g.spr(heroSprite('D', 'idle', false), x + 70, y - Math.sin(tt * 3) * 2, { w: 80, h: 96, screen: true, flip: flipD });
 };
 const floor = (g: Gfx, col = '#2b1f2e') => { g.srect(0, 200, VW, 40, col); g.srect(0, 200, VW, 5, '#8d93a0'); };
 const swirl = (g: Gfx, cx: number, cy: number, tt: number) => { for (let i = 0; i < 40; i++) { const a = tt * 3 + i * 0.5, r = 6 + i * 3; g.srect(cx + Math.cos(a) * r, cy + Math.sin(a) * r * 0.6, 4, 4, i % 2 ? '#7fd6ff' : '#ffd23f', 1 - i / 45); } };

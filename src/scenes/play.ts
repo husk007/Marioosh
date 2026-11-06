@@ -135,15 +135,15 @@ export class PlayScene implements Scene {
   // ------------------------------------------------------------------ HUD
   private drawHud(app: App, g: Gfx): void {
     const w = this.world; const s = app.session!; const ctx = g.ctx;
-    g.srect(0, 0, VW, 30, '#000', 0.35);
+    { const hg = ctx.createLinearGradient(0, 0, 0, 30); hg.addColorStop(0, 'rgba(10,8,24,0.78)'); hg.addColorStop(1, 'rgba(10,8,24,0.42)'); ctx.fillStyle = hg; ctx.fillRect(0, 0, VW, 30); g.srect(0, 30, VW, 1, '#ffffff', 0.18); g.srect(0, 31, VW, 1, '#000000', 0.25); }
     // życia
     w.players.forEach((p, i) => {
       const li = s.coop ? i : 0; const x = i === 0 ? 8 : 8 + 120;
-      ctx.drawImage(heartIcon('life', p.brother), x, 4);
+      g.spr(heartIcon('life', p.brother), x, 4, { screen: true });
       g.text('×' + s.data.lives[li], x + 20, 7, { size: 8, color: p.dead ? '#ff6a5a' : '#fff' });
       const U = p.upg[p.brother]; let ix = x + 58;
-      if (U.shield) { ctx.drawImage(heartIcon('shield'), ix, 4); ix += 17; }
-      if (U.coil) { ctx.drawImage(heartIcon('coil'), ix, 4); ix += 17; }
+      if (U.shield) { g.spr(heartIcon('shield'), ix, 4, { screen: true }); ix += 17; }
+      if (U.coil) { g.spr(heartIcon('coil'), ix, 4, { screen: true }); ix += 17; }
       for (const [k, v, max] of [['magnet', U.magnet, 20], ['extender', U.extender, 15], ['gloves', U.gloves, 12], ['star', U.star, 12]] as const) {
         if (v > 0) { ctx.drawImage(itemSprite(k), ix, 4, 14, 14); g.srect(ix, 20, 14 * (v / max), 2, '#ffd23f'); ix += 17; }
       }
@@ -155,8 +155,8 @@ export class PlayScene implements Scene {
     g.text(String(tl), VW / 2, 12, { size: 10, align: 'center', color: tl < 30 && Math.floor(w.time * 4) % 2 === 0 ? '#ff6a5a' : '#fff' });
     // opakowania, kaucja, punkty
     const rx = VW - 8;
-    ctx.drawImage(heartIcon('pet'), rx - 236, 3); g.text(String(s.run.pets), rx - 218, 7, { size: 8 });
-    ctx.drawImage(heartIcon('can'), rx - 186, 3); g.text(String(s.run.cans), rx - 168, 7, { size: 8 });
+    g.spr(heartIcon('pet'), rx - 236, 3, { screen: true }); g.text(String(s.run.pets), rx - 218, 7, { size: 8 });
+    g.spr(heartIcon('can'), rx - 186, 3, { screen: true }); g.text(String(s.run.cans), rx - 168, 7, { size: 8 });
     g.text(`${(s.data.depositGrosze / 100).toFixed(2)} ${t('hud.zl')}`, rx - 142, 4, { size: 7, color: '#8aff9a' });
     g.text(String(s.score).padStart(7, '0'), rx, 4, { size: 7, align: 'right' });
     g.text(`${s.packages % 100}/100`, rx, 16, { size: 6, align: 'right', color: '#c8c8d8', shadow: null });
