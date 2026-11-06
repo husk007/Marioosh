@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DICTS, LANGS, RTL_LANGS, setLang, t } from '../src/engine/i18n';
 
@@ -37,5 +39,27 @@ describe('i18n: 6 języków', () => {
       const same = keys.filter((k) => DICTS[l][k] === DICTS.en[k] && DICTS.en[k].length > 24);
       expect(same.length, `${l}: ${same.slice(0, 5).join(', ')}`).toBeLessThan(keys.length * 0.03);
     }
+  });
+});
+
+describe('parametry komunikatów', () => {
+  it('toast.eco przyjmuje {n} we wszystkich językach (regresja „n+”)', () => {
+    for (const l of LANGS) {
+      setLang(l);
+      const out = t('toast.eco', { n: '1.50' });
+      expect(out, l).toContain('1.50');
+      expect(out, l).not.toContain('{');
+    }
+    setLang('pl');
+  });
+  it('parametry przekazywane w say(...) zgadzają się z placeholderami w słowniku', () => {
+    const src = ['world.ts', 'bosses.ts'].map((f) => readFileSync(join(__dirname, '../src/game', f), 'utf8')).join('\n');
+    const re = /say\('([\w.]+)',\s*\{([^}]*)\}\)/g; let m: RegExpExecArray | null; let n = 0;
+    while ((m = re.exec(src))) {
+      const names = [...m[2].matchAll(/(\w+)\s*:/g)].map((x) => x[1]).sort().join(',');
+      for (const l of LANGS) for (const need of ph(DICTS[l][m[1]] ?? '').split(',').filter(Boolean)) expect(names.split(','), `${l}:${m[1]}`).toContain(need);
+      n++;
+    }
+    expect(n).toBeGreaterThan(3);
   });
 });

@@ -27,6 +27,8 @@ class RoomB {
   oneway(x0: number, w: number, row: number) { for (let x = x0; x < x0 + w; x++) this.set(x, row, T.ONEWAY); }
   /** wiersz powierzchni (pierwszy kafelek lity lub jednokierunkowy od rows ≥ from) */
   surface(x: number, from = 7): number { for (let y = from; y < this.h; y++) { const t = this.get(x, y); if (t === T.SOLID || t === T.ONEWAY || t === T.CRUMBLE || t === T.CONVL || t === T.CONVR || t === T.CABLE || t === T.GATE || t === T.CRACKED) return y; } return -1; }
+  /** powierzchnia, na której da się stanąć (bez bramek i kabli, które znikają/otwierają się) */
+  ground1(x: number, from = 7): number { for (let y = from; y < this.h; y++) { const t = this.get(x, y); if (t === T.SOLID || t === T.ONEWAY || t === T.CRUMBLE || t === T.CONVL || t === T.CONVR || t === T.CRACKED) return y; } return -1; }
   toRoom(world: number, name: string, dark: boolean, spawn: { x: number; y: number }): Room {
     return { w: this.w, h: this.h, tiles: this.tiles, water: this.water, specs: this.specs, world, dark, name, spawn };
   }
@@ -167,9 +169,17 @@ function bonusRoom(rng: Rng, cans: number, levelId: string, _from: { x: number; 
   const W = 30, b = new RoomB(W, ROWS);
   b.ground(0, W, 12);
   b.block(0, 0, 1, 12); b.block(W - 1, 0, 1, 12);
-  for (let i = 0; i < cans; i++) {
-    const x = 5 + (i % 20), row = 10 - Math.floor(Math.sin((i % 20) / 20 * Math.PI) * 3) - (i >= 20 ? 3 : 0);
-    b.specs.push({ t: 'item', k: i % 3 === 0 ? 'pet' : 'can', x: P(x) + 16, y: P(row) + 8, id: `${tag}:bonus${idx}:${i}` });
+  // Wysokości dobrane do skoku braci (apex ≈ 77 px dla Marioosha): puszki co najwyżej ~88 px nad podłożem
+  // lub na niskiej półce (64 px nad podłożem), skąd znów sięga się ~88 px w górę.
+  b.oneway(8, 8, 10);
+  const slots: Array<{ x: number; row: number }> = [];
+  for (let x = 5; x <= 24; x++) {
+    if (x >= 8 && x <= 15) continue;
+    slots.push({ x, row: 10 - (x % 3 === 1 ? 1 : 0) });
+  }
+  for (let x = 8; x <= 15; x++) { slots.push({ x, row: 9 }); slots.push({ x, row: 8 }); }
+  for (let i = 0; i < cans && i < slots.length; i++) {
+    b.specs.push({ t: 'item', k: i % 3 === 0 ? 'pet' : 'can', x: P(slots[i].x) + 16, y: P(slots[i].row) + 8, id: `${tag}:bonus${idx}:${i}` });
   }
   b.specs.push({ t: 'ecoport', x: P(26), y: P(12), broken: false, id: `${tag}:eco${idx}`, fuses: [] });
   void levelId; void rng;
@@ -179,7 +189,7 @@ function bonusRoom(rng: Rng, cans: number, levelId: string, _from: { x: number; 
 function secretRoom(world: number, tag: string, idx: number, withNote: boolean, cans: number): Room {
   const W = 24, b = new RoomB(W, ROWS);
   b.ground(0, W, 12); b.block(0, 0, 1, 12); b.block(W - 1, 0, 1, 12);
-  for (let i = 0; i < cans; i++) b.specs.push({ t: 'item', k: i % 5 === 0 ? 'pet' : 'can', x: P(4 + (i % 16)) + 16, y: P(9 - Math.floor(i / 16)) + 8, id: `${tag}:sec${idx}:${i}` });
+  for (let i = 0; i < cans; i++) b.specs.push({ t: 'item', k: i % 5 === 0 ? 'pet' : 'can', x: P(4 + (i % 16)) + 16, y: P(10 - Math.floor(i / 16)) + 8, id: `${tag}:sec${idx}:${i}` });
   if (withNote) {
     b.specs.push({ t: 'item', k: 'note', x: P(12) + 16, y: P(10) + 8, id: `note:${world}` });
     b.specs.push({ t: 'item', k: 'signet', x: P(16) + 16, y: P(10) + 8, id: `signet:${world}` });
@@ -478,22 +488,22 @@ function placePickups(b: RoomB, rng: Rng, j: LevelJson, id: string, skip: [numbe
     const gx = Math.round(start + gi * stride + rng.range(0, Math.max(0, stride - size - 1)));
     for (let i = 0; i < size; i++) {
       const xi = gx + i; if (skip.some(([a, c]) => xi >= a && xi <= c)) { continue; }
-      const s0 = b.surface(xi); let row: number;
+      const s0 = b.ground1(xi); let row: number;
       if (s0 < 0) {            // przepaść: łuk
-        let l = xi, r = xi; while (l > 0 && b.surface(l) < 0) l--; while (r < b.w - 1 && b.surface(r) < 0) r++;
-        const ref = Math.min(b.surface(l) < 0 ? 12 : b.surface(l), b.surface(r) < 0 ? 12 : b.surface(r));
-        row = ref - 2 - Math.sin(((xi - l) / Math.max(1, r - l)) * Math.PI) * 1.5;
+        let l = xi, r = xi; while (l > 0 && b.ground1(l) < 0) l--; while (r < b.w - 1 && b.ground1(r) < 0) r++;
+        const ref = Math.min(b.ground1(l) < 0 ? 12 : b.ground1(l), b.ground1(r) < 0 ? 12 : b.ground1(r));
+        row = ref - 2 - Math.sin(((xi - l) / Math.max(1, r - l)) * Math.PI) * 1.0;
       } else row = s0 - 2 - (gi % 3 === 2 && id !== 'W1-L1' ? 1 : 0);
       b.specs.push({ t: 'item', k: bag[n++], x: P(xi) + 16, y: Math.round(P(row)) + 8, id: `${id}:i${g++}` });
     }
   });
   // opakowania, które trafiły w strefy pominięte — dokładamy na początku poziomu, by budżet się zgadzał
   let fx = start;
-  while (n < total) { const s1 = b.surface(fx); if (s1 > 0 && !skip.some(([a, c]) => fx >= a && fx <= c)) b.specs.push({ t: 'item', k: bag[n++], x: P(fx) + 16, y: P(s1 - 2) + 8, id: `${id}:i${g++}` }); fx++; if (fx > b.w - 14) fx = start; if (g > total * 6) break; }
+  while (n < total) { const s1 = b.ground1(fx); if (s1 > 0 && !skip.some(([a, c]) => fx >= a && fx <= c)) b.specs.push({ t: 'item', k: bag[n++], x: P(fx) + 16, y: P(s1 - 2) + 8, id: `${id}:i${g++}` }); fx++; if (fx > b.w - 14) fx = start; if (g > total * 6) break; }
   // złote puszki
   for (let i = 0; i < j.collectibles.golden_cans; i++) {
     const m = /x=(\d+)/.exec(j.special + ' ' + j.secret); const gx = m ? parseInt(m[1], 10) : Math.round(b.w * 0.7);
-    let sx = Math.min(b.w - 12, Math.max(12, gx)); const rowS = b.surface(sx);
+    let sx = Math.min(b.w - 12, Math.max(12, gx)); const rowS = b.ground1(sx);
     if (rowS > 0) { b.oneway(sx - 1, 2, rowS - 2); b.specs.push({ t: 'item', k: 'golden', x: P(sx) + 16, y: P(rowS - 3) + 8, id: `${id}:g${i}` }); }
     else b.specs.push({ t: 'item', k: 'golden', x: P(sx) + 16, y: P(9), id: `${id}:g${i}` });
   }

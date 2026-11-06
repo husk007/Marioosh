@@ -476,7 +476,7 @@ export class World {
     const gr = this.session.deposit(); e.flash = 1;
     this.sfx('ecoport');
     if (!e.used) { e.used = true; this.session.addScore(500); }
-    this.say('toast.eco', { zl: (gr / 100).toFixed(2) });
+    this.say('toast.eco', { n: (gr / 100).toFixed(2) });
   }
   private freeStatue(s: StatueEnt, p: PlayerEnt): void {
     s.freed = true; s.t = 0; this.sfx('free'); this.events.push({ t: 'caption', key: 'caption.free' });
