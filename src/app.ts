@@ -19,6 +19,7 @@ export interface Scene {
 }
 
 function readDebug(): boolean {
+  if ((globalThis as { __MARIOOSH_DEBUG?: boolean }).__MARIOOSH_DEBUG === true) return true;   // wymuszenie przez stronę-hosta (np. strona testera)
   if ((import.meta as { env?: Record<string, string> }).env?.VITE_DEBUG === '1') return true;
   try {
     const q = new URLSearchParams(location.search).get('debug');
