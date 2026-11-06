@@ -25,6 +25,7 @@ jobs:
   desktop:
     needs: web
     strategy:
+      fail-fast: false
       matrix:
         include:
           - { os: windows-latest, script: dist:win, name: windows }
