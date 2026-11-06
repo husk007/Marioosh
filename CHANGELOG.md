@@ -1,5 +1,8 @@
 # Zmiany
 
+## 0.1.3
+- **Skrzynki:** przedmiot wybity ze skrzynki zostawał na wiszącej skrzynce (~138 px nad ziemią, poza zasięgiem skoku). Teraz wyskakuje w bok i spada na ziemię obok; skrzynki ukryte i w wieży (W6-L2) są umieszczone tak, by dało się je uderzyć. Test symuluje otwarcie każdej z 114 skrzynek.
+
 ## 0.1.2
 - **Skoki a bonusy:** wszystkie przedmioty są teraz w zasięgu skoku obu braci (fizyka bez zmian — poprawiono rozmieszczenie: niższe łuki, pokoje bonusowe i tajne). Test jednostkowy pilnuje tego dla wszystkich 32 poziomów.
 - **Poprawka:** przy oddawaniu butelek w EcoPorcie zamiast kwoty pojawiało się „n+” (zła nazwa parametru tłumaczenia). Dodano testy parametrów komunikatów we wszystkich 6 językach.

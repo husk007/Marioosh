@@ -538,15 +538,22 @@ export class World {
     this.rt.tiles[c.ty * this.rt.grid.w + c.tx] = T.SOLID;
     this.sfx('crate'); this.burst(c.tx * TILE + 16, c.ty * TILE + 6, '#d89a3a', 8, 110);
     const ghost = this.persistent(c.k) && this.session.collected.has(c.id);
-    this.rt.items.push({ id: c.id, kind: c.k, x: c.tx * TILE + 16, y: c.ty * TILE - 8, vy: -150, taken: false, ghost, t: 0, popT: 0.35, fixed: false });
-    void p;
+    // przedmiot wyskakuje ze skrzynki w bok i spada na ziemię obok — inaczej leżałby na wiszącej skrzynce, poza zasięgiem skoku
+    const g = this.rt.grid; const sup = (tx: number, row: number): boolean => { for (let r = row; r < g.h; r++) { const t = tileAt(g, tx, r); if (t === T.SOLID || t === T.ONEWAY || t === T.CRUMBLE || t === T.CRACKED || t === T.CONVL || t === T.CONVR) return true; } return false; };
+    const open = (dir: number): boolean => { const t = tileAt(g, c.tx + dir, c.ty); return t !== T.SOLID && t !== T.CRACKED && sup(c.tx + dir, c.ty + 1); };
+    const pref = px(p.mv.body) < c.tx * TILE + 16 ? 1 : -1;      // odlatuje od strony, z której uderzono
+    const dir = open(pref) ? pref : open(-pref) ? -pref : 0;
+    this.rt.items.push({ id: c.id, kind: c.k, x: c.tx * TILE + 16, y: c.ty * TILE - 8, vy: dir ? -230 : -150, vx: dir * 110, taken: false, ghost, t: 0, popT: 0.35, fixed: false, home: { x: c.tx * TILE + 16, y: c.ty * TILE - 10 } });
   }
 
   private updateItems(dt: number): void {
     const rt = this.rt;
     for (const it of rt.items) {
       if (it.taken) continue; it.t += dt;
-      if (!it.fixed) { it.vy += 700 * dt; it.y += it.vy * dt; const t = tileAt(rt.grid, Math.floor(it.x / TILE), Math.floor((it.y + 10) / TILE)); if (it.vy > 0 && (t === T.SOLID || t === T.ONEWAY)) { it.y = Math.floor((it.y + 10) / TILE) * TILE - 10; it.vy = 0; it.fixed = true; } }
+      const above = !!it.home && !!it.vx && Math.abs(it.x - it.home.x) < 17 && it.y <= it.home.y + 6; // jeszcze nad własną skrzynką
+      if (!it.fixed && it.vx) { const nx = it.x + it.vx * dt; const wall = above ? T.EMPTY : tileAt(rt.grid, Math.floor((nx + Math.sign(it.vx) * 8) / TILE), Math.floor(it.y / TILE)); if (wall === T.SOLID || wall === T.CRACKED) it.vx = 0; else it.x = nx; it.vx *= Math.exp(-3 * dt); }
+      if (!it.fixed && it.home && it.y > rt.grid.h * TILE + 40) { it.x = it.home.x; it.y = it.home.y; it.vy = 0; it.vx = 0; it.fixed = true; }   // zabezpieczenie: nigdy nie gub przedmiotu w przepaści
+      if (!it.fixed) { it.vy += 700 * dt; it.y += it.vy * dt; const t = tileAt(rt.grid, Math.floor(it.x / TILE), Math.floor((it.y + 10) / TILE)); if (it.vy > 0 && !above && (t === T.SOLID || t === T.ONEWAY || t === T.CRACKED || t === T.CRUMBLE || t === T.CONVL || t === T.CONVR)) { it.y = Math.floor((it.y + 10) / TILE) * TILE - 10; it.vy = 0; it.vx = 0; it.fixed = true; } }
       if (it.popT > 0) { it.popT -= dt; continue; }
       for (const p of this.players) {
         if (p.dead || p.downed || p.tele) continue; const b = p.mv.body; const U = p.upg[p.brother];

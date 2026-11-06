@@ -32,7 +32,7 @@ export interface Enemy {
   a: number; c: number; d: number; lastSwing: number; grounded: boolean; flying: boolean;
 }
 
-export interface Item { id: string; kind: ItemKind; x: number; y: number; vy: number; taken: boolean; ghost: boolean; t: number; popT: number; fixed: boolean }
+export interface Item { id: string; kind: ItemKind; x: number; y: number; vy: number; taken: boolean; ghost: boolean; t: number; popT: number; fixed: boolean; vx?: number; home?: { x: number; y: number } }
 export interface Crate { id: string; k: ItemKind; tx: number; ty: number; hidden: boolean; revealed: boolean; used: boolean; bump: number }
 export interface CableEnt { id: string; color: CableColor; tx: number; ty: number; face: 'up' | 'down'; dest?: Dest; warp?: string; locked: boolean; gate?: string; hidden: boolean; revealed: boolean; symbol?: number }
 export interface StatueEnt { id: string; idx: number; x: number; y: number; freed: boolean; t: number; ghost: boolean }

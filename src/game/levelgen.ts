@@ -512,7 +512,7 @@ function placePickups(b: RoomB, rng: Rng, j: LevelJson, id: string, skip: [numbe
 // ---------------------------------------------------------------- ulepszenia (skrzynki)
 function placePowerups(b: RoomB, rng: Rng, j: LevelJson, id: string, world: number, endX: number) {
   const place = (k: ItemKind, x: number, hidden: boolean, tag: string) => {
-    const s = b.surface(x); if (s < 0) return; if (b.get(x, s - 4) !== T.EMPTY || b.get(x, s - 3) !== T.EMPTY) return;
+    const s = b.ground1(x); if (s < 0) return; if (b.get(x, s - 4) !== T.EMPTY || b.get(x, s - 3) !== T.EMPTY) return;
     if (b.specs.some((q) => q.t === 'cable' && Math.abs(q.x / TILE - x) < 3)) return;
     b.specs.push({ t: 'crate', k, x: P(x), y: P(s - 4), hidden, id: `${id}:${tag}` });
   };
@@ -554,10 +554,10 @@ function placeSecrets(b: RoomB, rng: Rng, j: LevelJson, id: string, world: numbe
   }
   // niewidoczna skrzynka (1UP lub ulepszenie)
   const hid = /Niewidoczn/i.test(j.secret) && nums.length ? nums[0] : Math.round(b.w * 0.5) + rng.int(-4, 4);
-  const hs = b.surface(hid); if (hs > 3 && b.get(hid, hs - 4) === T.EMPTY && b.get(hid, hs - 3) === T.EMPTY) b.specs.push({ t: 'crate', k: /Gwiazd/.test(j.secret) ? 'star' : /Bezpiecznik/.test(j.secret) ? 'xl' : 'battery', x: P(hid), y: P(hs - 4), hidden: true, id: `${id}:hid` });
-  else { const alt = flatNear(Math.round(b.w * 0.5)); if (alt > 0) b.specs.push({ t: 'crate', k: 'battery', x: P(alt), y: P(b.surface(alt) - 4), hidden: true, id: `${id}:hid` }); }
+  const hs = b.ground1(hid); if (hs > 3 && b.get(hid, hs - 4) === T.EMPTY && b.get(hid, hs - 3) === T.EMPTY) b.specs.push({ t: 'crate', k: /Gwiazd/.test(j.secret) ? 'star' : /Bezpiecznik/.test(j.secret) ? 'xl' : 'battery', x: P(hid), y: P(hs - 4), hidden: true, id: `${id}:hid` });
+  else { const alt = flatNear(Math.round(b.w * 0.5)); if (alt > 0) b.specs.push({ t: 'crate', k: 'battery', x: P(alt), y: P(b.ground1(alt) - 4), hidden: true, id: `${id}:hid` }); }
   // Gwiazda Napięcia w 1-3 oraz wybranych poziomach — jako dodatkowa widoczna skrzynka
-  if (/Gwiazd/.test(j.secret)) { const sx = nums[0] ?? Math.round(b.w * 0.58); const ss = b.surface(sx); if (ss > 3) b.specs.push({ t: 'crate', k: 'star', x: P(sx), y: P(ss - 4), hidden: false, id: `${id}:star` }); }
+  if (/Gwiazd/.test(j.secret)) { const sx = nums[0] ?? Math.round(b.w * 0.58); const ss = b.ground1(sx); if (ss > 3) b.specs.push({ t: 'crate', k: 'star', x: P(sx), y: P(ss - 4), hidden: false, id: `${id}:star` }); }
   // 8. fragment kryształu — ukryty w 8-3 (Sala Tysiąca Posągów)
   if (id === 'W8-L3') { const sx = flatNear(Math.round(b.w * 0.8)); if (sx > 0) b.specs.push({ t: 'item', k: 'shard', x: P(sx) + 16, y: P(b.surface(sx) - 2) + 8, id: 'shard:8' }); }
   void world;
@@ -648,7 +648,18 @@ function buildTower(j: LevelJson, rng: Rng, style: Style) {
   }
   if (j.collectibles.golden_cans) { const p = at(0.7); b.specs.push({ t: 'item', k: 'golden', x: P(p.x0 + 1) + 16, y: P(p.row - 3) + 8, id: `${id}:g0` }); }
   b.specs.push({ t: 'crate', k: 'xl', x: P(6), y: P(base - 4), hidden: false, id: `${id}:xl` });
-  b.specs.push({ t: 'crate', k: 'battery', x: P(W - 3), y: P(plats[Math.floor(plats.length / 2)].row - 4), hidden: true, id: `${id}:hid` });
+  { // ukryta skrzynka nad półką pośrodku wieży — tak, by dało się ją uderzyć ze stojącego miejsca i by nic jej nie zasłaniało
+    let hx = -1, hr = -1;
+    for (let i = Math.floor(plats.length / 2); i < plats.length - 3 && hx < 0; i++) {
+      const p = plats[i]; if (p.row === base) continue;
+      for (let x = p.x0 + 1; x < p.x0 + p.w - 1; x++) {
+        const clear = [1, 2].every((d) => { const q = plats[i + d]; return !q || x + 1 < q.x0 || x - 1 > q.x0 + q.w - 1; });
+        if (clear) { hx = x; hr = p.row - 4; break; }
+      }
+    }
+    if (hx < 0) { const p = plats[Math.floor(plats.length / 2)]; hx = p.x0 + 1; hr = p.row - 4; }
+    b.specs.push({ t: 'crate', k: 'battery', x: P(hx), y: P(hr), hidden: true, id: `${id}:hid` });
+  }
   b.specs.push({ t: 'platform', x: P(W - 5), y: P(base), w: 2, mode: 'v', range: P(30), speed: 55, offset: 0 });
   for (const [name, cnt] of Object.entries(j.enemy_budget)) {
     const k = ENEMY_BY_NAME[name]; if (!k) continue;
