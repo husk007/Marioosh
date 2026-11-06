@@ -19,9 +19,32 @@
     "appId": "pl.husk007.marioosh",
     "productName": "Marioosh",
     "artifactName": "Marioosh-${version}-${os}-${arch}.${ext}",
-    "directories": { "output": "out" },
-    "files": ["main.cjs", "app/**/*", "package.json"],
-    "win": { "target": ["nsis", "zip"], "icon": "icon.png" },
-    "linux": { "target": ["AppImage", "deb", "tar.gz"], "category": "Game", "icon": "icon.png", "maintainer": "husk007" }
-  }
+    "directories": {
+      "output": "out"
+    },
+    "files": [
+      "main.cjs",
+      "app/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "icon": "icon.png"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb",
+        "tar.gz"
+      ],
+      "category": "Game",
+      "icon": "icon.png",
+      "maintainer": "husk007"
+    }
+  },
+  "homepage": "https://github.com/husk007/Marioosh",
+  "repository": "github:husk007/Marioosh"
 }
