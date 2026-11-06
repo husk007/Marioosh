@@ -539,7 +539,7 @@ export class World {
     this.sfx('crate'); this.burst(c.tx * TILE + 16, c.ty * TILE + 6, '#d89a3a', 8, 110);
     const ghost = this.persistent(c.k) && this.session.collected.has(c.id);
     // przedmiot wyskakuje ze skrzynki w bok i spada na ziemię obok — inaczej leżałby na wiszącej skrzynce, poza zasięgiem skoku
-    const g = this.rt.grid; const sup = (tx: number, row: number): boolean => { for (let r = row; r < g.h; r++) { const t = tileAt(g, tx, r); if (t === T.SOLID || t === T.ONEWAY || t === T.CRUMBLE || t === T.CRACKED || t === T.CONVL || t === T.CONVR) return true; } return false; };
+    const g = this.rt.grid; const sup = (tx: number, row: number): boolean => { for (let r = row; r < g.h; r++) { const t = tileAt(g, tx, r); if (t === T.SOLID || t === T.ONEWAY || t === T.CONVL || t === T.CONVR) return true; if (t !== T.EMPTY && t !== T.LADDER && t !== T.CABLE && t !== T.GATE) return false; } return false; }; // tylko trwałe podłoże (kruche mosty, kolce i pęknięte bloki nie liczą się)
     const open = (dir: number): boolean => { const t = tileAt(g, c.tx + dir, c.ty); return t !== T.SOLID && t !== T.CRACKED && sup(c.tx + dir, c.ty + 1); };
     const pref = px(p.mv.body) < c.tx * TILE + 16 ? 1 : -1;      // odlatuje od strony, z której uderzono
     const dir = open(pref) ? pref : open(-pref) ? -pref : 0;

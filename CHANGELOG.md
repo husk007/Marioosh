@@ -1,5 +1,8 @@
 # Zmiany
 
+## 0.1.4
+- **Skrzynki nad kruchymi mostami (np. W5-L1):** przedmiot mógł wylądować na znikającym moście albo obok niego i wpaść w przepaść. Skrzynki stawiane są teraz tylko nad trwałym podłożem (z trwałym podłożem także po obu stronach), a przedmiot wyskakuje wyłącznie na stałą ziemię. Test sprawdza to dla wszystkich 128 skrzynek.
+
 ## 0.1.3
 - **Skrzynki:** przedmiot wybity ze skrzynki zostawał na wiszącej skrzynce (~138 px nad ziemią, poza zasięgiem skoku). Teraz wyskakuje w bok i spada na ziemię obok; skrzynki ukryte i w wieży (W6-L2) są umieszczone tak, by dało się je uderzyć. Test symuluje otwarcie każdej z 114 skrzynek.
 

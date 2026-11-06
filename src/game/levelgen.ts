@@ -29,6 +29,10 @@ class RoomB {
   surface(x: number, from = 7): number { for (let y = from; y < this.h; y++) { const t = this.get(x, y); if (t === T.SOLID || t === T.ONEWAY || t === T.CRUMBLE || t === T.CONVL || t === T.CONVR || t === T.CABLE || t === T.GATE || t === T.CRACKED) return y; } return -1; }
   /** powierzchnia, na której da się stanąć (bez bramek i kabli, które znikają/otwierają się) */
   ground1(x: number, from = 7): number { for (let y = from; y < this.h; y++) { const t = this.get(x, y); if (t === T.SOLID || t === T.ONEWAY || t === T.CRUMBLE || t === T.CONVL || t === T.CONVR || t === T.CRACKED) return y; } return -1; }
+  /** trwałe podłoże (nie znika ani się nie kruszy) */
+  stable(x: number, from = 7): boolean { for (let y = from; y < this.h; y++) { const t = this.get(x, y); if (t === T.SOLID || t === T.ONEWAY || t === T.CONVL || t === T.CONVR) return true; if (t !== T.EMPTY && t !== T.LADDER && t !== T.CABLE && t !== T.GATE) return false; } return false; }
+  /** czy nad kolumną x można postawić skrzynkę: stałe podłoże pod skrzynką i po obu stronach, skąd przedmiot spadnie na ziemię */
+  crateOK(x: number): boolean { const s = this.ground1(x); return s > 3 && this.stable(x, s) && this.stable(x - 1, s - 3) && this.stable(x + 1, s - 3); }
   toRoom(world: number, name: string, dark: boolean, spawn: { x: number; y: number }): Room {
     return { w: this.w, h: this.h, tiles: this.tiles, water: this.water, specs: this.specs, world, dark, name, spawn };
   }
@@ -512,7 +516,7 @@ function placePickups(b: RoomB, rng: Rng, j: LevelJson, id: string, skip: [numbe
 // ---------------------------------------------------------------- ulepszenia (skrzynki)
 function placePowerups(b: RoomB, rng: Rng, j: LevelJson, id: string, world: number, endX: number) {
   const place = (k: ItemKind, x: number, hidden: boolean, tag: string) => {
-    const s = b.ground1(x); if (s < 0) return; if (b.get(x, s - 4) !== T.EMPTY || b.get(x, s - 3) !== T.EMPTY) return;
+    const x0 = x; x = ((): number => { for (let d = 0; d <= 10; d++) for (const g of d ? [-d, d] : [0]) if (b.crateOK(x0 + g)) return x0 + g; return x0; })(); const s = b.ground1(x); if (s < 0) return; if (b.get(x, s - 4) !== T.EMPTY || b.get(x, s - 3) !== T.EMPTY) return;
     if (b.specs.some((q) => q.t === 'cable' && Math.abs(q.x / TILE - x) < 3)) return;
     b.specs.push({ t: 'crate', k, x: P(x), y: P(s - 4), hidden, id: `${id}:${tag}` });
   };
@@ -553,11 +557,12 @@ function placeSecrets(b: RoomB, rng: Rng, j: LevelJson, id: string, world: numbe
     if (!addCable('yellow', yx, rs.length - 1, true, 'yellow')) rs.pop();
   }
   // niewidoczna skrzynka (1UP lub ulepszenie)
-  const hid = /Niewidoczn/i.test(j.secret) && nums.length ? nums[0] : Math.round(b.w * 0.5) + rng.int(-4, 4);
+  const hid0 = /Niewidoczn/i.test(j.secret) && nums.length ? nums[0] : Math.round(b.w * 0.5) + rng.int(-4, 4);
+  const hid = ((): number => { for (let d = 0; d <= 10; d++) for (const g of d ? [-d, d] : [0]) if (b.crateOK(hid0 + g) && !b.specs.some((q) => q.t === 'cable' && Math.abs(q.x / TILE - (hid0 + g)) < 2)) return hid0 + g; return hid0; })();
   const hs = b.ground1(hid); if (hs > 3 && b.get(hid, hs - 4) === T.EMPTY && b.get(hid, hs - 3) === T.EMPTY) b.specs.push({ t: 'crate', k: /Gwiazd/.test(j.secret) ? 'star' : /Bezpiecznik/.test(j.secret) ? 'xl' : 'battery', x: P(hid), y: P(hs - 4), hidden: true, id: `${id}:hid` });
   else { const alt = flatNear(Math.round(b.w * 0.5)); if (alt > 0) b.specs.push({ t: 'crate', k: 'battery', x: P(alt), y: P(b.ground1(alt) - 4), hidden: true, id: `${id}:hid` }); }
   // Gwiazda Napięcia w 1-3 oraz wybranych poziomach — jako dodatkowa widoczna skrzynka
-  if (/Gwiazd/.test(j.secret)) { const sx = nums[0] ?? Math.round(b.w * 0.58); const ss = b.ground1(sx); if (ss > 3) b.specs.push({ t: 'crate', k: 'star', x: P(sx), y: P(ss - 4), hidden: false, id: `${id}:star` }); }
+  if (/Gwiazd/.test(j.secret)) { const sx0 = nums[0] ?? Math.round(b.w * 0.58); const sx = ((): number => { for (let d = 0; d <= 10; d++) for (const g of d ? [-d, d] : [0]) if (b.crateOK(sx0 + g)) return sx0 + g; return sx0; })(); const ss = b.ground1(sx); if (ss > 3) b.specs.push({ t: 'crate', k: 'star', x: P(sx), y: P(ss - 4), hidden: false, id: `${id}:star` }); }
   // 8. fragment kryształu — ukryty w 8-3 (Sala Tysiąca Posągów)
   if (id === 'W8-L3') { const sx = flatNear(Math.round(b.w * 0.8)); if (sx > 0) b.specs.push({ t: 'item', k: 'shard', x: P(sx) + 16, y: P(b.surface(sx) - 2) + 8, id: 'shard:8' }); }
   void world;

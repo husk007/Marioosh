@@ -40,6 +40,10 @@ describe('przedmioty wybite ze skrzynek', () => {
             if (!SUP.has(g.tiles[r * g.w + itx + dx])) continue;
             if (r * 32 - it.y <= REACH - 10 && r * 32 >= y0 - 4) ok = true; break;
           }
+          const under = g.tiles[Math.floor((it.y + 12) / 32) * g.w + itx];
+          if (under !== T.SOLID && under !== T.ONEWAY && under !== T.CONVL && under !== T.CONVR) bad.push(`${id}#${ri} ${c.id}: przedmiot leży na nietrwałym podłożu (kafel ${under})`);
+          const own = g.tiles[(ground / 32) * g.w + c.tx];
+          if (own !== T.SOLID && own !== T.ONEWAY && own !== T.CONVL && own !== T.CONVR) bad.push(`${id}#${ri} ${c.id}: pod skrzynką nietrwałe podłoże (kafel ${own})`);
           if (!it.fixed || !ok) bad.push(`${id}#${ri} ${c.id}: przedmiot na ${Math.round(it.y)} bez stojalnej powierzchni w zasięgu skoku`);
         }
       }
