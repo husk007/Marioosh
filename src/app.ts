@@ -14,11 +14,25 @@ export interface Scene {
   leave?(app: App): void;
   /** czy rysować przyciski dotykowe */
   touchUI?: boolean;
+  /** scena, w której klawisz F nie przełącza pełnego ekranu (np. F = atak) */
+  noFsKey?: boolean;
 }
+
+function readDebug(): boolean {
+  if ((import.meta as { env?: Record<string, string> }).env?.VITE_DEBUG === '1') return true;
+  try {
+    const q = new URLSearchParams(location.search).get('debug');
+    if (q === '1') localStorage.setItem('marioosh.debug', '1'); else if (q === '0') localStorage.removeItem('marioosh.debug');
+    return localStorage.getItem('marioosh.debug') === '1';
+  } catch { return false; }
+}
+export function setDebugEnabled(on: boolean): void { try { if (on) localStorage.setItem('marioosh.debug', '1'); else localStorage.removeItem('marioosh.debug'); } catch { /* */ } }
 
 export class App {
   g: Gfx; input: Input; audio = new AudioEngine(); settings: Settings = loadSettings();
   session: Session | null = null;
+  /** tryb testera (ukryty): wybór dowolnego poziomu, opcjonalny „god mode”; włączany ?debug=1 lub 5× dotknięciem numeru wersji */
+  debug = { enabled: readDebug(), god: true };
   scene!: Scene; time = 0; private acc = 0; private last = 0; tapFx: { x: number; y: number; t: number } | null = null;
   private unlocked = false;
 
@@ -33,7 +47,7 @@ export class App {
     });
     document.addEventListener('visibilitychange', () => { if (document.hidden) this.audio.duck(true); else this.audio.duck(false); });
   }
-  private allowFsKey(): boolean { return (this.scene as { name?: string })?.constructor?.name !== 'PlayScene' && (this.scene as { name?: string })?.constructor?.name !== 'KeysScene'; }
+  private allowFsKey(): boolean { return !this.scene?.noFsKey; }
 
   unlockAudio(): void { if (!this.unlocked) { this.unlocked = true; this.audio.unlock(); } }
 

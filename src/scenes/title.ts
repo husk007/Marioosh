@@ -5,15 +5,21 @@ import { VH, VW } from '../game/constants';
 import { heroSprite, parallaxLayer } from '../sprites/art';
 import { Menu, skyBackdrop, title } from './ui';
 import { SlotScene, SettingsScene } from './menus';
+import { setDebugEnabled } from '../app';
+import { MapScene } from './map';
+import { Session } from '../game/session';
+import { TESTER_SLOT, testerSave } from '../game/save';
+import { LEVEL_IDS } from '../game/levels';
 
 export class TitleScene implements Scene {
-  menu!: Menu; armed = false; t = 0;
+  menu!: Menu; armed = false; t = 0; verTaps = 0; verT = 0;
   enter(app: App): void {
     this.menu = new Menu([
       { label: () => t('menu.play'), action: () => app.setScene(new SlotScene()) },
       { label: () => t('menu.settings'), action: () => app.setScene(new SettingsScene(() => new TitleScene())) },
       { label: () => t('menu.credits'), action: () => app.setScene(new CreditsScene()) },
       { label: () => t('menu.fullscreen'), action: () => app.toggleFullscreen() },
+      ...(app.debug.enabled ? [{ label: () => 'TESTER: wybór poziomów (god mode)', action: () => { app.session = new Session(testerSave(LEVEL_IDS), TESTER_SLOT); app.input.menu.ok = false; app.setScene(new MapScene('W3-L4')); } }] : []),
       {
         label: () => `◀  ${t('lang.name')}  ▶`, fontLang: () => app.settings.lang,
         action: (d = 1) => { const i = LANGS.indexOf(app.settings.lang as never); app.settings.lang = LANGS[(i + (d || 1) + LANGS.length) % LANGS.length]; app.applySettings(); app.audio.sfx('menu'); },
@@ -22,7 +28,9 @@ export class TitleScene implements Scene {
     app.session = null; app.audio.music('title');
   }
   update(app: App, dt: number): void {
-    this.t += dt;
+    this.t += dt; this.verT -= dt; if (this.verT <= 0) this.verTaps = 0;
+    const tp = app.input.menu.tap;
+    if (this.armed && tp && tp.x > VW - 90 && tp.y > VH - 28) { this.verTaps++; this.verT = 3; if (this.verTaps >= 5) { setDebugEnabled(!app.debug.enabled); app.debug.enabled = !app.debug.enabled; app.setScene(new TitleScene()); return; } }
     if (!this.armed) { if (app.input.anyActivity || app.input.menu.ok || app.input.menu.tap) { this.armed = true; app.unlockAudio(); app.audio.music('title'); app.audio.sfx('select'); app.input.anyActivity = false; } return; }
     if (app.input.menu.back) return;
     this.menu.update(app);
@@ -40,7 +48,7 @@ export class TitleScene implements Scene {
     g.wrap(t('game.tagline'), 500, 7).forEach((ln, i) => g.text(ln, VW / 2, 92 + i * g.lineH(7), { size: 7, align: 'center', color: '#e8e8f0' }));
     if (!this.armed) g.text(app.input.touchEnabled ? t('press.tap') : t('press.start'), VW / 2, 190, { size: 9, align: 'center', color: '#ffd23f', alpha: 0.5 + 0.5 * Math.sin(this.t * 5) });
     else this.menu.draw(g, VW / 2, 146, 27, 280, 9);
-    g.text('v0.1.0', VW - 6, VH - 12, { size: 6, align: 'right', color: '#c8c8d8', shadow: null });
+    g.text('v0.1.1', VW - 6, VH - 12, { size: 6, align: 'right', color: '#c8c8d8', shadow: null });
     g.text(t('fs.hint'), 6, VH - 12, { size: 6, color: '#c8c8d8', shadow: null });
   }
 }

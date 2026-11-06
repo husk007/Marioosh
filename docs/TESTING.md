@@ -20,8 +20,15 @@ Własna przeglądarka dla e2e: `PW_CHROMIUM=/ścieżka/do/chrome npm run test:e2
 
 ## Bot osiągalności i jego granice
 Bot (`tests/bot.ts`) biegnie w prawo, skacze przez przeszkody/przepaści, włącza przełączniki, używa przewodów, a w zagadce W8-L2 wybiera właściwy przewód. Przechodzi **25 z 32** poziomów. Pozostałe **7** są jawnie oznaczone jako `skip` w `tests/reach.test.ts` z powodem:
-`W3-L4` (lądowanie na wysepce), `W6-L2` (tryb wieży), `W7-L1…L4`, `W8-L4`. To granice *bota*, nie dowód, że poziom jest nieprzejezdny — **wymagają testu ręcznego** (zalecane: grać je z włączonym kodem `god` w konsoli: `__app` → scena rozgrywki → `world.god = true`).
+`W3-L4` (lądowanie na wysepce), `W6-L2` (tryb wieży), `W7-L1…L4`, `W8-L4`. To granice *bota*, nie dowód, że poziom jest nieprzejezdny — **wymagają testu ręcznego** (patrz niżej).
 Narzędzia diagnostyczne: `npx vite-node tools/trace.ts W2-L1 60`, `tools/dbg.ts` (ASCII-dump planszy: `npx vite-node tools/dbg.ts W2-L1 30 80`).
 
 ## Czego nie testowano
 Natywnych paczek (Electron, Android, iOS), urządzeń dotykowych, padów, dźwięku (słuchowo), balansu trudności, pełnego przejścia gry przez człowieka, walk z bossami (poza dotarciem do areny i testami jednostkowymi reguł).
+
+## Tryb testera (ręczne sprawdzenie poziomów)
+- **Web:** otwórz grę z `?debug=1` (np. `http://localhost:5173/?debug=1`) albo 5× dotknij/kliknij numer wersji w prawym dolnym rogu ekranu tytułowego (powtórzenie wyłącza tryb).
+- **Android:** `Marioosh-android-tester.apk` z wydania/CI ma tryb włączony od początku (build bez keystore).
+- Na ekranie tytułowym pojawia się pozycja **TESTER: wybór poziomów (god mode)** → mapa z odblokowanymi wszystkimi poziomami i Pradowem. Dane idą do osobnego slotu 9 (nie ruszają zapisów gracza).
+- „God mode” (domyślnie włączony): wrogowie, pociski i bossowie nie ranią; kolce i przepaście nadal zabijają. Przełącznik w menu pauzy.
+- Do sprawdzenia: **W3-L4** (wysepka po skoku z platformy), **W6-L2** (wieża — czy da się wspiąć do wyjścia), **W7-L1…L4**, **W8-L4**. Szukaj: miejsc bez wyjścia, niemożliwych skoków, zablokowanych bram bez dostępnego przełącznika, braku checkpointu, błędów kamery. Zgłaszaj id poziomu + pozycję (kafelek x) — bot daje ją przez `npx vite-node tools/trace.ts <id>`.

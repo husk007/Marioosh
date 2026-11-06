@@ -69,7 +69,10 @@ jobs:
       - name: Licencje Android SDK (SDK jest preinstalowany na runnerze)
         run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
       - run: npm ci
-      - run: npm run build
+      - name: Build web (bez keystore = APK testowy z menu wyboru poziomów i god mode)
+        run: npm run build
+        env:
+          VITE_DEBUG: ${{ secrets.ANDROID_KEYSTORE_BASE64 == '' && '1' || '' }}
       - run: node scripts/prepare-mobile.mjs
       - working-directory: mobile
         run: npm install --no-audit --no-fund && npx cap sync android
@@ -89,7 +92,7 @@ jobs:
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
           mkdir -p out
-          cp mobile/android/app/build/outputs/apk/debug/app-debug.apk out/Marioosh-android-debug.apk
+          cp mobile/android/app/build/outputs/apk/debug/app-debug.apk out/Marioosh-android-$([ -z "$KS_B64" ] && echo tester || echo debug).apk
           if [ -n "$KS_B64" ]; then
             echo "$KS_B64" | base64 -d > ks.jks
             BT=$(ls $ANDROID_HOME/build-tools | sort -V | tail -1)

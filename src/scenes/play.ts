@@ -9,6 +9,7 @@ import { drawWorld } from '../game/worldDraw';
 import { heartIcon, itemSprite } from '../sprites/art';
 import { Menu, panel, title } from './ui';
 import { MapScene } from './map';
+import { TESTER_SLOT } from '../game/save';
 import { GameOverScene } from './gameover';
 import { EndingScene } from './story';
 import { TitleScene } from './title';
@@ -17,7 +18,7 @@ import { ACTIONS } from '../engine/settings';
 interface Toast { text: string; t: number; max: number }
 
 export class PlayScene implements Scene {
-  touchUI = true;
+  touchUI = true; noFsKey = true;
   world!: World; toasts: Toast[] = []; caption: Toast | null = null;
   paused = false; pauseMenu!: Menu; helpOpen = false;
   result: { lines: [string, string][]; t: number; scarlet?: string; next: () => void } | null = null;
@@ -32,12 +33,14 @@ export class PlayScene implements Scene {
     const night = s.data.night;
     this.world = new World(getLevel(this.levelId, night), s, { audio: app.audio, settings: app.settings, night });
     app.input.coop = s.coop;
+    const tester = s.slot === TESTER_SLOT; if (tester) this.world.god = app.debug.god;
     this.pauseMenu = new Menu([
       { label: () => t('pause.resume'), action: () => { this.paused = false; } },
       { label: () => t('pause.checkpoint'), action: () => { this.paused = false; this.world.retryFromCheckpoint(); } },
       { label: () => t('pause.help'), action: () => { this.helpOpen = true; } },
       { label: () => t('pause.map'), action: () => { s.persist(s.run.time); app.setScene(new MapScene(this.levelId)); } },
       { label: () => t('pause.menu'), action: () => { s.persist(s.run.time); app.setScene(new TitleScene()); } },
+      ...(tester ? [{ label: () => 'TESTER: god mode ' + (this.world.god ? 'ON' : 'OFF'), action: () => { this.world.god = !this.world.god; app.debug.god = this.world.god; } }] : []),
     ]);
     this.setMusic(app);
   }

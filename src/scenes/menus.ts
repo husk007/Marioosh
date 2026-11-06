@@ -108,6 +108,7 @@ export class SettingsScene implements Scene {
 }
 
 export class KeysScene implements Scene {
+  noFsKey = true;
   menu!: Menu; waiting = -1; tt = 0;
   constructor(public player: 0 | 1, public back: () => Scene) {}
   enter(app: App): void {

@@ -85,3 +85,11 @@ export function completion(d: SaveData): number {
   const lv = Object.values(d.levels).filter((l) => l.done).length / 32;
   return Math.round((lv * 40 + (d.freed.length / 96) * 30 + (d.shards.length / 8) * 15 + (d.notes.length / 8) * 15));
 }
+
+/** Slot techniczny trybu testera (poza 3 zwykłymi slotami): wszystko odblokowane. */
+export const TESTER_SLOT = 9;
+export function testerSave(levelIds: string[]): SaveData {
+  const d = newSave('solo', 'M'); d.unlockedWorld = 8; d.pradowoUnlocked = true; d.lives = [9, 9];
+  for (const id of levelIds) d.levels[id] = { done: true, bestScore: 0, bestTime: 0, pets: 0, cans: 0, golden: 0, freed: 0 };
+  d.currentLevel = levelIds[0] ?? 'W1-L1'; return d;
+}

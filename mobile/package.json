@@ -1,6 +1,6 @@
 {
   "name": "marioosh-mobile",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Marioosh & Darioosh — powłoka Capacitor dla Androida i iOS",
   "license": "MIT",
@@ -16,5 +16,7 @@
     "@capacitor/status-bar": "^7.0.0",
     "@capacitor/splash-screen": "^7.0.0"
   },
-  "devDependencies": { "@capacitor/cli": "^7.0.0" }
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.0"
+  }
 }
