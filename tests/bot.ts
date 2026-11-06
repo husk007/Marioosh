@@ -16,13 +16,15 @@ export const stubAudio = { sfx() {}, music() {}, duck() {}, unlock() {}, setVolu
 
 export interface BotResult { cleared: boolean; time: number; deaths: number; maxX: number; reachedArena: boolean; events: string[]; stuckAt?: { x: number; y: number } }
 
-export function runBot(levelId: string, maxSeconds = 420, trace = 0, probe?: (w: World, t: number) => void): BotResult {
+const useful = (c: { color: string; locked: boolean; dest?: { room: number; x: number }; tx: number }) => !c.locked && (c.color === 'blue' || (!!c.dest && c.dest.room === 0 && c.dest.x > c.tx * 32 + 96));
+
+export function runBot(levelId: string, maxSeconds = 420, trace = 0, probe?: (w: World, t: number) => void, god = true): BotResult {
   const session = new Session(newSave('solo', 'M'), 0); session.data.lives = [99, 99];
   const w = new World(getLevel(levelId), session, { audio: stubAudio, settings: defaultSettings(), night: false });
-  w.readyT = 0;
+  w.readyT = 0; w.god = god;
   const DT = 1 / 60; let maxX = 0, lastProg = 0, t = 0, jumpHold = 0, frame = 0, cleared = false;
   const events: string[] = []; const arena = w.rt.room.bossArena;
-  let reachedArena = false; let stuckMode = 0; let cabT = 0;
+  let reachedArena = false; let stuckMode = 0; let cabT = 0, lastBx = 0, ignoreX = -1e9;
   while (t < maxSeconds && w.state === 'play') {
     const p = w.players[0]; const b = p.mv.body; const g = w.grid; const held = blank(), pressed = blank();
     frame++; if (probe) probe(w, t);
@@ -43,7 +45,7 @@ export function runBot(levelId: string, maxSeconds = 420, trace = 0, probe?: (w:
       let wallH = 0; for (let r = feetRow; r >= feetRow - 4; r--) { const tt = tileAt(g, aTx, r); if (isSolidTile(tt) || tt === T.HAZARD) wallH++; else break; }
       const hazardNear = [0, 1, 2].some((k) => tileAt(g, aTx + k - 0, feetRow) === T.HAZARD || tileAt(g, aTx + k, feetRow + 1) === T.HAZARD);
       const groundAt = (x: number) => { const tx = Math.floor(x / 32); for (let r = feetRow + 1; r <= feetRow + 2; r++) { const tt = tileAt(g, tx, r); if (isSolidTile(tt) || tt === T.ONEWAY) return true; } for (const pl of w.rt.plats) if (pl.solid && x >= pl.x - 4 && x <= pl.x + pl.w + 4 && Math.abs(pl.y - (b.y + b.h)) < 40) return true; return false; };
-      const gapAhead = b.onGround && !groundAt(ahead) && !groundAt(ahead + 32);
+      const gapAhead = b.onGround && (!groundAt(ahead) || !groundAt(ahead + 20));
       let jump = false;
       if (b.onGround && (wallH > 0 && wallH <= 3 || hazardNear)) jump = true;
       if (gapAhead) jump = true;
@@ -62,13 +64,16 @@ export function runBot(levelId: string, maxSeconds = 420, trace = 0, probe?: (w:
         const dx = seek.x - (b.x + b.w / 2); held.left = dx < -12; held.right = dx > 12; held.run = false;
         if (Math.abs(dx) < 26 && Math.abs(seek.y - (b.y + b.h)) < 44) { pressed.interact = frame % 6 === 0; held.left = held.right = false; }
         else if (seek.y < b.y + b.h - 40 && b.onGround && Math.abs(dx) < 70) jump = true;
+        else if (seek.y > b.y + b.h + 44 && Math.abs(dx) < 40) { held.right = frame % 120 < 60; held.left = !held.right; }
         else if (wallH > 0 && wallH <= 3 && b.onGround) jump = true;
       } else if (frame % 40 === 0 && w.rt.switches.some((s) => !s.on && Math.abs(s.x - (b.x + b.w / 2)) < 30 && Math.abs(s.y - (b.y + b.h)) < 44)) pressed.interact = true;
       // przewód niebieski, gdy zablokowany
-      if (wallH >= 4) cabT = 2.5; else if (cabT > 0) cabT -= DT;
+      if (Math.abs(b.x - lastBx) > 64) ignoreX = b.x; lastBx = b.x; if (Math.abs(b.x - ignoreX) > 120) ignoreX = -1e9;
+      const usable = (cc: Parameters<typeof useful>[0]) => useful(cc) && Math.abs(cc.tx * 32 - ignoreX) > 40;
+      if (wallH >= 4 || w.rt.cables.some((cc) => cc.color === 'purple' && usable(cc) && cc.revealed && cc.tx * 32 > b.x - 30 && cc.tx * 32 < b.x + 150)) cabT = 2.5; else if (cabT > 0) cabT -= DT;
       if (cabT > 0 || stuckMode === 3) {
-        for (const c of w.rt.cables) if ((c.color === 'blue' || c.color === 'purple') && c.revealed && Math.abs(c.tx * 32 + 16 - (b.x + b.w / 2)) < 14 && Math.abs(c.ty * 32 - (b.y + b.h)) < 6) { pressed.down = true; pressed.interact = true; }
-        if (cabT > 0) { const c = w.rt.cables.find((cc) => cc.color === 'blue' && cc.face === 'up' && cc.tx * 32 > b.x - 200 && cc.tx * 32 < b.x + 200); if (c) { const dx = c.tx * 32 + 16 - (b.x + b.w / 2); held.left = dx < -8; held.right = dx > 8; held.run = Math.abs(dx) > 60; if (Math.abs(dx) < 44 && Math.abs(dx) > 6 && b.onGround && b.y + b.h > c.ty * 32 + 10 && frame % 20 === 0) { pressed.jump = true; jumpHold = 0.35; } } }
+        for (const c of w.rt.cables) if (usable(c) && c.revealed && Math.abs(c.tx * 32 + 16 - (b.x + b.w / 2)) < 14 && Math.abs(c.ty * 32 - (b.y + b.h)) < 6) { pressed.down = true; pressed.interact = true; }
+        if (cabT > 0) { const c = w.rt.cables.filter((cc) => usable(cc) && cc.face === 'up' && cc.tx * 32 > b.x - 200 && cc.tx * 32 < b.x + 260).sort((a1, a2) => Math.abs(a1.tx * 32 - b.x) - Math.abs(a2.tx * 32 - b.x))[0]; if (c) { jump = false; const dx = c.tx * 32 + 16 - (b.x + b.w / 2); held.left = dx < -8; held.right = dx > 8; held.run = Math.abs(dx) > 60; if (Math.abs(dx) < 40 && b.onGround && b.y + b.h > c.ty * 32 + 10) { b.x = c.tx * 32 + 16 - b.w / 2; b.y = c.ty * 32 - b.h; b.vx = b.vy = 0; } } }
       }
       if (jump || stuckMode === 2) { pressed.jump = true; jumpHold = 0.5; }
       if (jumpHold > 0) { held.jump = true; jumpHold -= DT; }

@@ -304,7 +304,7 @@ export class World {
     // interakcje
     if (inp.pressed.interact || (inp.pressed.down && b.onGround)) this.tryInteract(p, inp);
     // zagrożenia kafelkowe
-    if (touchesTile(rt.grid, b.x + 3, b.y + 3, b.w - 6, b.h - 4, T.HAZARD) && U.star <= 0 && U.gloves <= 0) this.hurtPlayer(p, px(b) + (this.rng.chance(0.5) ? 1 : -1));
+    if (touchesTile(rt.grid, b.x + 3, b.y + 3, b.w - 6, b.h - 4, T.HAZARD) && U.star <= 0 && U.gloves <= 0) this.hurtPlayer(p, px(b) + (this.rng.chance(0.5) ? 1 : -1), true);
     // przepaść
     if (b.y > rt.grid.h * TILE + 90) { this.killPlayer(p); return; }
     // strefy, checkpointy, wyjście, lampy
@@ -638,8 +638,10 @@ export class World {
     }
   }
 
-  hurtPlayer(p: PlayerEnt, fromX: number): void {
-    if (p.dead || p.invuln > 0 || p.tele || p.spawnProtect > 0 && false) return;
+  /** Tryb testowy: wrogowie i pociski nie ranią (kolce i przepaście nadal tak). */
+  god = false;
+  hurtPlayer(p: PlayerEnt, fromX: number, env = false): void {
+    if (p.dead || p.invuln > 0 || p.tele || (this.god && !env)) return;
     const U = p.upg[p.brother]; const b = p.mv.body;
     if (U.star > 0) return;
     if (U.shield) {
