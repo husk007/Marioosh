@@ -38,14 +38,18 @@ const promptOf = (a) => `${a.prompt_en}\nAVOID (must not appear): ${a.negative_p
 async function gen(a) {
   const body = { model, prompt: promptOf(a), size: sizeFor(a), quality, n: 1, background: bg(a), output_format: 'png' };
   if (dry) { console.log(`[dry] ${a.asset_id} ${a.name} ${body.size} bg=${body.background} q=${quality} prompt=${body.prompt.length}zn`); return null; }
+  let last = '';
   for (let t = 0; t < 5; t++) {
     const r = await fetch(base + '/images/generations', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key }, body: JSON.stringify(body) });
     if (r.ok) { const j = await r.json(); const b64 = j.data?.[0]?.b64_json; if (!b64) throw new Error('brak b64_json'); return Buffer.from(b64, 'base64'); }
-    const txt = (await r.text()).slice(0, 300);
-    if (r.status === 429 || r.status >= 500) { await new Promise((s) => setTimeout(s, 2000 * 2 ** t)); continue; }
-    throw new Error(`HTTP ${r.status}: ${txt}`);   // 400/401/403: nie ponawiaj (np. weryfikacja organizacji, zły klucz, polityka treści)
+    const txt = (await r.text()).slice(0, 400);
+    last = `HTTP ${r.status}: ${txt}`;
+    // 429 z insufficient_quota/billing = brak środków na koncie: ponawianie nic nie da
+    if (/insufficient_quota|billing_hard_limit|exceeded your current quota/i.test(txt)) throw new Error(last + '  [BRAK ŚRODKÓW / LIMIT NA KONCIE — doładuj saldo w platform.openai.com → Billing]');
+    if (r.status === 429 || r.status >= 500) { console.log(`  ponowienie ${t + 1}/5 po ${last}`); await new Promise((s) => setTimeout(s, 2000 * 2 ** t)); continue; }
+    throw new Error(last);   // 400/401/403: nie ponawiaj (np. weryfikacja organizacji, zły klucz, polityka treści)
   }
-  throw new Error('zbyt wiele ponowień');
+  throw new Error('zbyt wiele ponowień; ostatni błąd: ' + last);
 }
 
 const manifestPath = join(outDir, 'manifest.json');
@@ -60,7 +64,7 @@ async function worker() {
       mkdirSync(dirname(pathOf(a)), { recursive: true }); writeFileSync(pathOf(a), png);
       manifest[a.asset_id] = { name: a.name, category: a.category, size: sizeFor(a), quality, model, file: `${a.category}/${a.asset_id}.png` };
       ok++; console.log('ok  ', a.asset_id, a.name);
-    } catch (e) { fail++; console.log('FAIL', a.asset_id, a.name, '-', e.message); if (/HTTP 40[13]/.test(e.message)) { i = list.length; } }
+    } catch (e) { fail++; console.log('FAIL', a.asset_id, a.name, '-', e.message); if (/HTTP 40[13]|BRAK ŚRODKÓW/.test(e.message)) { i = list.length; } }
   }
 }
 await Promise.all(Array.from({ length: conc }, worker));
