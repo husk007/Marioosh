@@ -1,6 +1,7 @@
 /** Rysowanie świata gry (bez HUD). Wszystkie współrzędne w px świata, kamera w gfx.camX/camY. */
 import { Gfx, Img, Pix, lh, lw, makeCanvas, tinted } from '../engine/gfx';
 import { WORLDS } from '../data/worlds';
+import { hdBackground } from '../sprites/hd';
 import {
   BOSS_SIZE, HERO_H, HERO_W, LOOK, TOP_PAD, cloudLayer, OUT, bossSprite, bubbleSprite, cableSprite, checkpointSprite, companionSprite, crateSprite, ecoportSprite, enemySprite, exitSprite,
   freedSprite, glowImage, heroSprite, itemSprite, lampSprite, lanternSprite, parallaxLayer, pulseSprite, rockSprite, shieldSprite, signSprite, skyImage, sparkSprite,
@@ -45,7 +46,7 @@ export function drawWorld(w: World, g: Gfx): void {
   g.camX = Math.round(w.cam.x + sx); g.camY = Math.round(w.cam.y + sy);
 
   // niebo + paralaksa
-  ctx.drawImage(skyImage(room.world, room.dark), 0, 0, VW, VH);
+  ctx.drawImage(hdBackground(room.world) ?? skyImage(room.world, room.dark), 0, 0, VW, VH);
   const clouds = cloudLayer(room.world);
   if (clouds && !room.dark) { const cw = lw(clouds); const ox = -((g.camX * 0.05 + w.time * 4) % cw + cw) % cw; for (const dx of [0, cw]) ctx.drawImage(clouds, Math.round(ox + dx), 10, cw, lh(clouds)); }
   const parF = [0.12, 0.25, 0.45];

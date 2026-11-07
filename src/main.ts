@@ -1,5 +1,6 @@
 import { App } from './app';
 import { loadFonts } from './engine/gfx';
+import { preloadHDArt } from './sprites/hd';
 import { TitleScene } from './scenes/title';
 import { PlayScene } from './scenes/play';
 import { Session } from './game/session';
@@ -9,6 +10,7 @@ import { LEVEL_IDS } from './game/levels';
 async function boot(): Promise<void> {
   const canvas = document.getElementById('game') as HTMLCanvasElement;
   try { await loadFonts(); } catch { /* użyj czcionki zapasowej */ }
+  await preloadHDArt();
   const app = new App(canvas);
   (window as unknown as { __app: App }).__app = app;      // hak dla testów e2e
   // hak dla tooli deweloperskich/e2e: od razu uruchamia poziom w trybie testera (tylko przy włączonym debugu)

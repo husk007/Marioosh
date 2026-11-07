@@ -10,6 +10,7 @@ import { stylize } from './style';
 import { drawItem, drawCrate, drawCable, drawIcon } from './objects';
 import { drawBoss } from './bosses';
 import { drawEnemy } from './enemies';
+import { hdEnemySprite } from './hd';
 import { drawBubble, drawCheckpoint, drawCompanion, drawEcoport, drawExit, drawFreed, drawLamp, drawLantern, drawPulse, drawRock, drawScarlet, drawSign, drawSpark, drawStatue, drawSwitch } from './props';
 
 const cache = new Map<string, Img>();
@@ -35,7 +36,7 @@ export function heroSprite(brother: 'M' | 'D', frame: HeroFrame, big: boolean, n
 export function companionSprite(f: number): Img { return memo('comp2:' + (f & 1), () => drawCompanion(f)); }
 // --------------------------------------------------------------------------- wrogowie
 export { LOOK, type EnemyLook } from './enemies';
-export function enemySprite(kind: EnemyKind, f: number, state: number): Img { return memo(`en2:${kind}:${f & 1}:${state}`, () => drawEnemy(kind, f, state)); }
+export function enemySprite(kind: EnemyKind, f: number, state: number): Img { return hdEnemySprite(kind) ?? memo(`en2:${kind}:${f & 1}:${state}`, () => drawEnemy(kind, f, state)); }
 
 // --------------------------------------------------------------------------- bossowie
 export { BOSS_SIZE } from './bosses';

@@ -7,7 +7,7 @@ Roadmapa (`docs/design/06_ROADMAP_v0_2.md`) sugerowała Godot 4.x jako punkt sta
 - zero zależności uruchomieniowych (build ≈ 300 KB), CI bez licencji i bez eksportu silnika;
 - czcionki CJK/arabskie osadzane jako podzbiory WOFF2 (`scripts/build-fonts.mjs`).
 
-Kompromis: Canvas 2D/WebView ma niższy sufit wydajności niż silnik natywny; przy rozdzielczości wirtualnej 640×360 i grafice pikselowej to wystarcza (60 Hz stałego kroku).
+Kompromis: Canvas 2D/WebView ma niższy sufit wydajności niż silnik natywny; przy rozdzielczości wirtualnej 640×360 i supersamplowanych zasobach SVG/Canvas to wystarcza (60 Hz stałego kroku).
 
 ## Warstwy
 ```
@@ -18,7 +18,7 @@ main.ts → App (pętla, skalowanie, nakładka dotykowa, przełączanie scen)
   └─ game/     world.ts (stan i reguły) · worldDraw.ts (rysowanie) · entities.ts · enemies.ts · bosses.ts
                physics.ts (AABB, kafelki, platformy jednostronne) · movement.ts (tabela z GDD B)
                levelgen.ts (generator z blueprintu JSON) · levels.ts · session.ts · save.ts · constants.ts
-  sprites/art.ts   proceduralne sprite'y, kafelki, tła (Pix: prosty rasteryzator pikseli z konturem)
+  sprites/art.ts   hybrydowy renderer: pliki SVG HD przez sprites/hd.ts + proceduralne fallbacki
 ```
 Zależności idą tylko w dół: `game/*` nie zna DOM-u; audio jest wstrzykiwane (`AudioEngine`), więc testy używają atrapy.
 
@@ -37,4 +37,6 @@ Zależności idą tylko w dół: `game/*` nie zna DOM-u; audio jest wstrzykiwane
 - Wszystkie napisy w `src/data/i18n/*.ts`, typ `Dict` wymusza ten sam zestaw kluczy; testy sprawdzają komplet i zgodność `{parametrów}`.
 
 ## Grafika i dźwięk
-Brak plików zasobów: sprite'y rysuje `Pix` na offscreen-canvasach i memoizuje; muzyka i efekty są syntezowane w WebAudio (oscylatory + szum, sekwencer). Eksport PNG do dokumentacji: `node tools/art-export.mjs` → `docs/art/`.
+Hybrydowy rendering HD: `src/sprites/hd.ts` asynchronicznie wczytuje SVG z `public/art/hd/` i rasteruje je do offscreen-canvasów 2× (tła) lub 4× (wrogowie), bez zmiany fizyki i wymiarów świata. Pozostałe sprite'y są tworzone proceduralnie i służą także jako fallback, jeśli obraz SVG się nie załaduje. Muzyka i SFX są syntezowane w WebAudio. Eksport podglądowy PNG: `node tools/art-export.mjs` → `docs/art/` (nie zawiera jeszcze wszystkich nowych SVG).
+
+Nowy kierunek: gładka grafika ilustracyjna 2D HD, bez pixel artu. Wstępny zestaw opisano w `docs/art/HD_ASSET_PACK_WAVE1.md`.

@@ -21,7 +21,7 @@ Dwuwymiarowa platformówka o dwóch braciach, ośmiu planetach, jednym przedłu�
 - **Kaucja:** opakowania PET (100 pkt / 0,50 zł), puszki (150 pkt / 0,50 zł), złota puszka (750 pkt / 2,50 zł, liczy się jako *jedno* opakowanie); +1 życie za każde 100; EcoPort wypłaca kaucję.
 - 96 mieszkańców do uwolnienia, 8 fragmentów kryształu (7 od strażników + 8-3), zapiski, zakończenie zwykłe i prawdziwe (wymaga wszystkich 8 fragmentów).
 - 3 sloty zapisu (zapis atomowy), ustawienia (głośność, napisy, ograniczenie błysków/trzęsienia, przypisanie klawiszy), pad, sterowanie dotykowe.
-- Cała grafika i muzyka są **generowane proceduralnie w kodzie** (brak plików z zasobami); podgląd: [`docs/art/`](docs/art).
+- **Nowa warstwa grafiki HD:** 12 dodatkowych ilustracji SVG przeciwników i 9 teł planet jest wczytywanych do Canvas; pozostałe grafiki nadal są generowane proceduralnie jako fallback. Muzyka jest syntezowana w WebAudio. Zob. [`docs/art/HD_ASSET_PACK_WAVE1.md`](docs/art/HD_ASSET_PACK_WAVE1.md).
 
 ## Sterowanie
 | Akcja | Gracz 1 (solo: oba zestawy działają) | Gracz 2 (co-op) | Pad |
@@ -70,7 +70,7 @@ Zakres: fizyka i skoki (kryterium M1), generator i budżety 32 poziomów, rachun
 ```
 src/engine/   wejście, grafika (Canvas), dźwięk (WebAudio), i18n, ustawienia, zapis
 src/game/     fizyka, ruch, świat, wrogowie, bossowie, generator poziomów, sesja i zapis
-src/sprites/  proceduralna grafika pikselowa
+src/sprites/  ilustracje wektorowe HD + dotychczasowa grafika proceduralna
 src/scenes/   tytuł, menu, mapa, rozgrywka, fabuła
 src/data/     poziomy i bestiariusz (JSON z projektu), słowniki 6 języków
 docs/design/  projekt etapu 1–2 (koncepcja, GDD, atlas poziomów, bestiariusz, biblia graficzna)
@@ -83,6 +83,8 @@ tests/ e2e/   testy                   .github/    CI, Pages, Release
 [Architektura](docs/ARCHITECTURE.md) · [Budowanie](docs/BUILDING.md) · [Platformy](docs/PLATFORMS.md) · [Testowanie](docs/TESTING.md) · [Lokalizacja](docs/LOCALIZATION.md) · [Licencje](docs/LICENSES.md) · [Zmiany](CHANGELOG.md) · [Projekt gry (GDD itd.)](docs/design/README.md)
 
 ## Stan i ograniczenia
+**Migracja grafiki HD:** dostępna jest pierwsza seria 12 przeciwników i 9 teł planet w SVG. Wcześniejsze portrety referencyjne braci i bossów oraz pełne animacje nie są jeszcze zastąpione finalnymi ilustracjami; trwa stopniowa wymiana assetów. Grafiki pochodzące od użytkownika służą za wzorce kierunku artystycznego, ale nie są jeszcze częścią repozytorium.
+
 Wersja **0.1.0** — pierwsza kompletna, grywalna implementacja projektu z etapu 2. Uczciwie:
 - Poziomy są **generowane proceduralnie** z blueprintu (`src/data/levels.json`) deterministycznym ziarnem, a nie ręcznie projektowane; ich przejezdność weryfikują testy geometrii oraz bot, ale **7 poziomów** (W3-L4, W6-L2, W7-L1…L4, W8-L4) jest poza zasięgiem bota i wymaga testu ręcznego ([tryb testera](docs/TESTING.md#tryb-testera-ręczne-sprawdzenie-poziomów): `?debug=1`). Balans (prędkości, HP bossów) to wartości startowe.
 - Paczki Windows/Linux/Android/iOS **kompilują się w CI** (GitHub Actions), ale **nie były uruchamiane** na docelowych systemach/urządzeniach; uruchomiono i przetestowano wersję web (Chromium, e2e).
@@ -90,7 +92,7 @@ Wersja **0.1.0** — pierwsza kompletna, grywalna implementacja projektu z etapu
 - Tłumaczenia wykonane maszynowo/redakcyjnie — zalecana weryfikacja przez rodzimych użytkowników (zwłaszcza suahili i arabski). Zob. [`docs/LOCALIZATION.md`](docs/LOCALIZATION.md).
 
 ## English summary
-**Marioosh & Darioosh: The Curse of Katoblepas** is a 2D platformer for two brothers (solo or local co-op), 8 worlds / 32 levels, 19 enemy kinds and 8 bosses, a bottle-deposit economy (PET/can/golden can, +1 life per 100 packages), petrification meter, cables/warps/secrets, 3 save slots, gamepad and touch controls. Everything (art, music) is procedural — no asset files.
+**Marioosh & Darioosh: The Curse of Katoblepas** is a 2D platformer for two brothers (solo or local co-op), 8 worlds / 32 levels, 19 enemy kinds and 8 bosses, a bottle-deposit economy (PET/can/golden can, +1 life per 100 packages), petrification meter, cables/warps/secrets, 3 save slots, gamepad and touch controls. The game now supports SVG HD art assets (initial enemy and background set); remaining art is drawn procedurally as a fallback. Music is synthesised with WebAudio.
 
 ```bash
 npm ci && npm run dev        # play in the browser
