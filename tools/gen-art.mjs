@@ -6,20 +6,22 @@
 // Wynik: public/art/gen/<kategoria>/<ASSET_ID>.png  + manifest.json. Istniejące pliki są pomijane (--force nadpisuje).
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { readdirSync } from 'node:fs';
+import { cutout } from './cutout.mjs';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 const opt = (n, d) => { const i = args.indexOf('--' + n); return i < 0 ? d : (args[i + 1] && !args[i + 1].startsWith('--') ? args[i + 1] : true); };
-const category = opt('category', ''), ids = String(opt('ids', '')).split(',').filter(Boolean);
+const categories = String(opt('category', '')).split(',').filter((c) => c && c !== 'all'), recut = !!opt('recut', false), category = '', ids = String(opt('ids', '')).split(',').filter(Boolean);
 const limit = Number(opt('limit', 0)) || Infinity, quality = String(opt('quality', 'medium')), force = !!opt('force', false), dry = !!opt('dry', false);
 const model = String(opt('model', 'gpt-image-2')), conc = Math.max(1, Number(opt('concurrency', 2)));
 const base = process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1';
 const key = process.env.OPENAI_API_KEY;
-if (!key && !dry) { console.error('Brak OPENAI_API_KEY w środowisku.'); process.exit(2); }
+if (!key && !dry && !recut) { console.error('Brak OPENAI_API_KEY w środowisku.'); process.exit(2); }
 
 const all = JSON.parse(readFileSync(join(root, 'tools', 'art-prompts.json'), 'utf8'));
-let list = all.filter((a) => (!category || a.category === category) && (!ids.length || ids.includes(a.asset_id)));
+let list = all.filter((a) => (!categories.length || categories.includes(a.category)) && (!ids.length || ids.includes(a.asset_id)));
 const outDir = join(root, 'public', 'art', 'gen');
 const pathOf = (a) => join(outDir, a.category, a.asset_id + '.png');
 if (!force) list = list.filter((a) => !existsSync(pathOf(a)));
@@ -53,6 +55,15 @@ async function gen(a) {
   throw new Error('zbyt wiele ponowień; ostatni błąd: ' + last);
 }
 
+if (recut) {
+  const { readdirSync: rd } = await import('node:fs');
+  let n = 0;
+  for (const c of rd(outDir, { withFileTypes: true }).filter((e) => e.isDirectory())) for (const f of rd(join(outDir, c.name)).filter((f) => f.endsWith('.png'))) {
+    const fp = join(outDir, c.name, f), r = cutout(readFileSync(fp), null);
+    if (r.mode !== 'none') { writeFileSync(fp, r.buf); n++; }
+  }
+  console.log('Ponownie wycięto tło w', n, 'plikach'); process.exit(0);
+}
 const manifestPath = join(outDir, 'manifest.json');
 const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : {};
 let ok = 0, fail = 0, i = 0;
@@ -61,9 +72,11 @@ async function worker() {
   while (i < list.length) {
     const a = list[i++];
     try {
-      const png = await gen(a); if (!png) continue;
+      let png = await gen(a); if (!png) continue;
+      let cut = 'n/a';
+      if (bg(a) === 'transparent') { const r = cutout(png, null); png = r.buf; cut = r.mode; if (r.mode === 'none') console.log('  uwaga: nie wykryto tła do wycięcia (sprawdź ręcznie):', a.asset_id); }
       mkdirSync(dirname(pathOf(a)), { recursive: true }); writeFileSync(pathOf(a), png);
-      manifest[a.asset_id] = { name: a.name, category: a.category, size: sizeFor(a), quality, model, file: `${a.category}/${a.asset_id}.png` };
+      manifest[a.asset_id] = { name: a.name, category: a.category, size: sizeFor(a), quality, model, cutout: cut, file: `${a.category}/${a.asset_id}.png` };
       ok++; console.log('ok  ', a.asset_id, a.name);
     } catch (e) { fail++; console.log('FAIL', a.asset_id, a.name, '-', e.message); if (/HTTP 40[13]|BRAK ŚRODKÓW/.test(e.message)) { i = list.length; } }
   }

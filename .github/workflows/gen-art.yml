@@ -4,13 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       category:
-        description: 'Kategoria (np. enemies, bosses, characters, level-backgrounds, story-illustrations, collectibles, parallax)'
+        description: 'Kategorie po przecinku albo "all". Np. enemies,bosses,characters. (level-backgrounds, story-illustrations, collectibles, interactables, civilians, conduits, planet-props, planet-tiles, parallax, effects, interface, ...)'
         required: true
         default: 'enemies'
       limit:
-        description: 'Maks. liczba assetów (0 = wszystkie z kategorii)'
+        description: 'Maks. liczba assetów NA KATEGORIĘ (0 = wszystkie)'
         required: true
-        default: '3'
+        default: '0'
       model:
         description: 'Model obrazów (np. gpt-image-2, gpt-image-2.6-sunburst, gpt-image-1.5, gpt-image-1-mini)'
         required: true
@@ -19,23 +19,39 @@ on:
         description: 'Jakość: low | medium | high'
         required: true
         default: 'medium'
+      concurrency:
+        description: 'Równoległe żądania (4 = bezpiecznie; przy błędach 429 zmniejsz)'
+        required: true
+        default: '4'
 permissions:
   contents: write
 jobs:
   gen:
     runs-on: ubuntu-latest
+    timeout-minutes: 350
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
-      - name: Generuj
+      - run: npm ci
+      - name: Generuj kategoriami i zapisuj po każdej
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: node tools/gen-art.mjs --category "${{ inputs.category }}" --limit "${{ inputs.limit }}" --quality "${{ inputs.quality }}" --model "${{ inputs.model }}"
-      - name: Zapisz wyniki w repo
+          CATS: ${{ inputs.category }}
         run: |
           git config user.name "gen-art[bot]"; git config user.email "gen-art@users.noreply.github.com"
-          git add public/art/gen
-          git diff --cached --quiet && { echo "Brak nowych plików"; exit 0; }
-          git commit -m "art: wygenerowane grafiki (${{ inputs.category }}, limit ${{ inputs.limit }}, ${{ inputs.quality }})"
-          git pull --rebase origin main && git push origin HEAD:main
+          if [ "$CATS" = "all" ]; then CATS=$(node -e "console.log([...new Set(require('./tools/art-prompts.json').map(a=>a.category))].join(','))"); fi
+          FAILED=0
+          for C in ${CATS//,/ }; do
+            echo "::group::$C"
+            node tools/gen-art.mjs --category "$C" --limit "${{ inputs.limit }}" --quality "${{ inputs.quality }}" --model "${{ inputs.model }}" --concurrency "${{ inputs.concurrency }}" || FAILED=1
+            echo "::endgroup::"
+            git add public/art/gen
+            if ! git diff --cached --quiet; then
+              git commit -m "art: wygenerowane grafiki ($C)"
+              git pull --rebase origin main && git push origin HEAD:main
+            fi
+            # brak środków/klucza: nie ma sensu iść dalej
+            if [ "$FAILED" = "1" ] && [ -z "$(git log -1 --since='3 minutes ago' --format=%H -- public/art/gen)" ]; then echo "Kategoria $C bez wyników — przerywam"; break; fi
+          done
+          exit $FAILED
