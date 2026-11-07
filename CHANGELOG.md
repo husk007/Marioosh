@@ -1,5 +1,11 @@
 # Zmiany
 
+## HD art / 2026-11-07 (w przygotowaniu)
+- Pierwszy etap migracji do gładkiej grafiki HD: 12 ilustracji SVG wrogów oraz 9 planetarnych ilustracji tła.
+- Asynchroniczny preload, supersampling 4× dla przeciwników i 2× dla teł; awaryjny fallback do proceduralnych grafik.
+- Zaktualizowana dokumentacja artystyczna. Finalne portrety postaci i sprite sheety animacji są nadal w opracowaniu.
+
+
 ## 0.1.5
 - **Grafika wg „Biblii HD v0.3”:** bracia przerysowani zgodnie z opisami (Marioosh — pomarańczowy kombinezon, niebieski kask, krępa sylwetka; Darioosh — niebieski kombinezon, żółty kask, smukły, z miernikiem), nowe pozy: spadanie, kucanie, zwycięstwo.
 - **Scarlet** (opiekunka / królowa): nowy portret w intro, w niewoli, przy rzucaniu zaklęcia i w zakończeniach oraz na ekranie wyniku.

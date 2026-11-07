@@ -1,5 +1,5 @@
 /* Service worker PWA: działanie offline po pierwszym uruchomieniu (cache-first dla plików gry). */
-const CACHE = 'marioosh-v0.1.1';
+const CACHE = 'marioosh-v0.1.6-hd-wave1';
 self.addEventListener('install', (e) => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then((c) => c.addAll(['./', './index.html', './manifest.webmanifest', './icon.svg']))); });
 self.addEventListener('activate', (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener('fetch', (e) => {
