@@ -1,0 +1,37 @@
+name: Generuj grafiki (OpenAI)
+# Ręcznie: Actions → „Generuj grafiki (OpenAI)” → Run workflow. Wymaga sekretu repozytorium OPENAI_API_KEY.
+on:
+  workflow_dispatch:
+    inputs:
+      category:
+        description: 'Kategoria (np. enemies, bosses, characters, level-backgrounds, story-illustrations, collectibles, parallax)'
+        required: true
+        default: 'enemies'
+      limit:
+        description: 'Maks. liczba assetów (0 = wszystkie z kategorii)'
+        required: true
+        default: '3'
+      quality:
+        description: 'Jakość: low | medium | high'
+        required: true
+        default: 'medium'
+permissions:
+  contents: write
+jobs:
+  gen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Generuj
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: node tools/gen-art.mjs --category "${{ inputs.category }}" --limit "${{ inputs.limit }}" --quality "${{ inputs.quality }}"
+      - name: Zapisz wyniki w repo
+        run: |
+          git config user.name "gen-art[bot]"; git config user.email "gen-art@users.noreply.github.com"
+          git add public/art/gen
+          git diff --cached --quiet && { echo "Brak nowych plików"; exit 0; }
+          git commit -m "art: wygenerowane grafiki (${{ inputs.category }}, limit ${{ inputs.limit }}, ${{ inputs.quality }})"
+          git pull --rebase origin main && git push origin HEAD:main
