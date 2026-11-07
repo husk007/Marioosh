@@ -367,5 +367,77 @@
   "quality": "medium",
   "model": "gpt-image-2",
   "cutout": "checker"
+ },
+ "boss-variants/BOSS_VARIANTS-003_rogomir-vulnerable__base.png": {
+  "asset_id": "BOSS_VARIANTS-003",
+  "name": "Rogomir - vulnerable",
+  "category": "boss-variants",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1536x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "boss-variants/BOSS_VARIANTS-004_rogomir-released__base.png": {
+  "asset_id": "BOSS_VARIANTS-004",
+  "name": "Rogomir - released",
+  "category": "boss-variants",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1536x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "boss-variants/BOSS_VARIANTS-001_katoblepas-phase-2-gaze__base.png": {
+  "asset_id": "BOSS_VARIANTS-001",
+  "name": "Katoblepas - phase 2 gaze",
+  "category": "boss-variants",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1536x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "boss-variants/BOSS_VARIANTS-002_katoblepas-phase-3-fused__base.png": {
+  "asset_id": "BOSS_VARIANTS-002",
+  "name": "Katoblepas - phase 3 fused",
+  "category": "boss-variants",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1536x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "boss-variants/BOSS_VARIANTS-005_zlomotaur-vulnerable__base.png": {
+  "asset_id": "BOSS_VARIANTS-005",
+  "name": "Złomotaur - vulnerable",
+  "category": "boss-variants",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1536x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "boss-variants/BOSS_VARIANTS-006_zlomotaur-released__base.png": {
+  "asset_id": "BOSS_VARIANTS-006",
+  "name": "Złomotaur - released",
+  "category": "boss-variants",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1536x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
  }
 }
