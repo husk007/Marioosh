@@ -607,5 +607,29 @@
   "quality": "medium",
   "model": "gpt-image-2",
   "cutout": "checker"
+ },
+ "bosses/BOSSES-008_rogodron__base.png": {
+  "asset_id": "BOSSES-008",
+  "name": "Rogodron",
+  "category": "bosses",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1536x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "bosses/BOSSES-007_krukorog-krolewski__base.png": {
+  "asset_id": "BOSSES-007",
+  "name": "Krukoróg Królewski",
+  "category": "bosses",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1536x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
  }
 }
