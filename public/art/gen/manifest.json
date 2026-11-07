@@ -355,5 +355,17 @@
   "quality": "medium",
   "model": "gpt-image-2",
   "cutout": "checker"
+ },
+ "character-variants/CHARACTER_VARIANTS-002_marioosh-coil-equipped__base.png": {
+  "asset_id": "CHARACTER_VARIANTS-002",
+  "name": "Marioosh - coil_equipped",
+  "category": "character-variants",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1024x1536",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
  }
 }
