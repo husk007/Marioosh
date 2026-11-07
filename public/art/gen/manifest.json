@@ -3241,5 +3241,341 @@
   "quality": "medium",
   "model": "gpt-image-2",
   "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-098_ferroks-top-center__base.png": {
+  "asset_id": "PLANET_TILES-098",
+  "name": "Ferroks - top-center",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-097_ferroks-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "none"
+ },
+ "planet-tiles/PLANET_TILES-095_vespera-breakable-ground__base.png": {
+  "asset_id": "PLANET_TILES-095",
+  "name": "Vespera - breakable-ground",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-081_vespera-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-094_vespera-hazard-base__base.png": {
+  "asset_id": "PLANET_TILES-094",
+  "name": "Vespera - hazard-base",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-081_vespera-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-096_vespera-hidden-room-wall__base.png": {
+  "asset_id": "PLANET_TILES-096",
+  "name": "Vespera - hidden-room-wall",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-081_vespera-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-099_ferroks-top-left-corner__base.png": {
+  "asset_id": "PLANET_TILES-099",
+  "name": "Ferroks - top-left-corner",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-097_ferroks-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-101_ferroks-left-wall__base.png": {
+  "asset_id": "PLANET_TILES-101",
+  "name": "Ferroks - left-wall",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-097_ferroks-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "none"
+ },
+ "planet-tiles/PLANET_TILES-100_ferroks-top-right-corner__base.png": {
+  "asset_id": "PLANET_TILES-100",
+  "name": "Ferroks - top-right-corner",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-097_ferroks-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-102_ferroks-right-wall__base.png": {
+  "asset_id": "PLANET_TILES-102",
+  "name": "Ferroks - right-wall",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-097_ferroks-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-103_ferroks-bottom-center__base.png": {
+  "asset_id": "PLANET_TILES-103",
+  "name": "Ferroks - bottom-center",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-097_ferroks-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-104_ferroks-bottom-left-corner__base.png": {
+  "asset_id": "PLANET_TILES-104",
+  "name": "Ferroks - bottom-left-corner",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-097_ferroks-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-106_ferroks-slope-up__base.png": {
+  "asset_id": "PLANET_TILES-106",
+  "name": "Ferroks - slope-up",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-097_ferroks-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-105_ferroks-bottom-right-corner__base.png": {
+  "asset_id": "PLANET_TILES-105",
+  "name": "Ferroks - bottom-right-corner",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-097_ferroks-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-108_ferroks-one-way-platform__base.png": {
+  "asset_id": "PLANET_TILES-108",
+  "name": "Ferroks - one-way-platform",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-097_ferroks-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-109_ferroks-moving-platform__base.png": {
+  "asset_id": "PLANET_TILES-109",
+  "name": "Ferroks - moving-platform",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-097_ferroks-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-107_ferroks-slope-down__base.png": {
+  "asset_id": "PLANET_TILES-107",
+  "name": "Ferroks - slope-down",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-097_ferroks-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-110_ferroks-hazard-base__base.png": {
+  "asset_id": "PLANET_TILES-110",
+  "name": "Ferroks - hazard-base",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-097_ferroks-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-111_ferroks-breakable-ground__base.png": {
+  "asset_id": "PLANET_TILES-111",
+  "name": "Ferroks - breakable-ground",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-097_ferroks-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-114_katoblis-top-center__base.png": {
+  "asset_id": "PLANET_TILES-114",
+  "name": "Katoblis - top-center",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-113_katoblis-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "none"
+ },
+ "planet-tiles/PLANET_TILES-112_ferroks-hidden-room-wall__base.png": {
+  "asset_id": "PLANET_TILES-112",
+  "name": "Ferroks - hidden-room-wall",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-097_ferroks-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "none"
+ },
+ "planet-tiles/PLANET_TILES-115_katoblis-top-left-corner__base.png": {
+  "asset_id": "PLANET_TILES-115",
+  "name": "Katoblis - top-left-corner",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-113_katoblis-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-116_katoblis-top-right-corner__base.png": {
+  "asset_id": "PLANET_TILES-116",
+  "name": "Katoblis - top-right-corner",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-113_katoblis-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-117_katoblis-left-wall__base.png": {
+  "asset_id": "PLANET_TILES-117",
+  "name": "Katoblis - left-wall",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-113_katoblis-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-118_katoblis-right-wall__base.png": {
+  "asset_id": "PLANET_TILES-118",
+  "name": "Katoblis - right-wall",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-113_katoblis-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-119_katoblis-bottom-center__base.png": {
+  "asset_id": "PLANET_TILES-119",
+  "name": "Katoblis - bottom-center",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-113_katoblis-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
  }
 }
