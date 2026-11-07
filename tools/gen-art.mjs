@@ -1,59 +1,120 @@
-// Generator grafik z biblioteki promptów przez OpenAI Images API (tools/art-prompts.json = 629 assetów, tools/art-poses.json = 599 póz).
+// Generator grafik z biblioteki promptów przez OpenAI Images API
+//   tools/art-prompts.json = 629 assetów (postacie, bossowie, wrogowie, przedmioty, kafelki podłoża, rekwizyty, paralaksa, tła poziomów, menu/interfejs, ilustracje fabularne)
+//   tools/art-poses.json   = 599 póz (stany animacji)
 // Klucz WYŁĄCZNIE ze zmiennej środowiskowej OPENAI_API_KEY (nigdy w pliku/repo).
 //
-//   node tools/gen-art.mjs --category enemies --limit 3 --dry
-//   node tools/gen-art.mjs --category characters,bosses --mode both            # baza + wszystkie pozy
-//   node tools/gen-art.mjs --ids CHARACTERS-001 --mode poses --states idle,walk,jump_apex
-//   node tools/gen-art.mjs --recut                                             # ponowne wycięcie tła z istniejących PNG
+//   node tools/gen-art.mjs --category all --mode base            # 1) wszystkie BAZY (najpierw podstawowe, potem zależne od nich)
+//   node tools/gen-art.mjs --category all --mode poses           # 2) wszystkie POZY (z bazami postaci/przedmiotów jako referencjami)
+//   node tools/gen-art.mjs --ids CHARACTERS-001 --mode both --states idle,walk --dry
+//   node tools/gen-art.mjs --list-categories                     # kategorie w kolejności produkcji
+//   node tools/gen-art.mjs --recut                               # ponowne wycięcie tła ze wszystkich PNG
+// Opcje: --limit N (assetów)  --quality low|medium|high  --model ...  --concurrency N  --force  --dry
 //
-// --mode base (domyślnie) | poses | both     --states a,b,c (filtr póz)     --quality low|medium|high
-// Nazewnictwo: public/art/gen/<kategoria>/<ID>_<slug>__<poza>.png   (poza „base” = neutralna referencja)
-//   np. characters/CHARACTERS-001_marioosh__base.png, characters/CHARACTERS-001_marioosh__walk.png
-// Pozy są rysowane z użyciem bazy jako obrazu referencyjnego (endpoint /images/edits), by postać była spójna.
-// manifest.json: plik -> {asset_id, name, state, target_frames, reference, model, ...}. Istniejące pliki są pomijane (--force nadpisuje).
+// REFERENCJE (obrazy wejściowe dla /images/edits — kolejność = numeracja „Image 1, 2…” w prompcie):
+//   baza wariantu/mieszkańca  ← baza „rodzica” (reference_asset_id z biblioteki)
+//   wariant z przedmiotem     ← + baza przedmiotu (cewka, magnes, gwiazda, latarnia…)
+//   poza postaci/wroga/bossa  ← baza tej postaci (+ przedmiot/obiekt, którego użycie pokazuje poza: panel, blok, przewód, brat…)
+//   kafelki, rekwizyty, paralaksa, tła poziomów ← kafelek wzorcowy planety („solid-center”) jako próbka palety/materiału
+//   ilustracje fabularne, portrety, menu ← bazy bohaterów/Katoblepasa wymienionych w opisie
+// Nazewnictwo: public/art/gen/<kategoria>/<ID>_<slug>__<poza>.png  (poza „base” = neutralna referencja). manifest.json zapisuje użyte referencje.
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, renameSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, join, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { cutout } from './cutout.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
-const opt = (n, d) => { const i = args.indexOf('--' + n); return i < 0 ? d : (args[i + 1] && !args[i + 1].startsWith('--') ? args[i + 1] : true); };
+const opt = (n, d) => { const i = args.indexOf('--' + n); return i < 0 ? d : (args[i + 1] !== undefined && !args[i + 1].startsWith('--') && args[i + 1] !== '' ? args[i + 1] : true); };
 const list_ = (v) => String(v === true ? '' : v).split(',').filter(Boolean);
 const categories = list_(opt('category', '')).filter((c) => c !== 'all'), ids = list_(opt('ids', '')), states = list_(opt('states', ''));
 const limit = Number(opt('limit', 0)) || Infinity, quality = String(opt('quality', 'medium')), force = !!opt('force', false), dry = !!opt('dry', false), recut = !!opt('recut', false);
 const mode = String(opt('mode', 'base')), model = String(opt('model', 'gpt-image-2')), conc = Math.max(1, Number(opt('concurrency', 2)));
 const base = process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1';
 const key = process.env.OPENAI_API_KEY;
-if (!key && !dry && !recut) { console.error('Brak OPENAI_API_KEY w środowisku.'); process.exit(2); }
 
 const assets = JSON.parse(readFileSync(join(root, 'tools', 'art-prompts.json'), 'utf8'));
 const poseJobs = JSON.parse(readFileSync(join(root, 'tools', 'art-poses.json'), 'utf8'));
+const byId = Object.fromEntries(assets.map((a) => [a.asset_id, a]));
 const outDir = join(root, 'public', 'art', 'gen');
 const slug = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l').replace(/Ł/g, 'L').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
 const fileOf = (a, state) => join(outDir, a.category, `${a.asset_id}_${slug(a.name)}__${state}.png`);
+const keyOf = (a, state) => `${a.category}/${basename(fileOf(a, state))}`;
 
+// kolejność produkcji: najpierw to, na czym opiera się reszta
+const PRIORITY = ['characters', 'bosses', 'enemies', 'collectibles', 'interactables', 'conduits', 'planet-tiles', 'civilians', 'planet-props', 'parallax', 'level-backgrounds', 'character-variants', 'boss-variants', 'enemy-variants', 'interface', 'story-illustrations', 'effects'];
+const rank = (c) => { const i = PRIORITY.indexOf(c); return i < 0 ? 99 : i; };
+if (opt('list-categories', false)) { console.log(PRIORITY.filter((c) => assets.some((a) => a.category === c)).join(',')); process.exit(0); }
+if (!key && !dry && !recut) { console.error('Brak OPENAI_API_KEY w środowisku.'); process.exit(2); }
+
+// --- reguły referencji ---------------------------------------------------------------------------
+const anchorOf = (planet) => assets.find((x) => x.category === 'planet-tiles' && x.planet === planet && /solid-center$/i.test(x.name));
+const HEROES = { Marioosh: 'CHARACTERS-001', Darioosh: 'CHARACTERS-002', Scarlet: 'CHARACTERS-003', Katoblepas: 'BOSSES-001' };
+const ITEM_FOR_VARIANT = { coil_equipped: 'COLLECTIBLES-007', magnet_equipped: 'COLLECTIBLES-008', invincible: 'COLLECTIBLES-011', uncursed: 'COLLECTIBLES-017', shielded: 'INTERACTABLES-020' };
+const POSE_EXTRAS = {   // poza → dodatkowy obiekt/postać, którego użycie poza pokazuje
+  'CHARACTERS-001': { interact_panel: ['INTERACTABLES-006', 'item'], push: ['INTERACTABLES-009', 'item'], climb_wire: ['CONDUITS-003', 'item'], teleport_entry: ['CONDUITS-001', 'item'], revive_brother: ['CHARACTERS-002', 'character'] },
+  'CHARACTERS-002': { interact_panel: ['INTERACTABLES-006', 'item'], push: ['INTERACTABLES-009', 'item'], climb_wire: ['CONDUITS-003', 'item'], teleport_entry: ['CONDUITS-001', 'item'], revive_brother: ['CHARACTERS-001', 'character'] },
+};
+const ICON_REFS = { 'PET Counter Icon': 'COLLECTIBLES-001', 'Can Counter Icon': 'COLLECTIBLES-003', 'Lives Icon': 'COLLECTIBLES-012' };
+function mentioned(a) {   // bohaterowie wymienieni w opisie (dla ilustracji fabularnych i menu)
+  const brief = (a.prompt_en.split('SUBJECT:')[1] || '').split('PALETTE:')[0];
+  const out = new Set();
+  for (const [n, id] of Object.entries(HEROES)) if (new RegExp(n, 'i').test(brief) && id !== a.asset_id) out.add(id);
+  if (/brothers|two electricians|both heroes|the heroes/i.test(brief)) { out.add('CHARACTERS-001'); out.add('CHARACTERS-002'); }
+  if (/tiny bull/i.test(brief)) out.add('CHARACTERS-004');
+  return [...out].slice(0, 4);
+}
+/** [{id, role}] — referencje dla BAZY assetu */
+function baseRefs(a) {
+  const r = [];
+  if (a.reference_asset_id) r.push({ id: a.reference_asset_id, role: 'model' });
+  if (a.category === 'character-variants') { const v = (a.name.split(' - ')[1] || '').trim(); if (ITEM_FOR_VARIANT[v]) r.push({ id: ITEM_FOR_VARIANT[v], role: 'item' }); }
+  if (['planet-tiles', 'planet-props', 'parallax', 'level-backgrounds'].includes(a.category) && a.planet) { const an = anchorOf(a.planet); if (an && an.asset_id !== a.asset_id) r.push({ id: an.asset_id, role: 'style' }); }
+  if (a.category === 'interface' || a.category === 'story-illustrations') {
+    if (ICON_REFS[a.name]) r.push({ id: ICON_REFS[a.name], role: 'item' });
+    const pl = /^Planet (\S+) Icon$/.exec(a.name); if (pl) { const an = anchorOf(assets.find((x) => x.planet && slug(x.planet) === slug(pl[1]))?.planet); if (an) r.push({ id: an.asset_id, role: 'style' }); }
+    for (const id of mentioned(a)) if (!r.some((x) => x.id === id)) r.push({ id, role: 'character' });
+  }
+  return r.filter((x) => byId[x.id] && x.id !== a.asset_id);
+}
+/** referencje dla POZY: baza własna + obiekt użyty w pozie */
+function poseRefs(a, state) {
+  const r = [{ id: a.asset_id, role: 'model' }];
+  const ex = POSE_EXTRAS[a.asset_id]?.[state]; if (ex && byId[ex[0]]) r.push({ id: ex[0], role: ex[1] });
+  return r;
+}
+const ROLE = {
+  model: 'approved model of the SAME subject: keep identical design, proportions, colors, costume, tools, horns and line style',
+  item: 'approved model of this exact item/object: reproduce it exactly as drawn (same shape, colors, details)',
+  character: 'approved model of a character that appears in the image: reproduce faithfully (same face, costume, colors)',
+  style: 'approved sample of this world: match its palette, materials, surface texture and line style, but do NOT copy its composition or content',
+};
+function refPrompt(refs) {
+  if (!refs.length) return '';
+  return 'ATTACHED REFERENCE IMAGES (in order):\n' + refs.map((r, i) => `Image ${i + 1} — ${byId[r.id].name}: ${ROLE[r.role]}.`).join('\n') + '\nChange ONLY what the task below describes. Same side-facing direction and feet baseline for characters. Plain flat white background around isolated sprites.\n';
+}
+
+// --- parametry obrazu ----------------------------------------------------------------------------
 function sizeFor(a) {   // gpt-image: 1024x1024, 1536x1024, 1024x1536
+  if (a.category === 'interface' && OPAQUE_NAMES.test(a.name)) return '1536x1024';   // tła menu/ładowania/mapy: szeroki kadr
   const m = /(\d+)x(\d+)/.exec(a.source_size || ''); if (!m) return '1024x1024';
   const r = Number(m[1]) / Number(m[2]);
   return r > 1.15 ? '1536x1024' : r < 0.87 ? '1024x1536' : '1024x1024';
 }
-const OPAQUE = new Set(['level-backgrounds', 'story-illustrations']);
-const wantsAlpha = (a) => !OPAQUE.has(a.category);
+const OPAQUE_NAMES = /Title Primary Background|Loading Background|World Map Card|sky layer/i;
+const wantsAlpha = (a) => !(a.category === 'level-backgrounds' || a.category === 'story-illustrations' || OPAQUE_NAMES.test(a.name));
 const AVOID = (a) => `\nAVOID (must not appear): ${a.negative_prompt_en}`;
-const REFERENCE = 'REFERENCE IMAGE: the attached image is the approved model of this exact character/object. Keep identical design, proportions, colors, costume, horns, tools, line style and scale; change ONLY the pose/state described below. Same side-facing direction, same feet baseline, plain flat white background.\n';
 
-// --- wywołania API z ponawianiem i adaptacją parametrów --------------------------------------
-async function call(a, prompt, refPng) {
+// --- API -----------------------------------------------------------------------------------------
+async function call(a, prompt, refPngs) {
   const body = { model, prompt: prompt.slice(0, 30000), size: sizeFor(a), quality, n: 1, output_format: 'png' };
-  if (wantsAlpha(a) && !refPng) body.background = 'transparent';
+  if (wantsAlpha(a) && !refPngs.length) body.background = 'transparent';
   let last = '';
   for (let t = 0; t < 5; t++) {
     let r;
-    if (refPng) {
+    if (refPngs.length) {
       const fd = new FormData();
       for (const [k, v] of Object.entries(body)) fd.append(k, String(v));
-      fd.append('image[]', new Blob([refPng], { type: 'image/png' }), 'reference.png');
+      refPngs.forEach((png, i) => fd.append('image[]', new Blob([png], { type: 'image/png' }), `reference${i + 1}.png`));
       r = await fetch(base + '/images/edits', { method: 'POST', headers: { Authorization: 'Bearer ' + key }, body: fd });
     } else {
       r = await fetch(base + '/images/generations', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key }, body: JSON.stringify(body) });
@@ -68,21 +129,11 @@ async function call(a, prompt, refPng) {
   throw new Error('zbyt wiele ponowień; ostatni błąd: ' + last);
 }
 
-// --- manifest ----------------------------------------------------------------------------------
+// --- manifest, migracja --------------------------------------------------------------------------
 const manifestPath = join(outDir, 'manifest.json');
 const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : {};
 const save = () => { mkdirSync(outDir, { recursive: true }); writeFileSync(manifestPath, JSON.stringify(manifest, null, 1)); };
-
-// --- migracja ze starego nazewnictwa (<ID>.png -> <ID>_<slug>__base.png) -----------------------
-function migrate() {
-  if (!existsSync(outDir)) return;
-  for (const a of assets) {
-    const old = join(outDir, a.category, a.asset_id + '.png');
-    if (existsSync(old) && !existsSync(fileOf(a, 'base'))) { renameSync(old, fileOf(a, 'base')); console.log('przemianowano', a.asset_id + '.png →', fileOf(a, 'base').split('/').pop()); }
-    if (manifest[a.asset_id]) { const m = manifest[a.asset_id]; delete manifest[a.asset_id]; manifest[`${a.category}/${fileOf(a, 'base').split('/').pop()}`] = { asset_id: a.asset_id, name: a.name, category: a.category, state: 'base', target_frames: 1, reference: null, size: m.size, quality: m.quality, model: m.model, cutout: m.cutout }; }
-  }
-}
-
+const recorded = (k) => { const m = manifest[k]; return m ? (m.refs ?? (m.reference ? [m.reference] : [])) : null; };
 if (recut) {
   let n = 0;
   for (const c of readdirSync(outDir, { withFileTypes: true }).filter((e) => e.isDirectory())) for (const f of readdirSync(join(outDir, c.name)).filter((f) => f.endsWith('.png'))) {
@@ -91,47 +142,63 @@ if (recut) {
   }
   console.log('Ponownie wycięto tło w', n, 'plikach'); process.exit(0);
 }
-migrate(); save();
+if (existsSync(outDir)) for (const a of assets) {   // stare nazwy <ID>.png
+  const old = join(outDir, a.category, a.asset_id + '.png');
+  if (existsSync(old) && !existsSync(fileOf(a, 'base'))) renameSync(old, fileOf(a, 'base'));
+}
 
-// --- plan pracy ----------------------------------------------------------------------------------
-const PRIORITY = ['characters', 'bosses', 'enemies', 'character-variants', 'boss-variants', 'enemy-variants', 'civilians'];
-const rank = (c) => { const i = PRIORITY.indexOf(c); return i < 0 ? 99 : i; };
-let todo = assets.filter((a) => (!categories.length || categories.includes(a.category)) && (!ids.length || ids.includes(a.asset_id)));
-todo.sort((x, y) => rank(x.category) - rank(y.category));
+// --- „nieświeżość”: plik istnieje, ale powstał bez wymaganych dziś referencji -------------------------
+const expectedBase = (a) => baseRefs(a).map((r) => basename(fileOf(byId[r.id], 'base')));
+const expectedPose = (a, s) => poseRefs(a, s).map((r) => basename(fileOf(byId[r.id], 'base')));
+const same = (x, y) => JSON.stringify(x) === JSON.stringify(y);
+const baseNeeded = (a) => force || !existsSync(fileOf(a, 'base')) || !same(recorded(keyOf(a, 'base')) ?? [], expectedBase(a));
+const poseNeeded = (a, s) => force || !existsSync(fileOf(a, s)) || !same(recorded(keyOf(a, s)) ?? [], expectedPose(a, s));
+
+// --- plan ----------------------------------------------------------------------------------------
+const doBase = mode === 'base' || mode === 'both', doPoses = mode === 'poses' || mode === 'both';
+const isAnchor = (a) => a.category === 'planet-tiles' && /solid-center$/i.test(a.name);
+let selected = assets.filter((a) => (!categories.length || categories.includes(a.category)) && (!ids.length || ids.includes(a.asset_id)));
+selected.sort((x, y) => rank(x.category) - rank(y.category) || (isAnchor(y) ? 1 : 0) - (isAnchor(x) ? 1 : 0));
 const jobsOf = (a) => poseJobs.filter((j) => j.asset_id === a.asset_id && (!states.length || states.includes(j.state)));
-const needBase = (a) => (mode === 'base' || mode === 'both') && (force || !existsSync(fileOf(a, 'base')));
-const needPoses = (a) => (mode === 'poses' || mode === 'both') ? jobsOf(a).filter((j) => force || !existsSync(fileOf(a, j.state))) : [];
-todo = todo.filter((a) => needBase(a) || needPoses(a).length).slice(0, limit);
-const total = todo.reduce((n, a) => n + (needBase(a) ? 1 : 0) + needPoses(a).length, 0);
-console.log(`Assetów: ${todo.length}, obrazów do wygenerowania: ${total} (tryb ${mode}, model ${model}, jakość ${quality})`);
+selected = selected.filter((a) => (doBase && baseNeeded(a)) || (doPoses && jobsOf(a).some((j) => poseNeeded(a, j.state)))).slice(0, limit);
+const nBase = doBase ? selected.filter(baseNeeded).length : 0;
+const poseTasks = doPoses ? selected.flatMap((a) => jobsOf(a).filter((j) => poseNeeded(a, j.state)).map((j) => ({ a, j }))) : [];
+console.log(`Assetów: ${selected.length}, obrazów do wygenerowania: ${nBase + poseTasks.length} (baz: ${nBase}, póz: ${poseTasks.length}; tryb ${mode}, model ${model}, jakość ${quality})`);
 
-async function finish(a, state, png, extra) {
+// --- generowanie ---------------------------------------------------------------------------------
+async function finish(a, state, png, refs, frames) {
   let cut = 'n/a';
-  if (wantsAlpha(a)) { const r = cutout(png, null); png = r.buf; cut = r.mode; if (r.mode === 'none') console.log('  uwaga: nie wykryto tła do wycięcia (sprawdź ręcznie):', a.asset_id, state); }
+  if (wantsAlpha(a)) { const r = cutout(png, null); png = r.buf; cut = r.mode; if (r.mode === 'none') console.log('  uwaga: nie wykryto tła do wycięcia (kafelek/pełny kadr?):', a.asset_id, state); }
   const fp = fileOf(a, state); mkdirSync(dirname(fp), { recursive: true }); writeFileSync(fp, png);
-  manifest[`${a.category}/${fp.split('/').pop()}`] = { asset_id: a.asset_id, name: a.name, category: a.category, state, target_frames: extra.frames, reference: extra.ref, size: sizeFor(a), quality, model, cutout: cut };
-  save();
-  return png;
+  manifest[keyOf(a, state)] = { asset_id: a.asset_id, name: a.name, category: a.category, state, target_frames: frames, refs: refs.map((r) => basename(fileOf(byId[r.id], 'base'))), size: sizeFor(a), quality, model, cutout: cut };
+  save(); return png;
 }
+let ok = 0, fail = 0, stop = false;
+const baseMemo = new Map();
+/** Zwraca PNG bazy; generuje ją (po wcześniejszym zapewnieniu baz-referencji), jeśli brakuje lub jest nieświeża. */
+function getBase(a) {
+  if (baseMemo.has(a.asset_id)) return baseMemo.get(a.asset_id);
+  const p = (async () => {
+    const fp = fileOf(a, 'base'), refs = baseRefs(a);
+    if (!(selectedIds.has(a.asset_id) ? baseNeeded(a) && doBase : (!existsSync(fp)))) return readFileSync(fp);
+    if (dry) { console.log(`[dry] baza ${a.asset_id} ${a.name} ${sizeFor(a)} refs=[${refs.map((r) => r.id + ':' + r.role).join(', ')}]`); return Buffer.alloc(0); }
+    const refPngs = []; for (const r of refs) refPngs.push(await getBase(byId[r.id]));
+    const png = await finish(a, 'base', await call(a, refPrompt(refs) + a.prompt_en + AVOID(a), refPngs), refs, 1);
+    ok++; console.log('ok  ', a.asset_id, a.name, 'base', refs.length ? `(refs: ${refs.map((r) => r.id).join(', ')})` : ''); return png;
+  })();
+  baseMemo.set(a.asset_id, p); return p;
+}
+const selectedIds = new Set(selected.map((a) => a.asset_id));
+async function pool(items, fn) { let i = 0; await Promise.all(Array.from({ length: conc }, async () => { while (i < items.length && !stop) await fn(items[i++]); })); }
+const guard = (e, what) => { fail++; console.log('FAIL', what, '-', e.message); if (/HTTP 40[13]|BRAK ŚRODKÓW/.test(e.message)) stop = true; };
 
-let ok = 0, fail = 0, stop = false, idx = 0;
-async function doAsset(a) {
-  let basePng = null;
-  const bf = fileOf(a, 'base');
-  if (needBase(a)) {
-    if (dry) console.log(`[dry] ${a.asset_id} ${a.name} base ${sizeFor(a)}`);
-    else try { basePng = await finish(a, 'base', await call(a, a.prompt_en + AVOID(a)), { frames: 1, ref: null }); ok++; console.log('ok  ', a.asset_id, a.name, 'base'); } catch (e) { fail++; console.log('FAIL', a.asset_id, 'base -', e.message); if (/HTTP 40[13]|BRAK ŚRODKÓW/.test(e.message)) stop = true; return; }
-  } else if (existsSync(bf)) basePng = readFileSync(bf);
-  for (const j of needPoses(a)) {
-    if (stop) return;
-    if (dry) { console.log(`[dry] ${a.asset_id} ${a.name} poza=${j.state} (klatek docelowo ${j.target_frames}) ref=${basePng || existsSync(bf) ? 'tak' : 'brak (zostanie wygenerowana wcześniej)'}`); continue; }
-    try {
-      const prompt = (basePng ? REFERENCE : '') + j.prompt_en + AVOID(a);
-      await finish(a, j.state, await call(a, prompt, basePng), { frames: j.target_frames, ref: basePng ? bf.split('/').pop() : null }); ok++; console.log('ok  ', a.asset_id, a.name, j.state);
-    } catch (e) { fail++; console.log('FAIL', a.asset_id, j.state, '-', e.message); if (/HTTP 40[13]|BRAK ŚRODKÓW/.test(e.message)) { stop = true; return; } }
-  }
-}
-async function worker() { while (idx < todo.length && !stop) await doAsset(todo[idx++]); }
-await Promise.all(Array.from({ length: conc }, worker));
+if (doBase) await pool(selected.filter(baseNeeded), async (a) => { try { await getBase(a); } catch (e) { guard(e, a.asset_id + ' base'); } });
+if (doPoses && !stop) await pool(poseTasks, async ({ a, j }) => {
+  try {
+    const refs = poseRefs(a, j.state), refPngs = []; for (const r of refs) refPngs.push(await getBase(byId[r.id]));
+    if (dry) { console.log(`[dry] poza ${a.asset_id} ${a.name} ${j.state} (klatek ${j.target_frames}) refs=[${refs.map((r) => r.id + ':' + r.role).join(', ')}]`); return; }
+    await finish(a, j.state, await call(a, refPrompt(refs) + j.prompt_en + AVOID(a), refPngs), refs, j.target_frames); ok++; console.log('ok  ', a.asset_id, a.name, j.state);
+  } catch (e) { guard(e, `${a.asset_id} ${j.state}`); }
+});
 console.log(`Gotowe: ${ok} ok, ${fail} błędów`);
 process.exit(fail && !ok ? 1 : 0);

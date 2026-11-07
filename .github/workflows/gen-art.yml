@@ -5,11 +5,11 @@ on:
   workflow_dispatch:
     inputs:
       category:
-        description: 'Kategorie po przecinku albo "all". Postacie z pozami: characters,bosses,enemies,character-variants,boss-variants,enemy-variants,civilians'
+        description: 'Kategorie po przecinku albo "all" (wszystko w kolejności produkcji: postacie, bossowie, wrogowie, przedmioty, przewody, kafelki podłoża, mieszkańcy, rekwizyty, paralaksa, tła poziomów, warianty, menu/interfejs, ilustracje fabularne, efekty)'
         required: true
-        default: 'characters,bosses,enemies,character-variants,boss-variants,enemy-variants,civilians'
+        default: 'all'
       mode:
-        description: 'base = tylko neutralna baza | poses = tylko pozy (wymaga bazy) | both = baza + wszystkie pozy'
+        description: 'both = ETAP 1: wszystkie bazy, ETAP 2: wszystkie pozy | base = tylko bazy | poses = tylko pozy (wymaga baz)'
         required: true
         default: 'both'
       states:
@@ -43,28 +43,33 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
       - run: npm ci
-      - name: Generuj partiami i zapisuj w repo po każdej
+      - name: Generuj (etap 1 bazy → etap 2 pozy), zapisując w repo po każdej partii
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           CATS: ${{ inputs.category }}
+          MODE: ${{ inputs.mode }}
         run: |
           git config user.name "gen-art[bot]"; git config user.email "gen-art@users.noreply.github.com"
-          if [ "$CATS" = "all" ]; then CATS=$(node -e "console.log([...new Set(require('./tools/art-prompts.json').map(a=>a.category))].join(','))"); fi
+          if [ "$CATS" = "all" ]; then CATS=$(node tools/gen-art.mjs --list-categories); fi
           LIM="${{ inputs.limit }}"; FAILED=0
-          for C in ${CATS//,/ }; do
-            DONE=0
-            while [ "$DONE" = "0" ]; do
-              # partia = 6 assetów (bazy + ich pozy), potem commit; pętla aż do wyczerpania kategorii
-              node tools/gen-art.mjs --category "$C" --limit 6 --mode "${{ inputs.mode }}" --states "${{ inputs.states }}" --quality "${{ inputs.quality }}" --model "${{ inputs.model }}" --concurrency "${{ inputs.concurrency }}" | tee /tmp/out.txt || FAILED=1
-              git add public/art/gen
-              if ! git diff --cached --quiet; then
-                git commit -q -m "art: wygenerowane grafiki ($C)"
-                git pull -q --rebase origin main && git push -q origin HEAD:main
-              fi
-              grep -q "obrazów do wygenerowania: 0" /tmp/out.txt && DONE=1
-              grep -q "Gotowe: 0 ok" /tmp/out.txt && { echo "Brak postępu w $C — przechodzę dalej"; DONE=1; }
-              grep -qE "BRAK ŚRODKÓW|HTTP 40[13]" /tmp/out.txt && { echo "Błąd konta/klucza — przerywam całość"; exit 1; }
-              [ "$LIM" != "0" ] && DONE=1
+          STAGES="base poses"; [ "$MODE" = "base" ] && STAGES="base"; [ "$MODE" = "poses" ] && STAGES="poses"
+          for STAGE in $STAGES; do
+            echo "######## ETAP: $STAGE ########"
+            BATCH=24; [ "$STAGE" = "poses" ] && BATCH=4
+            for C in ${CATS//,/ }; do
+              DONE=0
+              while [ "$DONE" = "0" ]; do
+                node tools/gen-art.mjs --category "$C" --limit $BATCH --mode "$STAGE" --states "${{ inputs.states }}" --quality "${{ inputs.quality }}" --model "${{ inputs.model }}" --concurrency "${{ inputs.concurrency }}" | tee /tmp/out.txt || FAILED=1
+                git add public/art/gen
+                if ! git diff --cached --quiet; then
+                  git commit -q -m "art: $STAGE ($C)"
+                  git pull -q --rebase origin main && git push -q origin HEAD:main
+                fi
+                grep -q "obrazów do wygenerowania: 0 " /tmp/out.txt && DONE=1
+                grep -q "Gotowe: 0 ok" /tmp/out.txt && { echo "Brak postępu w $C — przechodzę dalej"; DONE=1; }
+                grep -qE "BRAK ŚRODKÓW|HTTP 40[13]" /tmp/out.txt && { echo "Błąd konta/klucza — przerywam całość"; exit 1; }
+                [ "$LIM" != "0" ] && DONE=1
+              done
             done
           done
           exit $FAILED
