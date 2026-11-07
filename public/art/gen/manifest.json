@@ -31,5 +31,113 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2"
+ },
+ "characters/CHARACTERS-004_katoblepas-tiny-bull__base.png": {
+  "asset_id": "CHARACTERS-004",
+  "name": "Katoblepas Tiny Bull",
+  "category": "characters",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1024x1536",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "characters/CHARACTERS-001_marioosh__base.png": {
+  "asset_id": "CHARACTERS-001",
+  "name": "Marioosh",
+  "category": "characters",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1024x1536",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "characters/CHARACTERS-002_darioosh__base.png": {
+  "asset_id": "CHARACTERS-002",
+  "name": "Darioosh",
+  "category": "characters",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1024x1536",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "characters/CHARACTERS-003_princess-scarlet__base.png": {
+  "asset_id": "CHARACTERS-003",
+  "name": "Princess Scarlet",
+  "category": "characters",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1024x1536",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "characters/CHARACTERS-002_darioosh__idle.png": {
+  "asset_id": "CHARACTERS-002",
+  "name": "Darioosh",
+  "category": "characters",
+  "state": "idle",
+  "target_frames": 8,
+  "reference": "CHARACTERS-002_darioosh__base.png",
+  "size": "1024x1536",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "characters/CHARACTERS-003_princess-scarlet__idle.png": {
+  "asset_id": "CHARACTERS-003",
+  "name": "Princess Scarlet",
+  "category": "characters",
+  "state": "idle",
+  "target_frames": 8,
+  "reference": "CHARACTERS-003_princess-scarlet__base.png",
+  "size": "1024x1536",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "characters/CHARACTERS-001_marioosh__idle.png": {
+  "asset_id": "CHARACTERS-001",
+  "name": "Marioosh",
+  "category": "characters",
+  "state": "idle",
+  "target_frames": 8,
+  "reference": "CHARACTERS-001_marioosh__base.png",
+  "size": "1024x1536",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "characters/CHARACTERS-002_darioosh__walk.png": {
+  "asset_id": "CHARACTERS-002",
+  "name": "Darioosh",
+  "category": "characters",
+  "state": "walk",
+  "target_frames": 10,
+  "reference": "CHARACTERS-002_darioosh__base.png",
+  "size": "1024x1536",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "characters/CHARACTERS-001_marioosh__walk.png": {
+  "asset_id": "CHARACTERS-001",
+  "name": "Marioosh",
+  "category": "characters",
+  "state": "walk",
+  "target_frames": 10,
+  "reference": "CHARACTERS-001_marioosh__base.png",
+  "size": "1024x1536",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
  }
 }
