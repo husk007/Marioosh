@@ -1039,5 +1039,77 @@
   "quality": "medium",
   "model": "gpt-image-2",
   "cutout": "checker"
+ },
+ "collectibles/COLLECTIBLES-028_life-crystal-shard-6-vespera__base.png": {
+  "asset_id": "COLLECTIBLES-028",
+  "name": "Life Crystal Shard 6 - Vespera",
+  "category": "collectibles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "collectibles/COLLECTIBLES-025_life-crystal-shard-3-florion__base.png": {
+  "asset_id": "COLLECTIBLES-025",
+  "name": "Life Crystal Shard 3 - Florion",
+  "category": "collectibles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "collectibles/COLLECTIBLES-026_life-crystal-shard-4-aqualis__base.png": {
+  "asset_id": "COLLECTIBLES-026",
+  "name": "Life Crystal Shard 4 - Aqualis",
+  "category": "collectibles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "collectibles/COLLECTIBLES-027_life-crystal-shard-5-skaltria__base.png": {
+  "asset_id": "COLLECTIBLES-027",
+  "name": "Life Crystal Shard 5 - Skaltria",
+  "category": "collectibles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "collectibles/COLLECTIBLES-030_life-crystal-shard-8-katoblis__base.png": {
+  "asset_id": "COLLECTIBLES-030",
+  "name": "Life Crystal Shard 8 - Katoblis",
+  "category": "collectibles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "collectibles/COLLECTIBLES-029_life-crystal-shard-7-ferroks__base.png": {
+  "asset_id": "COLLECTIBLES-029",
+  "name": "Life Crystal Shard 7 - Ferroks",
+  "category": "collectibles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
  }
 }
