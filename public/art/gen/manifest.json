@@ -439,5 +439,65 @@
   "quality": "medium",
   "model": "gpt-image-2",
   "cutout": "checker"
+ },
+ "enemy-variants/ENEMY_VARIANTS-001_zukorog-combat-state__base.png": {
+  "asset_id": "ENEMY_VARIANTS-001",
+  "name": "Żukoróg - combat state",
+  "category": "enemy-variants",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "enemy-variants/ENEMY_VARIANTS-004_slimorog-combat-state__base.png": {
+  "asset_id": "ENEMY_VARIANTS-004",
+  "name": "Ślimoróg - combat state",
+  "category": "enemy-variants",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "enemy-variants/ENEMY_VARIANTS-003_rogoroza-combat-state__base.png": {
+  "asset_id": "ENEMY_VARIANTS-003",
+  "name": "Rogoróża - combat state",
+  "category": "enemy-variants",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "enemy-variants/ENEMY_VARIANTS-002_bazalisk-combat-state__base.png": {
+  "asset_id": "ENEMY_VARIANTS-002",
+  "name": "Bazalisk - combat state",
+  "category": "enemy-variants",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "enemy-variants/ENEMY_VARIANTS-005_kamieniorog-combat-state__base.png": {
+  "asset_id": "ENEMY_VARIANTS-005",
+  "name": "Kamienioróg - combat state",
+  "category": "enemy-variants",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
  }
 }
