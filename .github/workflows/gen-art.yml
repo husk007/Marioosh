@@ -1,16 +1,21 @@
 name: Generuj grafiki (OpenAI)
 # Ręcznie: Actions → „Generuj grafiki (OpenAI)” → Run workflow. Wymaga sekretu repozytorium OPENAI_API_KEY.
+# Wyniki: public/art/gen/<kategoria>/<ID>_<nazwa>__<poza>.png + manifest.json. Ponowne uruchomienie pomija gotowe pliki (można wznawiać).
 on:
   workflow_dispatch:
     inputs:
       category:
-        description: 'Kategorie po przecinku albo "all". Np. enemies,bosses,characters. (level-backgrounds, story-illustrations, collectibles, interactables, civilians, conduits, planet-props, planet-tiles, parallax, effects, interface, ...)'
+        description: 'Kategorie po przecinku albo "all". Postacie z pozami: characters,bosses,enemies,character-variants,boss-variants,enemy-variants,civilians'
         required: true
-        default: 'enemies'
-      limit:
-        description: 'Maks. liczba assetów NA KATEGORIĘ (0 = wszystkie)'
+        default: 'characters,bosses,enemies,character-variants,boss-variants,enemy-variants,civilians'
+      mode:
+        description: 'base = tylko neutralna baza | poses = tylko pozy (wymaga bazy) | both = baza + wszystkie pozy'
         required: true
-        default: '0'
+        default: 'both'
+      states:
+        description: 'Opcjonalnie: tylko wybrane pozy po przecinku (np. idle,walk,jump_apex). Puste = wszystkie'
+        required: false
+        default: ''
       model:
         description: 'Model obrazów (np. gpt-image-2, gpt-image-2.6-sunburst, gpt-image-1.5, gpt-image-1-mini)'
         required: true
@@ -23,6 +28,10 @@ on:
         description: 'Równoległe żądania (4 = bezpiecznie; przy błędach 429 zmniejsz)'
         required: true
         default: '4'
+      limit:
+        description: 'Maks. liczba assetów na kategorię (0 = wszystkie) — do testów ustaw np. 1'
+        required: true
+        default: '0'
 permissions:
   contents: write
 jobs:
@@ -34,24 +43,28 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
       - run: npm ci
-      - name: Generuj kategoriami i zapisuj po każdej
+      - name: Generuj partiami i zapisuj w repo po każdej
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           CATS: ${{ inputs.category }}
         run: |
           git config user.name "gen-art[bot]"; git config user.email "gen-art@users.noreply.github.com"
           if [ "$CATS" = "all" ]; then CATS=$(node -e "console.log([...new Set(require('./tools/art-prompts.json').map(a=>a.category))].join(','))"); fi
-          FAILED=0
+          LIM="${{ inputs.limit }}"; FAILED=0
           for C in ${CATS//,/ }; do
-            echo "::group::$C"
-            node tools/gen-art.mjs --category "$C" --limit "${{ inputs.limit }}" --quality "${{ inputs.quality }}" --model "${{ inputs.model }}" --concurrency "${{ inputs.concurrency }}" || FAILED=1
-            echo "::endgroup::"
-            git add public/art/gen
-            if ! git diff --cached --quiet; then
-              git commit -m "art: wygenerowane grafiki ($C)"
-              git pull --rebase origin main && git push origin HEAD:main
-            fi
-            # brak środków/klucza: nie ma sensu iść dalej
-            if [ "$FAILED" = "1" ] && [ -z "$(git log -1 --since='3 minutes ago' --format=%H -- public/art/gen)" ]; then echo "Kategoria $C bez wyników — przerywam"; break; fi
+            DONE=0
+            while [ "$DONE" = "0" ]; do
+              # partia = 6 assetów (bazy + ich pozy), potem commit; pętla aż do wyczerpania kategorii
+              node tools/gen-art.mjs --category "$C" --limit 6 --mode "${{ inputs.mode }}" --states "${{ inputs.states }}" --quality "${{ inputs.quality }}" --model "${{ inputs.model }}" --concurrency "${{ inputs.concurrency }}" | tee /tmp/out.txt || FAILED=1
+              git add public/art/gen
+              if ! git diff --cached --quiet; then
+                git commit -q -m "art: wygenerowane grafiki ($C)"
+                git pull -q --rebase origin main && git push -q origin HEAD:main
+              fi
+              grep -q "obrazów do wygenerowania: 0" /tmp/out.txt && DONE=1
+              grep -q "Gotowe: 0 ok" /tmp/out.txt && { echo "Brak postępu w $C — przechodzę dalej"; DONE=1; }
+              grep -qE "BRAK ŚRODKÓW|HTTP 40[13]" /tmp/out.txt && { echo "Błąd konta/klucza — przerywam całość"; exit 1; }
+              [ "$LIM" != "0" ] && DONE=1
+            done
           done
           exit $FAILED

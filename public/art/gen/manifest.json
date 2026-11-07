@@ -1,26 +1,35 @@
 {
- "ENEMIES-001": {
+ "enemies/ENEMIES-001_rogus__base.png": {
+  "asset_id": "ENEMIES-001",
   "name": "Roguś",
   "category": "enemies",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
   "size": "1024x1024",
   "quality": "medium",
-  "model": "gpt-image-2",
-  "file": "enemies/ENEMIES-001.png"
+  "model": "gpt-image-2"
  },
- "ENEMIES-002": {
+ "enemies/ENEMIES-002_baranitor__base.png": {
+  "asset_id": "ENEMIES-002",
   "name": "Baranitor",
   "category": "enemies",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
   "size": "1024x1024",
   "quality": "medium",
-  "model": "gpt-image-2",
-  "file": "enemies/ENEMIES-002.png"
+  "model": "gpt-image-2"
  },
- "ENEMIES-003": {
+ "enemies/ENEMIES-003_bykobieg__base.png": {
+  "asset_id": "ENEMIES-003",
   "name": "Bykobieg",
   "category": "enemies",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
   "size": "1024x1024",
   "quality": "medium",
-  "model": "gpt-image-2",
-  "file": "enemies/ENEMIES-003.png"
+  "model": "gpt-image-2"
  }
 }
