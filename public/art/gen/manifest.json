@@ -1843,5 +1843,77 @@
   "quality": "medium",
   "model": "gpt-image-2",
   "cutout": "checker"
+ },
+ "conduits/CONDUITS-028_black-conduit-vertical__base.png": {
+  "asset_id": "CONDUITS-028",
+  "name": "Black conduit - vertical",
+  "category": "conduits",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "conduits/CONDUITS-027_black-conduit-horizontal__base.png": {
+  "asset_id": "CONDUITS-027",
+  "name": "Black conduit - horizontal",
+  "category": "conduits",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "conduits/CONDUITS-025_purple-conduit-junction__base.png": {
+  "asset_id": "CONDUITS-025",
+  "name": "Purple conduit - junction",
+  "category": "conduits",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "conduits/CONDUITS-026_black-conduit-entrance__base.png": {
+  "asset_id": "CONDUITS-026",
+  "name": "Black conduit - entrance",
+  "category": "conduits",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "conduits/CONDUITS-029_black-conduit-bend__base.png": {
+  "asset_id": "CONDUITS-029",
+  "name": "Black conduit - bend",
+  "category": "conduits",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "conduits/CONDUITS-030_black-conduit-junction__base.png": {
+  "asset_id": "CONDUITS-030",
+  "name": "Black conduit - junction",
+  "category": "conduits",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
  }
 }
