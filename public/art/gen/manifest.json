@@ -1915,5 +1915,323 @@
   "quality": "medium",
   "model": "gpt-image-2",
   "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-049_aqualis-solid-center__base.png": {
+  "asset_id": "PLANET_TILES-049",
+  "name": "Aqualis - solid-center",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "none"
+ },
+ "planet-tiles/PLANET_TILES-033_florion-solid-center__base.png": {
+  "asset_id": "PLANET_TILES-033",
+  "name": "Florion - solid-center",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "none"
+ },
+ "planet-tiles/PLANET_TILES-017_zlomaria-solid-center__base.png": {
+  "asset_id": "PLANET_TILES-017",
+  "name": "Złomaria - solid-center",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "none"
+ },
+ "planet-tiles/PLANET_TILES-001_lumenia-solid-center__base.png": {
+  "asset_id": "PLANET_TILES-001",
+  "name": "Lumenia - solid-center",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "none"
+ },
+ "planet-tiles/PLANET_TILES-065_skaltria-solid-center__base.png": {
+  "asset_id": "PLANET_TILES-065",
+  "name": "Skaltria - solid-center",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "none"
+ },
+ "planet-tiles/PLANET_TILES-097_ferroks-solid-center__base.png": {
+  "asset_id": "PLANET_TILES-097",
+  "name": "Ferroks - solid-center",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "none"
+ },
+ "planet-tiles/PLANET_TILES-081_vespera-solid-center__base.png": {
+  "asset_id": "PLANET_TILES-081",
+  "name": "Vespera - solid-center",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "none"
+ },
+ "planet-tiles/PLANET_TILES-113_katoblis-solid-center__base.png": {
+  "asset_id": "PLANET_TILES-113",
+  "name": "Katoblis - solid-center",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "none"
+ },
+ "planet-tiles/PLANET_TILES-129_pradowo-secret-solid-center__base.png": {
+  "asset_id": "PLANET_TILES-129",
+  "name": "Pradowo secret - solid-center",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "none"
+ },
+ "planet-tiles/PLANET_TILES-003_lumenia-top-left-corner__base.png": {
+  "asset_id": "PLANET_TILES-003",
+  "name": "Lumenia - top-left-corner",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-001_lumenia-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-002_lumenia-top-center__base.png": {
+  "asset_id": "PLANET_TILES-002",
+  "name": "Lumenia - top-center",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-001_lumenia-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "none"
+ },
+ "planet-tiles/PLANET_TILES-004_lumenia-top-right-corner__base.png": {
+  "asset_id": "PLANET_TILES-004",
+  "name": "Lumenia - top-right-corner",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-001_lumenia-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-005_lumenia-left-wall__base.png": {
+  "asset_id": "PLANET_TILES-005",
+  "name": "Lumenia - left-wall",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-001_lumenia-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-006_lumenia-right-wall__base.png": {
+  "asset_id": "PLANET_TILES-006",
+  "name": "Lumenia - right-wall",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-001_lumenia-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-007_lumenia-bottom-center__base.png": {
+  "asset_id": "PLANET_TILES-007",
+  "name": "Lumenia - bottom-center",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-001_lumenia-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-008_lumenia-bottom-left-corner__base.png": {
+  "asset_id": "PLANET_TILES-008",
+  "name": "Lumenia - bottom-left-corner",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-001_lumenia-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-009_lumenia-bottom-right-corner__base.png": {
+  "asset_id": "PLANET_TILES-009",
+  "name": "Lumenia - bottom-right-corner",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-001_lumenia-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "none"
+ },
+ "planet-tiles/PLANET_TILES-010_lumenia-slope-up__base.png": {
+  "asset_id": "PLANET_TILES-010",
+  "name": "Lumenia - slope-up",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-001_lumenia-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-011_lumenia-slope-down__base.png": {
+  "asset_id": "PLANET_TILES-011",
+  "name": "Lumenia - slope-down",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-001_lumenia-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-012_lumenia-one-way-platform__base.png": {
+  "asset_id": "PLANET_TILES-012",
+  "name": "Lumenia - one-way-platform",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-001_lumenia-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-013_lumenia-moving-platform__base.png": {
+  "asset_id": "PLANET_TILES-013",
+  "name": "Lumenia - moving-platform",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-001_lumenia-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-015_lumenia-breakable-ground__base.png": {
+  "asset_id": "PLANET_TILES-015",
+  "name": "Lumenia - breakable-ground",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-001_lumenia-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-014_lumenia-hazard-base__base.png": {
+  "asset_id": "PLANET_TILES-014",
+  "name": "Lumenia - hazard-base",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-001_lumenia-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "none"
+ },
+ "planet-tiles/PLANET_TILES-016_lumenia-hidden-room-wall__base.png": {
+  "asset_id": "PLANET_TILES-016",
+  "name": "Lumenia - hidden-room-wall",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-001_lumenia-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "none"
  }
 }
