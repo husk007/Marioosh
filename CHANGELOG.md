@@ -1,10 +1,9 @@
 # Zmiany
 
-## HD art / 2026-11-07 (w przygotowaniu)
-- Pierwszy etap migracji do gładkiej grafiki HD: 12 ilustracji SVG wrogów oraz 9 planetarnych ilustracji tła.
-- Asynchroniczny preload, supersampling 4× dla przeciwników i 2× dla teł; awaryjny fallback do proceduralnych grafik.
-- Zaktualizowana dokumentacja artystyczna. Finalne portrety postaci i sprite sheety animacji są nadal w opracowaniu.
-
+## 0.1.6
+- **Grafika HD (fala 1):** 12 ilustracji SVG wrogów i 9 teł planet wczytywanych jako gładka grafika HD (z awaryjnym powrotem do rysunku proceduralnego).
+- Poprawka integracji: sprite'y HD są przycinane do widocznej zawartości, skalowane z zachowaniem proporcji (koniec ze ściśniętymi roślinami) i stoją stopami na ziemi (wcześniej część wrogów lewitowała nad podłożem).
+- Znane ograniczenia: wrogowie HD mają jedną klatkę (bez animacji chodu i bez osobnej pozy ogłuszenia); bracia, bossowie i pozostałe wrogowie nadal rysowani proceduralnie.
 
 ## 0.1.5
 - **Grafika wg „Biblii HD v0.3”:** bracia przerysowani zgodnie z opisami (Marioosh — pomarańczowy kombinezon, niebieski kask, krępa sylwetka; Darioosh — niebieski kombinezon, żółty kask, smukły, z miernikiem), nowe pozy: spadanie, kucanie, zwycięstwo.

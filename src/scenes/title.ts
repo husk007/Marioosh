@@ -48,7 +48,7 @@ export class TitleScene implements Scene {
     g.wrap(t('game.tagline'), 500, 7).forEach((ln, i) => g.text(ln, VW / 2, 92 + i * g.lineH(7), { size: 7, align: 'center', color: '#e8e8f0' }));
     if (!this.armed) g.text(app.input.touchEnabled ? t('press.tap') : t('press.start'), VW / 2, 190, { size: 9, align: 'center', color: '#ffd23f', alpha: 0.5 + 0.5 * Math.sin(this.t * 5) });
     else this.menu.draw(g, VW / 2, 146, 27, 280, 9);
-    g.text('v0.1.5', VW - 6, VH - 12, { size: 6, align: 'right', color: '#c8c8d8', shadow: null });
+    g.text('v0.1.6', VW - 6, VH - 12, { size: 6, align: 'right', color: '#c8c8d8', shadow: null });
     g.text(t('fs.hint'), 6, VH - 12, { size: 6, color: '#c8c8d8', shadow: null });
   }
 }

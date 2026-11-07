@@ -34,12 +34,28 @@ function loadEnemy(kind: EnemyKind): Promise<void> {
       try {
         const look = LOOK[kind];
         const w = look.w + 6, h = look.h + 6, ss = 4;
+        // 1) raster SVG w dużej skali, 2) przytnij do przezroczystego marginesu, 3) wpisz proporcjonalnie (bez rozciągania), stopami do dołu
+        const SRC = 4, sw = 160 * SRC, sh = 140 * SRC;
+        const tmp = makeCanvas(sw, sh);
+        const tctx = tmp.getContext('2d');
         const canvas = makeCanvas(w * ss, h * ss);
         const ctx = canvas.getContext('2d');
-        if (ctx) {
+        if (tctx && ctx) {
+          tctx.drawImage(im, 0, 0, sw, sh);
+          let bx = 0, by = 0, bw = sw, bh = sh;
+          try {
+            const d = tctx.getImageData(0, 0, sw, sh).data;
+            let x0 = sw, y0 = sh, x1 = -1, y1 = -1;
+            for (let y = 0; y < sh; y++) for (let x = 0; x < sw; x++) if (d[(y * sw + x) * 4 + 3] > 12) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+            if (x1 >= x0 && y1 >= y0) { bx = x0; by = y0; bw = x1 - x0 + 1; bh = y1 - y0 + 1; }
+          } catch { /* bez przycinania */ }
+          // rośliny są wysokie i wąskie w hitboxie, a ilustracje szerokie — pozwól im wystawać na boki, by zgadzała się wysokość
+          const wf = look.arch === 'plant' ? 1.7 : 1;
+          const k = Math.min(((look.w + 4) * wf * ss) / bw, ((look.h + 4) * ss) / bh);
+          const dw = bw * k, dh = bh * k;
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = 'high';
-          ctx.drawImage(im, 0, 0, canvas.width, canvas.height);
+          ctx.drawImage(tmp, bx, by, bw, bh, (canvas.width - dw) / 2, canvas.height - 3 * ss - dh + ss, dw, dh);
           canvas.ss = ss;
           hdSprites.set(kind, canvas);
         }
