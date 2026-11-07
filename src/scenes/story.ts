@@ -2,7 +2,7 @@ import type { App, Scene } from '../app';
 import type { Gfx } from '../engine/gfx';
 import { t } from '../engine/i18n';
 import { VH, VW } from '../game/constants';
-import { heroSprite, itemSprite, cableSprite, statueSprite } from '../sprites/art';
+import { heroSprite, itemSprite, cableSprite, statueSprite, scarletSprite } from '../sprites/art';
 import { MapScene } from './map';
 import { TitleScene } from './title';
 import { panel, skyBackdrop, title } from './ui';
@@ -54,8 +54,8 @@ export class IntroScene extends PagesScene {
       { text: () => t('intro.1'), art: (g, tt) => { floor(g); heroes(g, 220, 104, tt); g.srect(60, 80, 90, 120, '#4a4a5a'); g.srect(70, 90, 70, 20, '#3fbf5a'); } },
       { text: () => t('intro.2'), art: (g, tt) => { floor(g); heroes(g, 140, 104, tt); g.spr(cableSprite('purple', 'up', Math.floor(tt * 4)), 380, 168, { w: 64, h: 64, screen: true }); swirl(g, 412, 150, tt * 0.3); } },
       { text: () => t('intro.3'), art: (g, tt) => { swirl(g, VW / 2, 110, tt); heroes(g, VW / 2 - 66, 60 + Math.sin(tt * 2) * 8, tt); } },
-      { text: () => t('intro.4'), art: (g, tt) => { floor(g, '#2b3a2e'); for (let i = 0; i < 5; i++) g.spr(statueSprite(false, i), 60 + i * 110, 156, { w: 48, h: 66, screen: true }); heroes(g, 250, 100, tt); } },
-      { text: () => t('intro.5'), art: (g, tt) => { for (let i = 0; i < 8; i++) { g.ctx.fillStyle = i % 2 ? '#ffd23f' : '#7fd6ff'; g.ctx.beginPath(); g.ctx.arc(70 + i * 72, 120 + Math.sin(tt * 2 + i) * 14, 14, 0, Math.PI * 2); g.ctx.fill(); } },bg: 6 },
+      { text: () => t('intro.4'), art: (g, tt) => { floor(g, '#2b3a2e'); for (let i = 0; i < 5; i++) g.spr(statueSprite(false, i), 60 + i * 110, 156, { w: 48, h: 66, screen: true }); heroes(g, 250, 100, tt);  g.spr(scarletSprite(1, 0), VW - 110, 118, { w: 60, h: 88, screen: true });} },
+      { text: () => t('intro.5'), art: (g, tt) => { g.spr(scarletSprite(2, Math.floor(tt * 3)), VW / 2 - 40, 70 + Math.sin(tt * 2) * 4, { w: 80, h: 116, screen: true }); for (let i = 0; i < 8; i++) { g.ctx.fillStyle = i % 2 ? '#ffd23f' : '#7fd6ff'; g.ctx.beginPath(); g.ctx.arc(70 + i * 72, 120 + Math.sin(tt * 2 + i) * 14, 14, 0, Math.PI * 2); g.ctx.fill(); } },bg: 6 },
       { text: () => t('intro.6'), art: (g, tt) => { floor(g); heroes(g, 160, 104, tt); for (let i = 0; i < 6; i++) g.spr(itemSprite(i % 2 ? 'can' : 'pet', Math.floor(tt * 4)), 380 + i * 30, 160 + Math.sin(tt * 3 + i) * 6, { w: 30, h: 30, screen: true }); } },
     ], (app) => app.setScene(new MapScene('W1-L1')), 'title');
   }
@@ -70,7 +70,7 @@ export class EndingScene extends PagesScene {
   override enter(app: App): void {
     const s = app.session!; const secret = s.shards.size >= 8;
     type Pg = { text: () => string; art: (g: Gfx, tt: number) => void; bg?: number };
-    const base: Pg[] = [1, 2, 3, 4, 5, 6].map((n) => ({ text: () => t('end.' + n), art: (g: Gfx, tt: number) => { floor(g, '#2b3a2e'); heroes(g, 220, 104, tt); for (let i = 0; i < 10; i++) g.srect((i * 71 + tt * 30) % VW, 20 + (i * 37) % 80, 3, 3, '#ffd23f'); } }));
+    const base: Pg[] = [1, 2, 3, 4, 5, 6].map((n) => ({ text: () => t('end.' + n), art: (g: Gfx, tt: number) => { floor(g, '#2b3a2e'); heroes(g, 180, 104, tt); g.spr(scarletSprite(3, Math.floor(tt * 2)), 360, 112, { w: 66, h: 96, screen: true }); for (let i = 0; i < 10; i++) g.srect((i * 71 + tt * 30) % VW, 20 + (i * 37) % 80, 3, 3, '#ffd23f'); } }));
     base.push({ text: () => `${t('end.final')}\n${t('end.stats', { r: s.freed.size, s: s.shards.size, n: s.notes.size })}\n${t('end.unlock')}`, art: (g, tt) => { floor(g, '#2b3a2e'); heroes(g, 220, 104, tt); } });
     if (secret) for (const k of ['end.s1', 'end.s2', 'end.s3', 'end.s4', 'end.tbc']) base.push({ text: () => t(k), art: (g, tt) => { floor(g, '#1b1c2a'); g.spr(cableSprite('purple', 'up', Math.floor(tt * 4)), 300, 168, { w: 64, h: 64, screen: true }); swirl(g, 332, 150, tt * 0.3); }, bg: 6 });
     this.pages = base;

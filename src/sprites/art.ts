@@ -10,7 +10,7 @@ import { stylize } from './style';
 import { drawItem, drawCrate, drawCable, drawIcon } from './objects';
 import { drawBoss } from './bosses';
 import { drawEnemy } from './enemies';
-import { drawBubble, drawCheckpoint, drawCompanion, drawEcoport, drawExit, drawFreed, drawLamp, drawLantern, drawPulse, drawRock, drawSign, drawSpark, drawStatue, drawSwitch } from './props';
+import { drawBubble, drawCheckpoint, drawCompanion, drawEcoport, drawExit, drawFreed, drawLamp, drawLantern, drawPulse, drawRock, drawScarlet, drawSign, drawSpark, drawStatue, drawSwitch } from './props';
 
 const cache = new Map<string, Img>();
 function memo(key: string, make: () => Img): Img {
@@ -50,6 +50,7 @@ export function crateSprite(hidden: boolean, used: boolean): Img { return memo(`
 export { CABLE_COL } from './objects';
 export function cableSprite(color: CableColor, face: 'up' | 'down', pulse: number): Img { return memo(`cable2:${color}:${face}:${pulse & 1}`, () => drawCable(color, face, pulse)); }
 export function statueSprite(cracked: boolean, idx: number): Img { return memo(`statue2:${cracked ? 1 : 0}:${idx % 3}`, () => drawStatue(cracked, idx)); }
+export function scarletSprite(state: number, f = 0): Img { return memo(`scarlet:${state}:${f & 1}`, () => drawScarlet(state, f)); }
 export function freedSprite(): Img { return memo('freed2', () => drawFreed()); }
 export function checkpointSprite(on: boolean, f: number): Img { return memo(`cp2:${on ? 1 : 0}:${f & 1}`, () => drawCheckpoint(on, f)); }
 export function exitSprite(on: boolean, f: number): Img { return memo(`exit2:${on ? 1 : 0}:${f & 1}`, () => drawExit(on, f)); }

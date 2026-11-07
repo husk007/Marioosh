@@ -215,7 +215,7 @@ export function heroFrameFor(p: PlayerEnt): HeroFrame {
   if (p.atk.phase !== 'none') return 'attack';
   if (mv.climbing) return Math.floor(p.anim * 6) % 2 ? 'climb1' : 'climb0';
   if (mv.swimming) return 'swim';
-  if (!b.onGround) return 'jump';
+  if (!b.onGround) return b.vy > 90 ? 'fall' : 'jump';
   if (Math.abs(b.vx) > 12) return Math.floor(p.anim * (Math.abs(b.vx) > 200 ? 12 : 8)) % 2 ? 'walk1' : 'walk0';
   return 'idle';
 }

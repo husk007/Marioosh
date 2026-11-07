@@ -8,24 +8,24 @@ const OUTC = 'rgba(22,14,32,0.88)';
 
 export interface EnemyLook { body: string; belly: string; horn: string; w: number; h: number; arch: 'quad' | 'beetle' | 'fly' | 'swim' | 'plant' | 'snail' | 'rock' | 'hop'; }
 export const LOOK: Record<EnemyKind, EnemyLook> = {
-  rogus:       { body: '#9a6b3f', belly: '#d9b98a', horn: '#f4ecd0', w: 26, h: 22, arch: 'quad' },
-  baranitor:   { body: '#d8d2c4', belly: '#f2efe6', horn: '#8a7b5a', w: 32, h: 28, arch: 'quad' },
-  bykobieg:    { body: '#7a3a34', belly: '#c47a5a', horn: '#f0e6c8', w: 40, h: 30, arch: 'quad' },
-  zukorog:     { body: '#2e6f5b', belly: '#9ad0b0', horn: '#f4ecd0', w: 28, h: 20, arch: 'beetle' },
-  cmorog:      { body: '#a58bc6', belly: '#e6dcf2', horn: '#f4ecd0', w: 28, h: 20, arch: 'fly' },
-  pszczolrog:  { body: '#f0c43a', belly: '#4a3a1a', horn: '#fff6d0', w: 24, h: 18, arch: 'fly' },
-  rogowrobel:  { body: '#8a6a52', belly: '#d8c0a0', horn: '#fff6d0', w: 22, h: 18, arch: 'fly' },
-  krukorog:    { body: '#2a2a3a', belly: '#4a4a6a', horn: '#d8d0c0', w: 34, h: 28, arch: 'fly' },
-  gekorog:     { body: '#4aa05a', belly: '#b6e0a0', horn: '#f4ecd0', w: 28, h: 18, arch: 'quad' },
-  bazalisk:    { body: '#6b8f3a', belly: '#c8d890', horn: '#f0e6c8', w: 38, h: 26, arch: 'quad' },
-  rogopletw:   { body: '#3a8ac2', belly: '#bfe6f6', horn: '#f4ecd0', w: 30, h: 20, arch: 'swim' },
-  osmiorog:    { body: '#b8506a', belly: '#e8a0b0', horn: '#f4ecd0', w: 34, h: 30, arch: 'swim' },
-  kakturozec:  { body: '#3e8f4a', belly: '#9ad08a', horn: '#f4d0e0', w: 28, h: 34, arch: 'plant' },
-  rogopnacze:  { body: '#2f7a3c', belly: '#7fc060', horn: '#f4ecd0', w: 24, h: 40, arch: 'plant' },
+  rogus:       { body: '#b8432f', belly: '#f6d4b0', horn: '#f4ecd0', w: 26, h: 22, arch: 'quad' },
+  baranitor:   { body: '#e8d8b8', belly: '#f6ecd4', horn: '#f2ead0', w: 32, h: 28, arch: 'quad' },
+  bykobieg:    { body: '#7a3a2a', belly: '#c47a5a', horn: '#f0e6c8', w: 40, h: 30, arch: 'quad' },
+  zukorog:     { body: '#1d4a3a', belly: '#a8e070', horn: '#f4ecd0', w: 28, h: 20, arch: 'beetle' },
+  cmorog:      { body: '#b6a0d0', belly: '#f2e8d0', horn: '#f4ecd0', w: 28, h: 20, arch: 'fly' },
+  pszczolrog:  { body: '#f2b92e', belly: '#2a2428', horn: '#fff6d0', w: 24, h: 18, arch: 'fly' },
+  rogowrobel:  { body: '#8a5a3a', belly: '#d6844a', horn: '#fff6d0', w: 22, h: 18, arch: 'fly' },
+  krukorog:    { body: '#1d2548', belly: '#3a3f78', horn: '#d8d0c0', w: 34, h: 28, arch: 'fly' },
+  gekorog:     { body: '#5fb850', belly: '#b6f0c8', horn: '#f4ecd0', w: 28, h: 18, arch: 'quad' },
+  bazalisk:    { body: '#8a7860', belly: '#d0b888', horn: '#d8c8a8', w: 38, h: 26, arch: 'quad' },
+  rogopletw:   { body: '#2a64c8', belly: '#eef4ff', horn: '#f08a7a', w: 30, h: 20, arch: 'swim' },
+  osmiorog:    { body: '#7a4ab0', belly: '#b890d8', horn: '#f4ecd0', w: 34, h: 30, arch: 'swim' },
+  kakturozec:  { body: '#3e9a6a', belly: '#a8d8a0', horn: '#f4d0e0', w: 28, h: 34, arch: 'plant' },
+  rogopnacze:  { body: '#2a5a30', belly: '#8ac040', horn: '#f4ecd0', w: 24, h: 40, arch: 'plant' },
   rogoroza:    { body: '#2f7a3c', belly: '#e0507a', horn: '#f4ecd0', w: 28, h: 34, arch: 'plant' },
-  slimorog:    { body: '#c8a04a', belly: '#e8d090', horn: '#f4ecd0', w: 28, h: 22, arch: 'snail' },
-  rogoskoczek: { body: '#7a9a3a', belly: '#d8e090', horn: '#f4ecd0', w: 22, h: 20, arch: 'hop' },
-  kamienirog:  { body: '#7a7a82', belly: '#a0a0aa', horn: '#d8d0c0', w: 38, h: 32, arch: 'rock' },
+  slimorog:    { body: '#6a7a58', belly: '#e0a840', horn: '#f4ecd0', w: 28, h: 22, arch: 'snail' },
+  rogoskoczek: { body: '#8ad03a', belly: '#e8f0a0', horn: '#f4ecd0', w: 22, h: 20, arch: 'hop' },
+  kamienirog:  { body: '#5a5660', belly: '#8a8494', horn: '#cfc8d8', w: 38, h: 32, arch: 'rock' },
   dron:        { body: '#8d93a0', belly: '#ffcc40', horn: '#ff6a5a', w: 20, h: 16, arch: 'fly' },
 };
 
@@ -74,6 +74,7 @@ export function drawEnemy(kind: EnemyKind, f: number, state: number): Img {
       else { horn(g, hx - 4, hy - 5, hx - 6, hy - (big ? 15 : 12), 2, L.horn, -2); horn(g, hx + 2, hy - 5, hx + 6, hy - (big ? 15 : 12), 2, L.horn, 2); }
       eye(g, hx - 1, hy - 1, 2.1, st);
       g.fillStyle = shade(body, 0.55); g.beginPath(); g.ellipse(hx + 6.4, hy + 2.4, 2.4, 1.8, 0, 0, TAU); g.fill();
+      if (big) { g.strokeStyle = '#a05cdb'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(w - 14, h / 2 - 2); g.lineTo(w - 12, h / 2 + 3); g.lineTo(w - 15, h / 2 + 7); g.stroke(); }
       if (big && !st) { g.fillStyle = 'rgba(255,255,255,0.55)'; g.beginPath(); g.arc(w - 1, hy + 1, 1.6 + a, 0, TAU); g.fill(); }
       if (st) { spark(g, hx - 6, hy - 11); spark(g, hx + 3, hy - 12); }
       break;
@@ -84,7 +85,9 @@ export function drawEnemy(kind: EnemyKind, f: number, state: number): Img {
       else { leg(g, 4, h - 6 + (a ? 0 : 1.5), 4, 6, body); leg(g, w - 12, h - 6 + (a ? 1.5 : 0), 4, 6, body); }
       if (!hop) { g.strokeStyle = OUTC; g.lineWidth = 3.4; g.beginPath(); g.moveTo(5, h - 7); g.quadraticCurveTo(-3, h - 8, 0, h - 14); g.stroke(); g.strokeStyle = body; g.lineWidth = 2.2; g.stroke(); }
       blob(g, w / 2 - 2, h / 2 + 1, w / 2 - 3, h / 2 - 3, body); g.fillStyle = belly; g.globalAlpha = 0.85; g.beginPath(); g.ellipse(w / 2 - 2, h / 2 + 4, w / 3, h / 5, 0, 0, TAU); g.fill(); g.globalAlpha = 1;
+      if (kind === 'gekorog') { g.strokeStyle = '#ff9a3a'; g.lineWidth = 1.6; g.beginPath(); g.moveTo(6, 4.4); g.quadraticCurveTo(w / 2 - 2, 1.2, w - 12, 4.4); g.stroke(); }
       if (bas) { for (let i = 0; i < 6; i++) { const x = 6 + i * 4.6; shape(g, '#d8a838', () => { g.moveTo(x, 5); g.lineTo(x + 2.4, 0); g.lineTo(x + 4.4, 5); g.closePath(); }, 0.8); } }
+      if (hop) { g.fillStyle = '#b8a0e8'; for (const [dx, dy, r] of [[6, 7, 1.7], [11, 5, 1.4], [9, 11, 1.5], [14, 9, 1.2]] as number[][]) { g.beginPath(); g.arc(dx, dy, r, 0, TAU); g.fill(); } }
       leg(g, 8, h - 6, 4, 6, shade(body, 0.9)); leg(g, w - 17, h - 6, 4, 6, shade(body, 0.9));
       const hx = w - 8, hy = h / 2 - 3; blob(g, hx, hy, 7, 6, body);
       if (st) { horn(g, hx - 4, hy - 4, hx - 8, hy + 1, 1.8, L.horn, -2); horn(g, hx + 2, hy - 4, hx + 6, hy + 1, 1.8, L.horn, 2); }
@@ -115,7 +118,7 @@ export function drawEnemy(kind: EnemyKind, f: number, state: number): Img {
         g.shadowColor = '#ff3a3a'; g.shadowBlur = 5; g.fillStyle = '#ff4a3a'; g.beginPath(); g.arc(w - 6, h / 2 + 1, 3.2, 0, TAU); g.fill(); g.shadowBlur = 0; g.fillStyle = '#ffd0c0'; g.beginPath(); g.arc(w - 5.4, h / 2 + 0.4, 1.1, 0, TAU); g.fill();
         horn(g, 7, 6, 4, -2, 1.6, L.horn, -2); horn(g, w - 9, 6, w - 6, -2, 1.6, L.horn, 2); break;
       }
-      const wc = kind === 'cmorog' ? '#efe6fa' : kind === 'pszczolrog' ? 'rgba(220,240,255,0.8)' : shade(body, 0.8);
+      const wc = kind === 'cmorog' ? '#efe6fa' : kind === 'pszczolrog' ? 'rgba(140,230,245,0.75)' : shade(body, 0.8);
       const wingShape = (dx: number, sgn: number) => { shape(g, wc, () => { g.moveTo(cx + dx, 6); g.quadraticCurveTo(cx + dx + sgn * 10, wing - 3, cx + dx + sgn * (kind === 'cmorog' ? 14 : 11), wing + 5); g.quadraticCurveTo(cx + dx + sgn * 4, 8, cx + dx + sgn * 1, 9); g.closePath(); }, 0.9); };
       wingShape(-3, -1);
       if (kind === 'krukorog') { g.strokeStyle = OUTC; g.lineWidth = 4; g.beginPath(); g.moveTo(5, cy); g.lineTo(-1, cy + 6); g.stroke(); g.strokeStyle = shade(body, 0.8); g.lineWidth = 2.6; g.stroke(); }
@@ -156,7 +159,7 @@ export function drawEnemy(kind: EnemyKind, f: number, state: number): Img {
       shape(g, shade(body, 1.0), () => { g.roundRect(0.5, h / 2 - 3 + sway, 8, 5, 2.5); g.roundRect(0.5, h / 2 - 11 + sway, 5, 10, 2.5); }, 0.9);
       shape(g, shade(body, 1.0), () => { g.roundRect(w - 8.5, h / 2 - 1 - sway, 8, 5, 2.5); g.roundRect(w - 5.5, h / 2 - 9 - sway, 5, 10, 2.5); }, 0.9);
       if (!st) { g.fillStyle = '#f4f0d0'; for (let i = 0; i < 11; i++) { const x = 8 + (i % 3) * 6, y = 8 + Math.floor(i / 3) * 6.4; g.beginPath(); g.moveTo(x, y); g.lineTo(x + 0.9, y - 3); g.lineTo(x + 1.8, y); g.fill(); } }
-      shape(g, '#e8507a', () => { for (let k = 0; k < 6; k++) { const aa = (k / 6) * TAU; g.moveTo(w / 2 + Math.cos(aa) * 2.6 + 2.2, 3 + Math.sin(aa) * 2.6); g.arc(w / 2 + Math.cos(aa) * 2.6, 3 + Math.sin(aa) * 2.6, 2.2, 0, TAU); } }, 0.6);
+      shape(g, '#f08a3a', () => { for (let k = 0; k < 6; k++) { const aa = (k / 6) * TAU; g.moveTo(w / 2 + Math.cos(aa) * 2.6 + 2.2, 3 + Math.sin(aa) * 2.6); g.arc(w / 2 + Math.cos(aa) * 2.6, 3 + Math.sin(aa) * 2.6, 2.2, 0, TAU); } }, 0.6);
       g.fillStyle = '#ffe27a'; g.beginPath(); g.arc(w / 2, 3, 1.8, 0, TAU); g.fill();
       horn(g, w / 2 - 6, 6, w / 2 - 9, -1, 1.5, L.horn, -2); horn(g, w / 2 + 4, 6, w / 2 + 7, -1, 1.5, L.horn, 2);
       eye(g, w / 2 - 2, h / 2 - 1, 2.6, st);
@@ -193,7 +196,7 @@ export function drawEnemy(kind: EnemyKind, f: number, state: number): Img {
     case 'kamienirog': {
       leg(g, 4, h - 7, 9, 7, body); leg(g, w - 14, h - 7 + (a ? 0 : 1), 9, 7, body);
       shape(g, (() => { const gr = g.createLinearGradient(0, 0, w, h); gr.addColorStop(0, shade(st ? belly : body, 1.5)); gr.addColorStop(0.5, st ? belly : body); gr.addColorStop(1, shade(body, 0.55)); return gr; })(), () => { g.moveTo(2, h - 6); g.lineTo(5, 7); g.lineTo(13, 1.5); g.lineTo(w - 9, 2); g.lineTo(w - 2, h - 9); g.lineTo(w - 4, h - 5); g.closePath(); }, 1.1);
-      if (!st) { g.strokeStyle = 'rgba(30,30,42,0.7)'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(10, 6); g.lineTo(14, 16); g.lineTo(11, 22); g.moveTo(22, 5); g.lineTo(20, 18); g.stroke(); g.fillStyle = 'rgba(255,255,255,0.3)'; g.beginPath(); g.moveTo(6, 10); g.lineTo(14, 3); g.lineTo(14, 7); g.closePath(); g.fill(); g.fillStyle = '#6ea84a'; g.globalAlpha = 0.6; g.beginPath(); g.ellipse(17, 3.4, 6, 1.6, 0, 0, TAU); g.fill(); g.globalAlpha = 1; }
+      if (!st) { g.shadowColor = '#b8a0ff'; g.shadowBlur = 3; g.strokeStyle = '#c8b4ff'; g.lineWidth = 1.3; g.beginPath(); g.moveTo(10, 6); g.lineTo(14, 16); g.lineTo(11, 22); g.moveTo(22, 5); g.lineTo(20, 18); g.stroke(); g.fillStyle = 'rgba(255,255,255,0.3)'; g.beginPath(); g.moveTo(6, 10); g.lineTo(14, 3); g.lineTo(14, 7); g.closePath(); g.fill(); g.shadowBlur = 0; shape(g, '#2a2236', () => { g.arc(w / 2 - 4, h - 12, 3.2, 0, TAU); }, 0.8); g.fillStyle = '#b8a0ff'; g.beginPath(); g.arc(w / 2 - 4, h - 12, 1.4, 0, TAU); g.fill(); }
       blob(g, w - 8, h / 2, 7.4, 7, belly); horn(g, w - 12, h / 2 - 5, w - 13, h / 2 - 14, 2.2, L.horn, -2); horn(g, w - 5, h / 2 - 5, w - 2, h / 2 - 14, 2.2, L.horn, 2); eye(g, w - 10, h / 2 - 2, 2.3, st);
       break;
     }

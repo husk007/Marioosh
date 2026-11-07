@@ -229,3 +229,49 @@ export function drawRock(): Img {
   shape(g, lin(g, 2, 2, 16, 16, '#c8c8d2', '#8a8a94', '#54545e'), () => { g.moveTo(2.4, 13); g.lineTo(4, 4.4); g.lineTo(10, 1.6); g.lineTo(15.6, 6); g.lineTo(15, 14); g.lineTo(8, 16.4); g.closePath(); }, 1);
   g.strokeStyle = 'rgba(255,255,255,0.5)'; g.lineWidth = 0.8; g.beginPath(); g.moveTo(5, 5); g.lineTo(10, 3); g.stroke(); g.strokeStyle = 'rgba(30,30,40,0.5)'; g.beginPath(); g.moveTo(9, 7); g.lineTo(11, 12); g.stroke(); return c;
 }
+
+/** Księżniczka Scarlet 44×64: długie rude włosy, biało-złota suknia z kryształami, kryształowa korona. state: 0 idle, 1 uwięziona (kryształowa klatka), 2 rzuca światło, 3 uśmiechnięta */
+export function drawScarlet(state: number, f: number): Img {
+  const { c, g } = hiCanvas(44, 64); g.lineCap = 'round'; g.lineJoin = 'round'; const bob = state === 1 ? 0 : (f & 1) * 0.8; const cx = 22;
+  const skin = lin(g, 14, 0, 30, 0, '#e8b690', '#fbd9bb', '#f3c6a2');
+  if (state !== 1) glow(g, cx, 34, 30, state === 2 ? 'rgba(160,240,255,0.95)' : 'rgba(255,235,200,0.8)', state === 2 ? 0.8 : 0.45);
+  // włosy z tyłu
+  shape(g, lin(g, 8, 0, 36, 0, '#7a2230', '#c4462e', '#8c2a28'), () => { g.moveTo(cx - 9, 14 + bob); g.bezierCurveTo(cx - 17, 30, cx - 15, 46, cx - 8, 52); g.lineTo(cx + 7, 52); g.bezierCurveTo(cx + 15, 44, cx + 14, 28, cx + 9, 14 + bob); g.closePath(); }, 1);
+  // spodnie i buty (praktyczny strój), długi płaszcz techno-maga: lewa połowa perłowa, prawa burgundowa
+  shape(g, '#4a2a3a', () => { g.roundRect(cx - 6, 46, 5.4, 15, 2); g.roundRect(cx + 0.6, 46, 5.4, 15, 2); }, 1);
+  shape(g, lin(g, 0, 56, 0, 63, '#6a3a4a', '#3a1f2a'), () => { g.roundRect(cx - 7.4, 57, 7.6, 6.4, 2.4); g.roundRect(cx - 0.2, 57, 7.6, 6.4, 2.4); }, 1);
+  const coat = () => { g.moveTo(cx - 6, 27 + bob); g.bezierCurveTo(cx - 10, 38, cx - 12, 48, cx - 13, 58); g.lineTo(cx + 13, 58); g.bezierCurveTo(cx + 12, 48, cx + 10, 38, cx + 6, 27 + bob); g.closePath(); };
+  g.beginPath(); coat(); g.fillStyle = OUTC; g.save(); g.lineWidth = 1.2; g.strokeStyle = OUTC; g.stroke(); g.restore();
+  g.save(); g.beginPath(); coat(); g.clip();
+  g.fillStyle = lin(g, cx - 13, 0, cx, 0, '#e8e0d0', '#F8F3E6'); g.fillRect(cx - 14, 26, 14, 34);
+  g.fillStyle = lin(g, cx, 0, cx + 13, 0, '#B93950', '#8a2438'); g.fillRect(cx, 26, 14, 34);
+  g.fillStyle = 'rgba(255,255,255,0.35)'; g.fillRect(cx - 9, 36, 1.2, 20);
+  g.strokeStyle = '#D5B46B'; g.lineWidth = 0.8; g.beginPath(); g.moveTo(cx, 27); g.lineTo(cx, 58); g.stroke();       // złoty szew
+  g.strokeStyle = 'rgba(213,180,107,0.95)'; g.lineWidth = 0.7; g.beginPath(); g.moveTo(cx - 12, 54); g.lineTo(cx - 8, 54); g.lineTo(cx - 8, 50); g.lineTo(cx - 4, 50); g.moveTo(cx + 12, 54); g.lineTo(cx + 8, 54); g.lineTo(cx + 8, 50); g.lineTo(cx + 4, 50); g.stroke();   // obwody
+  g.fillStyle = '#D5B46B'; g.fillRect(cx - 14, 56, 28, 2.2);
+  g.restore();
+  g.fillStyle = '#D5B46B'; g.fillRect(cx - 5.4, 36 + bob, 10.8, 1.8);
+  // broszka: serce z cyjanowego kryształu
+  shape(g, lin(g, 0, 28, 0, 35, '#ffffff', '#8BE5E8', '#2a98d8'), () => { g.moveTo(cx, 35.4 + bob); g.bezierCurveTo(cx - 5, 31.4 + bob, cx - 3.2, 27.6 + bob, cx, 30.4 + bob); g.bezierCurveTo(cx + 3.2, 27.6 + bob, cx + 5, 31.4 + bob, cx, 35.4 + bob); g.closePath(); }, 0.8);
+  // ramiona
+  const arm = (x0: number, ang: number) => { const x1 = x0 + Math.sin(ang) * 11, y1 = 30 + bob + Math.cos(ang) * 11; g.strokeStyle = OUTC; g.lineWidth = 4; g.beginPath(); g.moveTo(x0, 30 + bob); g.lineTo(x1, y1); g.stroke(); g.strokeStyle = state === 2 ? '#fff' : '#f8ecec'; g.lineWidth = 2.8; g.stroke(); g.fillStyle = OUTC; g.beginPath(); g.arc(x1, y1, 2.4, 0, TAU); g.fill(); g.fillStyle = skin; g.beginPath(); g.arc(x1, y1, 1.8, 0, TAU); g.fill(); };
+  if (state === 2) { arm(cx - 5, -2.5); arm(cx + 5, 2.5); } else if (state === 1) { arm(cx - 5, -0.25); arm(cx + 5, 0.25); } else { arm(cx - 5, -0.35); arm(cx + 5, state === 3 ? 2.3 : 0.35); }
+  // głowa
+  shape(g, skin, () => { g.ellipse(cx, 18 + bob, 8, 8.6, 0, 0, TAU); }, 1);
+  // grzywka i kosmyki
+  shape(g, lin(g, 8, 0, 36, 0, '#8c2a28', '#d4502e', '#9a3028'), () => { g.moveTo(cx - 8.4, 19 + bob); g.bezierCurveTo(cx - 9.5, 6 + bob, cx + 9, 5 + bob, cx + 8.4, 18 + bob); g.bezierCurveTo(cx + 5, 12 + bob, cx - 2, 14 + bob, cx - 8.4, 19 + bob); g.closePath(); }, 1);
+  // oczy
+  const sad = state === 1; g.fillStyle = '#fff'; g.beginPath(); g.ellipse(cx - 3.2, 19.4 + bob, 1.9, 2.3, 0, 0, TAU); g.ellipse(cx + 3.2, 19.4 + bob, 1.9, 2.3, 0, 0, TAU); g.fill();
+  g.fillStyle = state === 2 ? '#2ad8e8' : '#2a8a9a'; g.beginPath(); g.ellipse(cx - 3, 19.8 + bob, 1.3, 1.8, 0, 0, TAU); g.ellipse(cx + 3.4, 19.8 + bob, 1.3, 1.8, 0, 0, TAU); g.fill();
+  g.fillStyle = '#16101e'; g.beginPath(); g.arc(cx - 3, 19.8 + bob, 0.7, 0, TAU); g.arc(cx + 3.4, 19.8 + bob, 0.7, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.fillRect(cx - 3.4, 18.6 + bob, 0.7, 0.7); g.fillRect(cx + 3, 18.6 + bob, 0.7, 0.7);
+  g.strokeStyle = '#7a2a20'; g.lineWidth = 0.9; g.beginPath(); g.moveTo(cx - 5.2, (sad ? 16.2 : 16.8) + bob); g.lineTo(cx - 1.6, (sad ? 17.4 : 16.4) + bob); g.moveTo(cx + 1.6, (sad ? 17.4 : 16.4) + bob); g.lineTo(cx + 5.2, (sad ? 16.2 : 16.8) + bob); g.stroke();
+  g.strokeStyle = '#b8524a'; g.lineWidth = 1; g.beginPath(); if (sad) { g.moveTo(cx - 2, 24.6 + bob); g.quadraticCurveTo(cx, 23.4 + bob, cx + 2, 24.6 + bob); } else { g.moveTo(cx - 2.4, 23.4 + bob); g.quadraticCurveTo(cx, 25.4 + bob, cx + 2.4, 23.4 + bob); } g.stroke();
+  g.fillStyle = 'rgba(240,120,120,0.35)'; g.beginPath(); g.ellipse(cx - 5, 22.4 + bob, 1.6, 1, 0, 0, TAU); g.ellipse(cx + 5.4, 22.4 + bob, 1.6, 1, 0, 0, TAU); g.fill();
+  // mała unosząca się korona z fasetowanych kryształów
+  const fl = (f & 1) * 0.6; shape(g, lin(g, 0, 1, 0, 8, '#fff6c0', '#D5B46B'), () => { g.moveTo(cx - 6, 7 + bob - fl); g.lineTo(cx - 5, 2.5 + bob - fl); g.lineTo(cx - 2.2, 5 + bob - fl); g.lineTo(cx, 0.8 + bob - fl); g.lineTo(cx + 2.2, 5 + bob - fl); g.lineTo(cx + 5, 2.5 + bob - fl); g.lineTo(cx + 6, 7 + bob - fl); g.closePath(); }, 0.9);
+  g.fillStyle = '#8BE5E8'; g.shadowColor = '#8BE5E8'; g.shadowBlur = 3; g.beginPath(); g.arc(cx, 4.4 + bob - fl, 1.2, 0, TAU); g.fill(); g.shadowBlur = 0;
+  // uwięziona: kryształowa klatka
+  if (state === 1) { g.strokeStyle = 'rgba(150,120,230,0.85)'; g.lineWidth = 1.4; for (let i = 0; i < 6; i++) { const x = 5 + i * 6.8; g.beginPath(); g.moveTo(x, 2); g.lineTo(x, 63); g.stroke(); } g.fillStyle = 'rgba(160,110,220,0.18)'; g.fillRect(3, 0, 38, 64); g.strokeStyle = 'rgba(200,160,255,0.9)'; g.lineWidth = 1.8; g.strokeRect(3, 1, 38, 62); }
+  if (state === 2) { g.fillStyle = '#fff'; for (let i = 0; i < 6; i++) { const a = i * 1.05 + f; g.globalAlpha = 0.8; g.beginPath(); g.arc(cx + Math.cos(a) * 17, 30 + Math.sin(a) * 16, 1.1, 0, TAU); g.fill(); } g.globalAlpha = 1; }
+  return c;
+}

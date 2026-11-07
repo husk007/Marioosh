@@ -6,7 +6,7 @@ import { VH, VW } from '../game/constants';
 import { getLevel, nextLevelId, parseId } from '../game/levels';
 import { World } from '../game/world';
 import { drawWorld } from '../game/worldDraw';
-import { heartIcon, itemSprite } from '../sprites/art';
+import { heartIcon, itemSprite, scarletSprite } from '../sprites/art';
 import { Menu, panel, title } from './ui';
 import { MapScene } from './map';
 import { TESTER_SLOT } from '../game/save';
@@ -211,7 +211,7 @@ export class PlayScene implements Scene {
       g.text(a, VW / 2 - 190, 92 + i * 22, { size: 8, color: '#c8c8d8', align: g.font.rtl ? 'right' : 'left' });
       g.text(b, VW / 2 + 190, 92 + i * 22, { size: 8, align: 'right' });
     });
-    if (r.scarlet) { const y = 96 + r.lines.length * 22; g.wrap(r.scarlet, 380, 7).forEach((ln, i) => g.text(ln, VW / 2, y + i * g.lineH(7), { size: 7, align: 'center', color: '#ffb0c0' })); }
+    if (r.scarlet) { const y = 96 + r.lines.length * 22; g.spr(scarletSprite(3, Math.floor(app.time * 2)), VW / 2 - 200, y - 26, { w: 36, h: 52, screen: true }); g.wrap(r.scarlet, 330, 7).forEach((ln, i) => g.text(ln, VW / 2 + 16, y + i * g.lineH(7), { size: 7, align: 'center', color: '#ffb0c0' })); }
     if (r.t > 0.8) g.text(t('result.next'), VW / 2, VH - 36, { size: 8, align: 'center', color: '#ffd23f', alpha: 0.6 + 0.4 * Math.sin(app.time * 6) });
   }
 }

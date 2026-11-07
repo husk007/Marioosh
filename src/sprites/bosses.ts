@@ -36,19 +36,22 @@ export function drawBoss(id: BossId, f: number, mode: number): Img {
   g.lineCap = 'round'; g.lineJoin = 'round';
   const tint = (col: string) => (hurt ? shade(col, 1.5) : col);
   switch (id) {
-    case 'rogomir': {            // purpurowy buhaj-ogrodnik ze złotymi rogami i kolczykiem w nosie
-      const body = tint('#7b5a9a');
-      leg(g, 10, h - 17, 11, 17 - step, shade(body, 0.8), 0); leg(g, 30, h - 17, 11, 17, shade(body, 0.8), 0); leg(g, 22, h - 17, 11, 17, body, step); leg(g, 44, h - 17, 11, 17 - step * 0.6, body, 0);
-      shape(g, rad(g, 30, 34, 34, shade(body, 1.4), body, shade(body, 0.62)), () => { g.moveTo(6, 38); g.bezierCurveTo(4, 14, 24, 8, 40, 14); g.bezierCurveTo(54, 18, 58, 36, 54, 48); g.lineTo(10, 50); g.closePath(); });
-      shape(g, lin(g, 0, 28, 0, 52, '#d9c1ec', '#b08ccc'), () => { g.ellipse(32, 44, 20, 8, 0, 0, TAU); }, 0.9);
-      g.fillStyle = 'rgba(30,10,50,0.35)'; for (let i = 0; i < 5; i++) { g.beginPath(); g.ellipse(14 + i * 7, 16 + (i % 2) * 3, 4, 7, 0.2, 0, TAU); g.fill(); }       // grzywa
-      shape(g, rad(g, 56, 28, 17, shade(body, 1.35), body, shade(body, 0.65)), () => { g.moveTo(44, 24); g.bezierCurveTo(46, 8, 66, 10, 70, 24); g.bezierCurveTo(72, 34, 66, 42, 56, 42); g.bezierCurveTo(46, 40, 42, 32, 44, 24); });
-      horn(g, 48, 14, 40, -2, 3.4, '#f2c940', -5); horn(g, 62, 13, 69, -3, 3.2, '#f2c940', 6);
-      shape(g, lin(g, 0, 32, 0, 42, '#e0c6f0', '#a07cc0'), () => { g.ellipse(64, 34, 6, 5, 0, 0, TAU); }, 0.9);
-      g.fillStyle = OUTC; g.beginPath(); g.ellipse(66, 33, 1, 1.4, 0, 0, TAU); g.fill();
-      g.strokeStyle = '#ffd23f'; g.lineWidth = 1.2; g.beginPath(); g.arc(64, 40, 2.4, 0, TAU); g.stroke();
-      eye(g, 56, 24, 3.4, '#ff7a1a', hurt);
-      if (exposed) glow(g, 30, 30, 14, 'rgba(255,230,100,0.9)', 0.9);
+    case 'rogomir': {            // wielki żuk z trzema rogami: ciemnozielony pancerz, jasny brzuch (słaby punkt)
+      const shell = tint('#1f5a3c');
+      const lg = (x: number, y: number, k: number) => { g.strokeStyle = OUTC; g.lineWidth = 5; g.beginPath(); g.moveTo(x, y); g.lineTo(x - 4 + k, y + 8); g.lineTo(x - 6 + k * 1.5, h - 2); g.stroke(); g.strokeStyle = '#173a2a'; g.lineWidth = 3.4; g.stroke(); };
+      lg(16, 44, step * 0.4); lg(26, 46, -step * 0.4); lg(38, 46, step * 0.4); lg(48, 44, -step * 0.4);
+      shape(g, rad(g, 30, 40, 26, '#e8d8a8', exposed ? '#ffe27a' : '#cdb988', '#8a7a52'), () => { g.ellipse(32, 46, 26, 9, 0, 0, TAU); }, 1.1);
+      shape(g, rad(g, 28, 22, 40, shade(shell, 2.0), shell, shade(shell, 0.45)), () => { g.moveTo(4, 44); g.bezierCurveTo(2, 14, 22, 4, 38, 8); g.bezierCurveTo(52, 12, 58, 28, 56, 44); g.closePath(); }, 1.5);
+      g.save(); g.beginPath(); g.moveTo(4, 44); g.bezierCurveTo(2, 14, 22, 4, 38, 8); g.bezierCurveTo(52, 12, 58, 28, 56, 44); g.closePath(); g.clip();
+      g.strokeStyle = 'rgba(5,25,15,0.7)'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(31, 6); g.lineTo(29, 46); g.stroke();
+      g.fillStyle = 'rgba(255,255,255,0.35)'; g.beginPath(); g.ellipse(18, 18, 6, 3, -0.7, 0, TAU); g.fill(); g.beginPath(); g.ellipse(44, 22, 4, 2, -0.6, 0, TAU); g.fill();
+      g.strokeStyle = 'rgba(120,230,170,0.35)'; g.lineWidth = 1; for (let i = 0; i < 3; i++) { g.beginPath(); g.arc(30, 44, 14 + i * 7, Math.PI * 1.05, Math.PI * 1.95); g.stroke(); }
+      g.restore();
+      shape(g, rad(g, 62, 36, 14, shade(shell, 1.8), shade(shell, 1.0), shade(shell, 0.45)), () => { g.moveTo(50, 30); g.bezierCurveTo(52, 20, 68, 22, 70, 34); g.bezierCurveTo(72, 44, 60, 48, 52, 44); g.closePath(); }, 1.3);
+      horn(g, 60, 26, 62, 0, 3.8, '#e8e0c8', -4); horn(g, 53, 29, 44, 12, 2.4, '#e8e0c8', -3); horn(g, 66, 30, 70, 15, 2.2, '#e8e0c8', 2);
+      eye(g, 62, 34, 3.2, '#ffcf2a', hurt);
+      shape(g, '#2a1410', () => { g.moveTo(66, 44); g.lineTo(72, 46); g.lineTo(66, 49); g.closePath(); }, 0.8);
+      if (exposed) glow(g, 30, 46, 16, 'rgba(255,230,100,0.9)', 0.9);
       break;
     }
     case 'zlomotaur': {          // złomowy minotaur z blach i tłoków
@@ -128,19 +131,23 @@ export function drawBoss(id: BossId, f: number, mode: number): Img {
       if (exposed) glow(g, 36, 40, 12, 'rgba(255,240,150,0.95)', 0.9);
       break;
     }
-    case 'rogodron': {           // dron z wirnikami i antenami-rogami
-      const body = tint('#6a8190');
-      const rot = f & 1 ? 1 : -1;
-      for (const x of [14, 62]) { g.fillStyle = 'rgba(200,220,240,0.45)'; g.beginPath(); g.ellipse(x, 10, 18, 2.4 + (f & 1), 0, 0, TAU); g.fill(); g.strokeStyle = OUTC; g.lineWidth = 1; g.beginPath(); g.moveTo(x - 18 * rot, 10); g.lineTo(x + 18 * rot, 10); g.stroke(); g.fillStyle = '#4a5560'; g.fillRect(x - 1, 10, 2, 14); }
-      shape(g, lin(g, 0, 20, 0, 54, shade(body, 1.4), body, shade(body, 0.55)), () => { g.roundRect(8, 22, 62, 30, 14); });
-      g.fillStyle = 'rgba(0,0,0,0.2)'; g.beginPath(); g.roundRect(10, 40, 58, 10, 6); g.fill();
-      for (let i = 0; i < 5; i++) { g.fillStyle = '#ff8c58'; g.globalAlpha = 0.5 + 0.5 * (((i + f) & 1)); g.fillRect(14 + i * 8, 46, 5, 2.4); g.globalAlpha = 1; }
-      shape(g, '#2a3038', () => { g.roundRect(46, 24, 28, 20, 8); }, 1.2);
-      g.shadowColor = '#ff8c58'; g.shadowBlur = 7; g.fillStyle = hurt ? '#ffd0c0' : '#ff7a2a'; g.beginPath(); g.arc(62, 34, 6.4, 0, TAU); g.fill(); g.shadowBlur = 0; g.fillStyle = '#ffd8a8'; g.beginPath(); g.arc(63, 33, 2.4, 0, TAU); g.fill(); g.fillStyle = '#120a14'; g.beginPath(); g.arc(63, 34, 1.2, 0, TAU); g.fill();
-      g.strokeStyle = OUTC; g.lineWidth = 1.5; g.beginPath(); g.moveTo(50, 22); g.lineTo(58, 17); g.stroke();
-      horn(g, 52, 24, 46, 6, 2.4, '#d9dde4', -3); horn(g, 66, 24, 74, 8, 2.4, '#d9dde4', 4);
-      g.fillStyle = '#ffd23f'; g.beginPath(); g.arc(46, 6, 1.5, 0, TAU); g.arc(74, 8, 1.5, 0, TAU); g.fill();
-      if (exposed) glow(g, 30, 38, 13, 'rgba(255,180,80,0.95)', 0.9);
+    case 'rogodron': {           // mechaniczny owad: połączenie osy i żuka, metalowe skrzydła, generatory na pancerzu
+      const metal = tint('#7d8794'); const up = f & 1 ? -5 : 3;
+      const wing = (x: number, k: number) => { shape(g, 'rgba(190,225,245,0.55)', () => { g.moveTo(x, 24); g.bezierCurveTo(x - 6 * k, 8 + up, x - 22 * k, 2 + up, x - 30 * k, 10 + up); g.bezierCurveTo(x - 26 * k, 20, x - 12 * k, 26, x, 26); g.closePath(); }, 1.1); g.strokeStyle = 'rgba(40,50,70,0.8)'; g.lineWidth = 0.9; g.beginPath(); g.moveTo(x, 25); g.lineTo(x - 28 * k, 10 + up); g.moveTo(x - 6 * k, 24); g.lineTo(x - 22 * k, 6 + up); g.stroke(); };
+      wing(36, 1); wing(46, 0.7);
+      for (const [lx, ph] of [[26, 0], [36, 1], [46, 0]] as [number, number][]) { g.strokeStyle = OUTC; g.lineWidth = 3.6; g.beginPath(); g.moveTo(lx, 44); g.lineTo(lx - 4, 54 + (ph ? step * 0.3 : 0)); g.lineTo(lx - 8, h - 3); g.stroke(); g.strokeStyle = '#59636f'; g.lineWidth = 2.2; g.stroke(); }
+      shape(g, lin(g, 0, 24, 0, 52, shade(metal, 1.5), metal, shade(metal, 0.5)), () => { g.moveTo(2, 38); g.bezierCurveTo(2, 26, 12, 22, 22, 26); g.lineTo(26, 46); g.bezierCurveTo(14, 52, 2, 48, 2, 38); g.closePath(); }, 1.3);
+      shape(g, '#2a2e3a', () => { g.moveTo(3, 38); g.lineTo(0.5, 41); g.lineTo(4, 43); g.closePath(); }, 0.8);                                  // żądło
+      shape(g, lin(g, 0, 26, 0, 52, shade(metal, 1.4), metal, shade(metal, 0.55)), () => { g.moveTo(22, 26); g.bezierCurveTo(34, 20, 50, 24, 52, 38); g.bezierCurveTo(52, 48, 36, 52, 24, 46); g.closePath(); }, 1.5);
+      g.save(); g.beginPath(); g.moveTo(22, 26); g.bezierCurveTo(34, 20, 50, 24, 52, 38); g.bezierCurveTo(52, 48, 36, 52, 24, 46); g.closePath(); g.clip();
+      g.fillStyle = '#e8b32a'; for (let i = 0; i < 3; i++) g.fillRect(26 + i * 9, 18, 4, 40); g.restore();
+      for (const [gx, gy] of [[8, 36], [30, 32], [40, 40]] as [number, number][]) { g.shadowColor = '#6ef0ff'; g.shadowBlur = 5; g.fillStyle = (f & 1) ? '#b8f8ff' : '#4fd0e8'; g.beginPath(); g.arc(gx, gy, 2.2, 0, TAU); g.fill(); g.shadowBlur = 0; }
+      shape(g, rad(g, 62, 34, 14, shade(metal, 1.8), metal, shade(metal, 0.5)), () => { g.moveTo(50, 28); g.bezierCurveTo(52, 20, 68, 22, 70, 34); g.bezierCurveTo(72, 44, 58, 48, 50, 42); g.closePath(); }, 1.4);
+      horn(g, 58, 24, 56, 4, 3, '#d9dde4', -3); horn(g, 64, 25, 72, 8, 2.6, '#d9dde4', 3);
+      g.shadowColor = '#ff8c58'; g.shadowBlur = 6; g.fillStyle = hurt ? '#ffd0c0' : '#ff7a2a'; g.beginPath(); g.arc(62, 34, 5, 0, TAU); g.fill(); g.shadowBlur = 0; g.fillStyle = '#1a1018'; g.beginPath(); g.arc(63, 34, 2, 0, TAU); g.fill();
+      g.strokeStyle = OUTC; g.lineWidth = 1.6; g.beginPath(); g.moveTo(55, 29); g.lineTo(66, 31); g.stroke();
+      shape(g, '#3a4048', () => { g.moveTo(68, 42); g.lineTo(76, 46); g.lineTo(68, 48); g.closePath(); }, 0.9);
+      if (exposed) glow(g, 18, 40, 14, 'rgba(255,180,80,0.95)', 0.9);
       break;
     }
     case 'katoblepas': {         // ostateczny tyran: czarny byk z pękniętymi rogami i purpurowym światłem

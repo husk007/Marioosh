@@ -16,8 +16,8 @@ const data = await page.evaluate(async (what) => {
   const cv = document.createElement('canvas'); cv.width = 1400; cv.height = 900; const x = cv.getContext('2d'); x.fillStyle = '#7fb6d8'; x.fillRect(0, 0, 1400, 900); x.fillStyle = '#5aa05a'; x.fillRect(0, 700, 1400, 200);
   const put = (img, px, py, k, label) => { const s = (img.ss ?? 1); x.imageSmoothingEnabled = k > 3; x.drawImage(img, px, py, img.width / s * k, img.height / s * k); if (label) { x.fillStyle = '#000'; x.font = '12px monospace'; x.fillText(label, px, py - 4); } };
   if (what === 'heroes') {
-    const fr = ['idle', 'walk0', 'walk1', 'jump', 'attack', 'climb0', 'climb1', 'swim', 'hurt'];
-    ['M', 'D'].forEach((b, r) => fr.forEach((f, i) => put(art.heroSprite(b, f, false), 20 + i * 150, 30 + r * 230, 4.2, b + ':' + f)));
+    const fr = ['idle', 'walk0', 'walk1', 'jump', 'fall', 'attack', 'climb0', 'swim', 'hurt', 'crouch', 'victory'];
+    ['M', 'D'].forEach((b, r) => fr.forEach((f, i) => put(art.heroSprite(b, f, false), 10 + i * 125, 30 + r * 230, 3.6, b + ':' + f)));
     ['M', 'D'].forEach((b, i) => put(art.heroSprite(b, 'idle', true), 20 + i * 150, 480, 4.2, b + ' big'));
     ['M', 'D'].forEach((b, i) => put(art.heroSprite(b, 'idle', false), 420 + i * 70, 560, 1, '1x'));
     ['M', 'D'].forEach((b, i) => put(art.heroSprite(b, 'walk0', false, true), 620 + i * 150, 480, 4.2, 'night'));
@@ -30,6 +30,10 @@ const data = await page.evaluate(async (what) => {
     const L = [['eco0', art.ecoportSprite(false, 0)], ['ecoBroken', art.ecoportSprite(true, 0)], ['cp0', art.checkpointSprite(false, 0)], ['cp1', art.checkpointSprite(true, 0)], ['exit', art.exitSprite(true, 0)], ['sw', art.switchSprite('lever', false)], ['swOn', art.switchSprite('lever', true)], ['lamp', art.lampSprite(0)], ['lantern', art.lanternSprite(true)], ['sign', art.signSprite(1)], ['statue', art.statueSprite(false, 0)], ['freed', art.freedSprite()], ['comp', art.companionSprite(0)]];
     L.forEach(([n, im], i) => put(im, 20 + (i % 7) * 190, 40 + Math.floor(i / 7) * 250, 3, n));
     ['rogomir','zlomotaur','kaktogor','rogopletw','ceratopsor','krukorog','rogodron','katoblepas'].forEach((b, i) => { try { const im = art.bossSprite(b, 0, 0); put(im, 10 + (i % 4) * 340, 380 + Math.floor(i / 4) * 160, 3, b); } catch (e) {} });
+  } else if (what === 'bosses') {
+    ['rogomir','zlomotaur','kaktogor','rogopletw','ceratopsor','krukorog','rogodron','katoblepas'].forEach((b, i) => { const im = art.bossSprite(b, 0, 0); put(im, 10 + (i % 4) * 340, 40 + Math.floor(i / 4) * 300, 3, b); });
+  } else if (what === 'scarlet') {
+    [0, 1, 2, 3].forEach((st, i) => put(art.scarletSprite(st, 0), 20 + i * 220, 40, 5, 'scarlet ' + st));
   } else if (what === 'enemies') {
     const k = ['rogus','baranitor','bykobieg','zukorog','cmorog','pszczolrog','rogowrobel','krukorog','gekorog','bazalisk','rogopletw','osmiorog','kakturozec','rogopnacze','rogoroza','slimorog','rogoskoczek','kamienirog','dron'];
     k.forEach((e, i) => put(art.enemySprite(e, 0, 0), 20 + (i % 7) * 190, 40 + Math.floor(i / 7) * 170, 4, e));
