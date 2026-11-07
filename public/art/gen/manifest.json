@@ -499,5 +499,113 @@
   "quality": "medium",
   "model": "gpt-image-2",
   "cutout": "checker"
+ },
+ "civilians/CIVILIANS-003_zlomarian-reclaimer-restored__base.png": {
+  "asset_id": "CIVILIANS-003",
+  "name": "Zlomarian Reclaimer - restored",
+  "category": "civilians",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1024x1536",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "civilians/CIVILIANS-001_lumenians-restored__base.png": {
+  "asset_id": "CIVILIANS-001",
+  "name": "Lumenians - restored",
+  "category": "civilians",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1024x1536",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "civilians/CIVILIANS-004_zlomarian-reclaimer-stone-statue__base.png": {
+  "asset_id": "CIVILIANS-004",
+  "name": "Zlomarian Reclaimer - stone statue",
+  "category": "civilians",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1024x1536",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "civilians/CIVILIANS-002_lumenians-stone-statue__base.png": {
+  "asset_id": "CIVILIANS-002",
+  "name": "Lumenians - stone statue",
+  "category": "civilians",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1024x1536",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "civilians/CIVILIANS-001_lumenians-restored__idle.png": {
+  "asset_id": "CIVILIANS-001",
+  "name": "Lumenians - restored",
+  "category": "civilians",
+  "state": "idle",
+  "target_frames": 8,
+  "reference": "CIVILIANS-001_lumenians-restored__base.png",
+  "size": "1024x1536",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "civilians/CIVILIANS-003_zlomarian-reclaimer-restored__idle.png": {
+  "asset_id": "CIVILIANS-003",
+  "name": "Zlomarian Reclaimer - restored",
+  "category": "civilians",
+  "state": "idle",
+  "target_frames": 8,
+  "reference": "CIVILIANS-003_zlomarian-reclaimer-restored__base.png",
+  "size": "1024x1536",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "civilians/CIVILIANS-005_florian-seedkeeper-restored__base.png": {
+  "asset_id": "CIVILIANS-005",
+  "name": "Florian Seedkeeper - restored",
+  "category": "civilians",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1024x1536",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "civilians/CIVILIANS-006_florian-seedkeeper-stone-statue__base.png": {
+  "asset_id": "CIVILIANS-006",
+  "name": "Florian Seedkeeper - stone statue",
+  "category": "civilians",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1024x1536",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "civilians/CIVILIANS-005_florian-seedkeeper-restored__idle.png": {
+  "asset_id": "CIVILIANS-005",
+  "name": "Florian Seedkeeper - restored",
+  "category": "civilians",
+  "state": "idle",
+  "target_frames": 8,
+  "reference": "CIVILIANS-005_florian-seedkeeper-restored__base.png",
+  "size": "1024x1536",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
  }
 }
