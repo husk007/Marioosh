@@ -12,3 +12,7 @@ Ten katalog zawiera 12 **nowych plików SVG**, nie sprite sheety. Obejmuje Rogus
 To pierwsze **grywalne warianty wektorowe**, a nie finalne ręcznie malowane grafiki z ilustracji referencyjnych. Każdy wróg ma jedną klatkę nieruchomą. Animacje ruchu, skamienienia i ataku oraz integracja oryginalnych przesłanych portretów HD wymagają dalszych prac. Bossowie i bohaterowie pozostają na dotychczasowym rendererze, aby nie wprowadzać niezgodnych proporcji.
 
 Zachowujemy osiem nazw światów i dwunożnych bossów, bez zastępowania ich cudzymi postaciami.
+
+## Fala 2 – tła planet HD
+
+Dodano dziewięć autorskich, pełnoekranowych teł SVG (planety 0–8) w `public/art/hd/worlds/`. Wczytywane są do Canvas z dwukrotnym supersamplingiem przez `src/sprites/hd.ts`. Scena gry wykorzystuje nowe tło przed trzema starymi warstwami paralaksy; na błędzie pobierania wraca do wygenerowanego nieba. Każdy świat ma własne barwy i charakterystyczne detale. Tła są ilustracyjnym pierwszym przebiegiem, wciąż wymagają dalszego dopracowania grafiki koncepcyjnej i warstw paralaksy.
