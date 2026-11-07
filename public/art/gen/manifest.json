@@ -271,5 +271,89 @@
   "quality": "medium",
   "model": "gpt-image-2",
   "cutout": "checker"
+ },
+ "enemies/ENEMIES-001_rogus__idle.png": {
+  "asset_id": "ENEMIES-001",
+  "name": "Roguś",
+  "category": "enemies",
+  "state": "idle",
+  "target_frames": 6,
+  "reference": "ENEMIES-001_rogus__base.png",
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "enemies/ENEMIES-004_zukorog__base.png": {
+  "asset_id": "ENEMIES-004",
+  "name": "Żukoróg",
+  "category": "enemies",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "enemies/ENEMIES-006_pszczolrog__base.png": {
+  "asset_id": "ENEMIES-006",
+  "name": "Pszczółrog",
+  "category": "enemies",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "enemies/ENEMIES-005_cmorog__base.png": {
+  "asset_id": "ENEMIES-005",
+  "name": "Ćmoróg",
+  "category": "enemies",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "enemies/ENEMIES-001_rogus__walk.png": {
+  "asset_id": "ENEMIES-001",
+  "name": "Roguś",
+  "category": "enemies",
+  "state": "walk",
+  "target_frames": 8,
+  "reference": "ENEMIES-001_rogus__base.png",
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "enemies/ENEMIES-007_rogowrobel__base.png": {
+  "asset_id": "ENEMIES-007",
+  "name": "Rogowróbel",
+  "category": "enemies",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "enemies/ENEMIES-008_krukorog__base.png": {
+  "asset_id": "ENEMIES-008",
+  "name": "Krukoróg",
+  "category": "enemies",
+  "state": "base",
+  "target_frames": 1,
+  "reference": null,
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
  }
 }
