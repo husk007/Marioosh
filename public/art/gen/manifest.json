@@ -1,0 +1,26 @@
+{
+ "ENEMIES-001": {
+  "name": "Roguś",
+  "category": "enemies",
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "file": "enemies/ENEMIES-001.png"
+ },
+ "ENEMIES-002": {
+  "name": "Baranitor",
+  "category": "enemies",
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "file": "enemies/ENEMIES-002.png"
+ },
+ "ENEMIES-003": {
+  "name": "Bykobieg",
+  "category": "enemies",
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "file": "enemies/ENEMIES-003.png"
+ }
+}
