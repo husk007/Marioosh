@@ -2905,5 +2905,341 @@
   "quality": "medium",
   "model": "gpt-image-2",
   "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-070_skaltria-right-wall__base.png": {
+  "asset_id": "PLANET_TILES-070",
+  "name": "Skaltria - right-wall",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-065_skaltria-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-069_skaltria-left-wall__base.png": {
+  "asset_id": "PLANET_TILES-069",
+  "name": "Skaltria - left-wall",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-065_skaltria-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-072_skaltria-bottom-left-corner__base.png": {
+  "asset_id": "PLANET_TILES-072",
+  "name": "Skaltria - bottom-left-corner",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-065_skaltria-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "none"
+ },
+ "planet-tiles/PLANET_TILES-071_skaltria-bottom-center__base.png": {
+  "asset_id": "PLANET_TILES-071",
+  "name": "Skaltria - bottom-center",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-065_skaltria-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-074_skaltria-slope-up__base.png": {
+  "asset_id": "PLANET_TILES-074",
+  "name": "Skaltria - slope-up",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-065_skaltria-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-076_skaltria-one-way-platform__base.png": {
+  "asset_id": "PLANET_TILES-076",
+  "name": "Skaltria - one-way-platform",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-065_skaltria-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-075_skaltria-slope-down__base.png": {
+  "asset_id": "PLANET_TILES-075",
+  "name": "Skaltria - slope-down",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-065_skaltria-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-073_skaltria-bottom-right-corner__base.png": {
+  "asset_id": "PLANET_TILES-073",
+  "name": "Skaltria - bottom-right-corner",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-065_skaltria-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-077_skaltria-moving-platform__base.png": {
+  "asset_id": "PLANET_TILES-077",
+  "name": "Skaltria - moving-platform",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-065_skaltria-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-079_skaltria-breakable-ground__base.png": {
+  "asset_id": "PLANET_TILES-079",
+  "name": "Skaltria - breakable-ground",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-065_skaltria-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-078_skaltria-hazard-base__base.png": {
+  "asset_id": "PLANET_TILES-078",
+  "name": "Skaltria - hazard-base",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-065_skaltria-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-080_skaltria-hidden-room-wall__base.png": {
+  "asset_id": "PLANET_TILES-080",
+  "name": "Skaltria - hidden-room-wall",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-065_skaltria-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "none"
+ },
+ "planet-tiles/PLANET_TILES-082_vespera-top-center__base.png": {
+  "asset_id": "PLANET_TILES-082",
+  "name": "Vespera - top-center",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-081_vespera-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-084_vespera-top-right-corner__base.png": {
+  "asset_id": "PLANET_TILES-084",
+  "name": "Vespera - top-right-corner",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-081_vespera-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-083_vespera-top-left-corner__base.png": {
+  "asset_id": "PLANET_TILES-083",
+  "name": "Vespera - top-left-corner",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-081_vespera-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-085_vespera-left-wall__base.png": {
+  "asset_id": "PLANET_TILES-085",
+  "name": "Vespera - left-wall",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-081_vespera-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-086_vespera-right-wall__base.png": {
+  "asset_id": "PLANET_TILES-086",
+  "name": "Vespera - right-wall",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-081_vespera-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "none"
+ },
+ "planet-tiles/PLANET_TILES-087_vespera-bottom-center__base.png": {
+  "asset_id": "PLANET_TILES-087",
+  "name": "Vespera - bottom-center",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-081_vespera-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-088_vespera-bottom-left-corner__base.png": {
+  "asset_id": "PLANET_TILES-088",
+  "name": "Vespera - bottom-left-corner",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-081_vespera-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-089_vespera-bottom-right-corner__base.png": {
+  "asset_id": "PLANET_TILES-089",
+  "name": "Vespera - bottom-right-corner",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-081_vespera-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "none"
+ },
+ "planet-tiles/PLANET_TILES-090_vespera-slope-up__base.png": {
+  "asset_id": "PLANET_TILES-090",
+  "name": "Vespera - slope-up",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-081_vespera-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-091_vespera-slope-down__base.png": {
+  "asset_id": "PLANET_TILES-091",
+  "name": "Vespera - slope-down",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-081_vespera-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-092_vespera-one-way-platform__base.png": {
+  "asset_id": "PLANET_TILES-092",
+  "name": "Vespera - one-way-platform",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-081_vespera-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
+ },
+ "planet-tiles/PLANET_TILES-093_vespera-moving-platform__base.png": {
+  "asset_id": "PLANET_TILES-093",
+  "name": "Vespera - moving-platform",
+  "category": "planet-tiles",
+  "state": "base",
+  "target_frames": 1,
+  "refs": [
+   "PLANET_TILES-081_vespera-solid-center__base.png"
+  ],
+  "size": "1024x1024",
+  "quality": "medium",
+  "model": "gpt-image-2",
+  "cutout": "checker"
  }
 }
