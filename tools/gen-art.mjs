@@ -13,7 +13,7 @@ const args = process.argv.slice(2);
 const opt = (n, d) => { const i = args.indexOf('--' + n); return i < 0 ? d : (args[i + 1] && !args[i + 1].startsWith('--') ? args[i + 1] : true); };
 const category = opt('category', ''), ids = String(opt('ids', '')).split(',').filter(Boolean);
 const limit = Number(opt('limit', 0)) || Infinity, quality = String(opt('quality', 'medium')), force = !!opt('force', false), dry = !!opt('dry', false);
-const model = String(opt('model', 'gpt-image-1')), conc = Math.max(1, Number(opt('concurrency', 2)));
+const model = String(opt('model', 'gpt-image-2')), conc = Math.max(1, Number(opt('concurrency', 2)));
 const base = process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1';
 const key = process.env.OPENAI_API_KEY;
 if (!key && !dry) { console.error('Brak OPENAI_API_KEY w środowisku.'); process.exit(2); }
@@ -47,6 +47,7 @@ async function gen(a) {
     // 429 z insufficient_quota/billing = brak środków na koncie: ponawianie nic nie da
     if (/insufficient_quota|billing_hard_limit|exceeded your current quota/i.test(txt)) throw new Error(last + '  [BRAK ŚRODKÓW / LIMIT NA KONCIE — doładuj saldo w platform.openai.com → Billing]');
     if (r.status === 429 || r.status >= 500) { console.log(`  ponowienie ${t + 1}/5 po ${last}`); await new Promise((s) => setTimeout(s, 2000 * 2 ** t)); continue; }
+    if (r.status === 400) { const prm = /"param":\s*"(\w+)"/.exec(txt)?.[1]; if (prm && ['background', 'quality', 'output_format', 'size', 'n'].includes(prm) && prm in body) { console.log(`  model nie przyjmuje „${prm}” — pomijam i ponawiam`); delete body[prm]; t--; continue; } }
     throw new Error(last);   // 400/401/403: nie ponawiaj (np. weryfikacja organizacji, zły klucz, polityka treści)
   }
   throw new Error('zbyt wiele ponowień; ostatni błąd: ' + last);

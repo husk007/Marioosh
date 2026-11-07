@@ -11,6 +11,10 @@ on:
         description: 'Maks. liczba assetów (0 = wszystkie z kategorii)'
         required: true
         default: '3'
+      model:
+        description: 'Model obrazów (np. gpt-image-2, gpt-image-2.6-sunburst, gpt-image-1.5, gpt-image-1-mini)'
+        required: true
+        default: 'gpt-image-2'
       quality:
         description: 'Jakość: low | medium | high'
         required: true
@@ -27,7 +31,7 @@ jobs:
       - name: Generuj
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: node tools/gen-art.mjs --category "${{ inputs.category }}" --limit "${{ inputs.limit }}" --quality "${{ inputs.quality }}"
+        run: node tools/gen-art.mjs --category "${{ inputs.category }}" --limit "${{ inputs.limit }}" --quality "${{ inputs.quality }}" --model "${{ inputs.model }}"
       - name: Zapisz wyniki w repo
         run: |
           git config user.name "gen-art[bot]"; git config user.email "gen-art@users.noreply.github.com"
