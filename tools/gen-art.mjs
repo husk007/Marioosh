@@ -187,7 +187,9 @@ if (opt('plan', false)) {
   const ordered = [...assets].sort((x, y) => rank(x.category) - rank(y.category) || (isAnchor(y) ? 1 : 0) - (isAnchor(x) ? 1 : 0));
   const items = [];
   const refInfo = (rs) => rs.map((r) => { const ra = byId[r.id], f = `${ra.category}/${basename(fileOf(ra, 'base'))}`; return { id: r.id, name: ra.name, role: r.role, file: f, url: RAW + f, ready: existsSync(fileOf(ra, 'base')) }; });
-  const push = (a, state, refs, text, frames, done) => items.push({ seq: items.length + 1, kind: state === 'base' ? 'base' : 'pose', asset_id: a.asset_id, name: a.name, category: a.category, state, frames, inbox_name: `${a.asset_id}__${state}.png`, repo_file: `${a.category}/${basename(fileOf(a, state))}`, size: sizeFor(a), transparent: wantsAlpha(a), refs: refInfo(refs), done, prompt: refPrompt(refs) + text + AVOID(a) });
+  const scope = existsSync(join(root, 'art-tasks', 'scope.json')) ? JSON.parse(readFileSync(join(root, 'art-tasks', 'scope.json'), 'utf8')) : {};
+  const skipped = (a, state) => (scope.skip_categories || []).includes(a.category) || (state !== 'base' && (scope.skip_pose_categories || []).includes(a.category)) || (scope.skip_ids || []).includes(a.asset_id) || (state !== 'base' && (scope.skip_states || []).includes(state));
+  const push = (a, state, refs, text, frames, done) => items.push({ skip: !done && skipped(a, state), seq: items.length + 1, kind: state === 'base' ? 'base' : 'pose', asset_id: a.asset_id, name: a.name, category: a.category, state, frames, inbox_name: `${a.asset_id}__${state}.png`, repo_file: `${a.category}/${basename(fileOf(a, state))}`, size: sizeFor(a), transparent: wantsAlpha(a), refs: refInfo(refs), done, prompt: refPrompt(refs) + text + AVOID(a) });
   for (const a of ordered) push(a, 'base', baseRefs(a), a.prompt_en, 1, !baseNeeded(a));
   for (const a of ordered) for (const j of poseJobs.filter((j) => j.asset_id === a.asset_id)) push(a, j.state, poseRefs(a, j.state), j.prompt_en, j.target_frames, !poseNeeded(a, j.state));
   writeFileSync(String(opt('plan', '')), JSON.stringify(items));

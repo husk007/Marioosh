@@ -1,0 +1,7 @@
+{
+  "_opis": "Zakres produkcji. Pozycje spoza zakresu dostają status SKIP (nie trafiają do kolejki). Edytuj i uruchom: node tools/art-roadmap.mjs (albo wrzuć dowolny plik do art-inbox/).",
+  "skip_categories": ["effects"],
+  "skip_pose_categories": ["collectibles", "conduits", "interactables"],
+  "skip_ids": [],
+  "skip_states": []
+}

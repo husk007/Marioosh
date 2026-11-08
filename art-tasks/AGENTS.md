@@ -1,6 +1,6 @@
 # AGENTS.md — art production agent (Marioosh & Darioosh: Klątwa Katoblepasa)
 
-You are an image-production agent for a 2D HD platformer. Your job each run: **produce up to 10 missing game images**, exactly as specified in a *window file*, and deliver them under exact file names. You do **not** write game code.
+You are an image-production agent for a 2D HD platformer. Your job each run: **produce the missing game image(s) assigned to you** (up to 10 if no LANE is given; exactly ONE if the task prompt gives a LANE number), exactly as specified in a *window file*, and deliver them under exact file names. You do **not** write game code.
 
 Repository: `husk007/Marioosh` (public). Raw base URL: `https://raw.githubusercontent.com/husk007/Marioosh/main/`
 
@@ -12,6 +12,8 @@ Repository: `husk007/Marioosh` (public). Raw base URL: `https://raw.githubuserco
 ## 1. Choose the window
 - **MODE A (you can commit to the repo):** take the window named by `FIRST_TODO_WINDOW` in ROADMAP.md.
 - **MODE B (you can NOT commit; images are returned in chat):** window = `W0 + FLOOR(hours elapsed since START)` (both given in the task prompt; use the real current time). If that window file does not exist (404) it is DONE → move to the next number until you find an existing window file. If you run past the last existing window, fall back to `FIRST_TODO_WINDOW` in ROADMAP.md.
+- **LANE (parallel tasks):** if the task prompt gives `LANE: N`, then in the chosen window take only the N-th item marked `(TODO)` (count TODO items in listed order, ignoring DONE and SKIP) and produce just that ONE image. If the window has fewer than N TODO items, reply `NOTHING TO DO` (no image). Several tasks with different LANE numbers run in parallel on the same window; never touch other lanes' items.
+- Items marked `(SKIP)` are out of scope — ignore them like DONE.
 - Generate ONLY items marked `(TODO)`. Never redo `(DONE)` items. Never invent items or change prompts.
 
 ## 2. Produce each TODO item (in listed order, one image per item)

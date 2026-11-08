@@ -10,7 +10,7 @@ KROKI
    https://raw.githubusercontent.com/husk007/Marioosh/main/art-tasks/ROADMAP.md
 3. Wybierz okno według PARAMETRÓW poniżej (TRYB A lub B — opis w AGENTS.md) i otwórz jego plik:
    https://raw.githubusercontent.com/husk007/Marioosh/main/art-tasks/windows/W###.md   (### = numer okna; 404 = okno już zrobione → następne)
-4. Dla każdej pozycji oznaczonej (TODO), po kolei:
+4. Jeśli w PARAMETRACH podano LANE: N — wykonaj TYLKO N-tą pozycję oznaczoną (TODO) w tym oknie (licząc po kolei, pomijając DONE i SKIP); gdy w oknie jest mniej niż N pozycji TODO, odpowiedz „NOTHING TO DO” i nie generuj niczego. Bez LANE — wszystkie pozycje (TODO) po kolei. Dla każdej wykonywanej pozycji:
    • jeśli pozycja ma REFERENCJE — otwórz każdy podany adres, obejrzyj obraz i użyj go jako wzorca (kolejność jak na liście); wygląd postaci/przedmiotu bierz z referencji, a z PROMPTU tylko to, co się zmienia (poza, stan, wariant, scena),
    • jeśli „References: none” — pracuj wyłącznie na PROMPCIE,
    • użyj promptu DOSŁOWNIE (z listą AVOID), jedna pozycja = jeden obraz, bez napisów, ramek, znaków wodnych i kolaży.
@@ -28,6 +28,7 @@ ZASADY
 • Referencje mają pierwszeństwo przed Twoją wyobraźnią: ten sam kask, kolory, proporcje, narzędzia, rogi.
 
 PARAMETRY (edytuj)
+LANE: 1             ← numer pasa 1..10 (zakładasz 10 zadań, każde z innym LANE; reszta parametrów identyczna)
 TRYB: B            ← wpisz A, jeśli zadanie ma zapis do GitHuba
 START: 2026-11-08T11:00:00+01:00   ← czas pierwszego uruchomienia zadania (tylko tryb B)
 W0: W028           ← wartość FIRST_TODO_WINDOW z ROADMAP.md w chwili zakładania zadania (tylko tryb B)
