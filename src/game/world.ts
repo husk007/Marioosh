@@ -221,7 +221,7 @@ export class World {
       const off = this.platsOffT > 0;
       for (let x = 0; x < this.grid.w; x++) for (let y = 0; y < this.grid.h; y++) {
         const i = y * this.grid.w + x;
-        if (off && this.grid.tiles[i] === T.ONEWAY && y < 12) { this.grid.tiles[i] = 20; }
+        if (off && this.grid.tiles[i] === T.ONEWAY && y < this.grid.h - 4) { this.grid.tiles[i] = 20; }
         else if (!off && this.grid.tiles[i] === 20) this.grid.tiles[i] = T.ONEWAY;
       }
     }
