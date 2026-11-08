@@ -39,4 +39,9 @@ const md = ['# ROADMAP — grafiki HD (Marioosh & Darioosh)', '', `_Wygenerowano
   '## Okna do zrobienia', '', 'Plik okna: `art-tasks/windows/W###.md`. Kolejność produkcji: najpierw wszystkie bazy, potem pozy.', '', '| Okno | Pozycje | TODO | Zawartość |', '|---|---|---|---|',
   ...todoWins.map(([n, list]) => `| ${wname(n)} | ${list[0].seq}–${list[list.length - 1].seq} | ${list.filter(open_).length} | ${[...new Set(list.filter(open_).map((i) => i.category + (i.kind === 'pose' ? ' (pozy)' : '')))].join(', ')} |`), ''];
 writeFileSync(join(root, 'art-tasks', 'ROADMAP.md'), md.join('\n'));
+
+// dane dla Art Station (tylko pozycje do zrobienia) + złożenie strony
+const stationItems = items.filter(open_).map(({ seq, kind, asset_id, name, category, state, inbox_name, size, transparent, refs, prompt }) => ({ seq, kind, asset_id, name, category, state, inbox_name, size, transparent, refs: refs.map(({ id, name, role, url, ready }) => ({ id, name, role, url, ready })), prompt }));
+writeFileSync(join(root, 'art-tasks', 'station-data.json'), JSON.stringify(stationItems));
+execFileSync('node', [join(root, 'tools', 'build-station.mjs')], { stdio: 'inherit' });
 console.log(`ROADMAP: ${done} gotowe, ${nTodo} do zrobienia, ${nSkip} SKIP, okien z pracą: ${todoWins.length}, pierwsze: ${first ? wname(first) : '-'}`);

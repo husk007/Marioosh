@@ -1,5 +1,5 @@
 name: Wczytaj grafiki z art-inbox
-# Uruchamia się po wrzuceniu plików do art-inbox/ (np. przez zadanie ChatGPT) albo ręcznie.
+# Uruchamia się po wrzuceniu plików lub paczek ZIP (z Art Station) do art-inbox/ albo ręcznie.
 on:
   push:
     branches: [main]
@@ -18,6 +18,10 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
       - run: npm ci
+      - name: Rozpakuj paczki ZIP z Art Station
+        run: |
+          shopt -s nullglob
+          for z in art-inbox/*.zip; do unzip -o -j -q "$z" -d art-inbox && rm -f "$z"; done
       - name: Wczytaj, wytnij tło, zamień na WebP
         run: node tools/gen-art.mjs --ingest art-inbox
       - name: Odśwież ROADMAP

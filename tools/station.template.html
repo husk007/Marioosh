@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Art Station — Marioosh & Darioosh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Układ: lepki pasek narzędzi + lista kart; karta = opis i referencje po lewej, pole na gotowy obraz po prawej. */
+:root{
+  --bg:#f2f4f9; --surface:#ffffff; --line:#d3d9e6; --fg:#13203d; --muted:#586583;
+  --accent:#e2540a; --accent-fg:#ffffff; --blue:#1d4ed8; --ok:#17803f; --warn:#9a5b00; --tile:#e8ecf4;
+  --display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
+  --body:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d1323; --surface:#151d33; --line:#2a3553; --fg:#e7ecf8; --muted:#97a3c0;
+  --accent:#ff8a3d; --accent-fg:#1c0d00; --blue:#86a8ff; --ok:#4cd18b; --warn:#f2b552; --tile:#1c2646; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1323; --surface:#151d33; --line:#2a3553; --fg:#e7ecf8; --muted:#97a3c0;
+  --accent:#ff8a3d; --accent-fg:#1c0d00; --blue:#86a8ff; --ok:#4cd18b; --warn:#f2b552; --tile:#1c2646; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.45 var(--body);margin:0}
+button,select,input{font:inherit;color:inherit}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px))}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding-block:12px}
+h1{font:700 22px/1.1 var(--display);margin:0 0 2px;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:13px;margin:0 0 10px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bar>*{min-width:0}
+input[type=search],select{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px 9px}
+input[type=search]{flex:1 1 160px}
+label.chk{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
+button{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px 11px;cursor:pointer}
+button:hover{border-color:var(--blue)}
+button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg);font-weight:600}
+button.primary:disabled{opacity:.45;cursor:not-allowed}
+.stats{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:13px;color:var(--muted)}
+.stats b{color:var(--fg);font-variant-numeric:tabular-nums}
+.progress{height:6px;background:var(--tile);border-radius:3px;overflow:hidden;margin-top:8px}
+.progress i{display:block;height:100%;background:var(--accent);width:0}
+details.how{margin:14px 0 4px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+details.how summary{cursor:pointer;font-weight:600}
+details.how ol{margin:8px 0 2px;padding-left:20px}
+details.how li{margin:4px 0}
+a{color:var(--blue)}
+.list{display:grid;gap:14px;padding-block:14px 40px}
+.card{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px}
+.card.active{border-color:var(--blue)}
+.card.has{border-color:var(--ok)}
+.meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.seq{font-family:var(--mono)}
+.chip{border:1px solid var(--line);border-radius:999px;padding:1px 8px;white-space:nowrap}
+.chip.warn{color:var(--warn);border-color:var(--warn)}
+h3{font:600 18px/1.2 var(--display);margin:6px 0 2px}
+h3 small{font:500 12px var(--mono);color:var(--muted);margin-left:6px}
+.id{font:12px var(--mono);color:var(--muted)}
+.refs{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.ref{width:92px;font-size:11px;color:var(--muted)}
+.ref .th{width:92px;height:92px;background:var(--tile);border-radius:6px;display:grid;place-items:center;overflow:hidden;border:1px solid var(--line)}
+.ref .th img{width:100%;height:100%;object-fit:contain}
+.ref .th span{padding:4px;text-align:center}
+.ref .cap{display:block;margin-top:3px;line-height:1.25;overflow-wrap:anywhere}
+.ref button{padding:2px 6px;font-size:11px;margin-top:3px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+details.pr{margin-top:8px}
+details.pr summary{cursor:pointer;color:var(--muted);font-size:13px}
+details.pr pre{white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.4 var(--mono);background:var(--tile);padding:10px;border-radius:6px;max-height:260px;overflow:auto}
+.slot{display:flex;flex-direction:column;gap:8px;min-width:0}
+.drop{flex:1;min-height:190px;border:2px dashed var(--line);border-radius:8px;display:grid;place-items:center;text-align:center;padding:10px;color:var(--muted);cursor:pointer;font-size:13px}
+.drop:hover,.drop.over{border-color:var(--accent);color:var(--fg);background:var(--tile)}
+.pv{background:var(--tile);border-radius:8px;display:grid;place-items:center;min-height:190px;overflow:hidden}
+.pv img{max-width:100%;max-height:260px;object-fit:contain;display:block}
+.st{font-size:12px;color:var(--ok)}
+.st.sent{color:var(--muted)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.more{justify-self:center}
+.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 14px;border-radius:8px;font-size:13px;max-width:90vw;z-index:9}
+.empty{padding:40px 0;text-align:center;color:var(--muted)}
+@media (max-width:720px){.card{grid-template-columns:minmax(0,1fr)}.pv,.drop{min-height:150px}}
+@media (prefers-reduced-motion:no-preference){.card{transition:border-color .15s}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <h1>Art Station</h1>
+  <p class="sub">Marioosh &amp; Darioosh: Klątwa Katoblepasa · kolejka grafik do wygenerowania w Gemini lub ChatGPT</p>
+  <div class="bar">
+    <input id="q" type="search" placeholder="Szukaj (nazwa, ID, np. CHARACTERS-001)" aria-label="Szukaj">
+    <select id="fcat" aria-label="Kategoria"></select>
+    <select id="fkind" aria-label="Rodzaj"><option value="">Bazy i pozy</option><option value="base">Tylko bazy</option><option value="pose">Tylko pozy</option></select>
+    <label class="chk"><input id="fhide" type="checkbox"> ukryj gotowe w stacji</label>
+  </div>
+  <div class="bar" style="margin-top:8px">
+    <button id="bRefs" title="Pobiera obrazy referencyjne dla wszystkich kart z bieżącego filtra">Pobierz referencje (ZIP)</button>
+    <button id="bMany" title="Wybierz kilka plików naraz; trafią po kolei do pustych kart">Wrzuć kilka obrazów po kolei</button>
+    <button id="bExport" class="primary" disabled>Eksportuj ZIP do wysłania</button>
+    <button id="bRefresh" title="Pobiera aktualną listę z GitHuba">Odśwież listę</button>
+    <button id="bTheme" aria-label="Zmień motyw">Motyw</button>
+  </div>
+  <div class="stats" id="stats"></div>
+  <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+</div></header>
+
+<main class="wrap">
+  <details class="how"><summary>Jak tego używać (4 kroki)</summary>
+    <ol>
+      <li>Wybierz kategorię i kliknij <b>Pobierz referencje (ZIP)</b>. Rozpakuj do folderu; to obrazy, które dołączasz do promptu, żeby postać wyglądała tak samo.</li>
+      <li>Na karcie kliknij <b>Kopiuj prompt</b>, otwórz Gemini lub ChatGPT, dołącz wskazane referencje w podanej kolejności, wklej prompt i wygeneruj <b>jeden</b> obraz.</li>
+      <li>Zapisz obraz i <b>upuść go na kartę</b> (albo kliknij pole, albo wklej Ctrl+V). Stacja sama zmniejsza go i nadaje właściwą nazwę.</li>
+      <li>Kliknij <b>Eksportuj ZIP do wysłania</b>, a potem wrzuć pobrane ZIP-y do folderu <code>art-inbox</code> w repozytorium: <a href="https://github.com/husk007/Marioosh/upload/main/art-inbox" target="_blank" rel="noopener">strona wgrywania na GitHubie</a>. Reszta (wycięcie tła, WebP, manifest, roadmapa) dzieje się automatycznie.</li>
+    </ol>
+    <p class="sub" style="margin:6px 0 0">Obrazy zapisują się w przeglądarce, więc możesz zamknąć kartę i wrócić. Przezroczystość: prompt prosi o jednolite białe tło, a automat je wycina. Jeśli Twój generator dokłada znak wodny, zerknij na rogi przed wysłaniem.</p>
+  </details>
+  <div class="list" id="list"></div>
+</main>
+<div class="toast" id="toast" hidden></div>
+<input type="file" id="fOne" accept="image/*" hidden>
+<input type="file" id="fMany" accept="image/*" multiple hidden>
+
+<script>
+window.STATION_DATA = /*__DATA__*/null;
+</script>
+<script>
+(() => {
+'use strict';
+const RAW = 'https://raw.githubusercontent.com/husk007/Marioosh/main/art-tasks/station-data.json';
+const PAGE = 24, ZIP_PART = 18 * 1024 * 1024;
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+let ITEMS = Array.isArray(window.STATION_DATA) ? window.STATION_DATA : [];
+const stem = (it) => it.inbox_name.replace(/\.png$/, '');
+const imgs = new Map();            // stem -> { blob, url, exported }
+let shown = PAGE, activeKey = null, pendingKey = null, toastT = 0, db = null;
+
+/* ---------- pamięć w przeglądarce (IndexedDB) ---------- */
+const idbOpen = () => new Promise((res) => { try { const r = indexedDB.open('art-station', 1); r.onupgradeneeded = () => r.result.createObjectStore('imgs'); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch (e) { res(null); } });
+const idbDo = (mode, fn) => new Promise((res) => { if (!db) return res(null); try { const t = db.transaction('imgs', mode); const r = fn(t.objectStore('imgs')); t.oncomplete = () => res(r && r.result); t.onerror = () => res(null); } catch (e) { res(null); } });
+const idbAll = () => new Promise((res) => { if (!db) return res([]); try { const out = []; const t = db.transaction('imgs'); const c = t.objectStore('imgs').openCursor(); c.onsuccess = () => { const cur = c.result; if (cur) { out.push([cur.key, cur.value]); cur.continue(); } }; t.oncomplete = () => res(out); t.onerror = () => res([]); } catch (e) { res([]); } });
+const persist = (k) => { const v = imgs.get(k); return v ? idbDo('readwrite', (s) => s.put({ blob: v.blob, exported: !!v.exported }, k)) : idbDo('readwrite', (s) => s.delete(k)); };
+
+/* ---------- pomocnicze ---------- */
+function toast(msg, ms = 3200) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); if (ms) toastT = setTimeout(() => { t.hidden = true; }, ms); }
+function saveBlob(blob, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 20000); }
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const aspectName = (s) => s === '1536x1024' ? 'poziomo 3:2' : s === '1024x1536' ? 'pionowo 2:3' : 'kwadrat 1:1';
+const aspectEn = (s) => s === '1536x1024' ? '3:2 landscape' : s === '1024x1536' ? '2:3 portrait' : '1:1 square';
+const baseName = (u) => u.split('/').pop();
+
+function promptFor(it) {
+  const bg = it.transparent
+    ? 'BACKGROUND: one flat, uniform pure white (#FFFFFF) fill behind the subject. No checkerboard pattern, no floor, no cast shadow, no glow.'
+    : 'BACKGROUND: this is a full scene, fill the entire frame, no transparency, no white border.';
+  const refs = it.refs.length ? '\n- Use the attached reference images in the exact order listed above (Image 1 = first attached file).' : '';
+  return `${it.prompt}\n\nOUTPUT RULES (these override anything above):\n- Generate exactly ONE image, aspect ratio ${aspectEn(it.size)}.\n- ${bg}\n- No text, captions, labels, watermark, frame, collage or several variants.${refs}`;
+}
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; } catch (e) {
+    const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand('copy'); } catch (e2) { /* nic */ } ta.remove(); return ok;
+  }
+}
+
+/* ---------- ZIP (bez kompresji, bez bibliotek) ---------- */
+const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+const crc32 = (u) => { let c = 0xFFFFFFFF; for (let i = 0; i < u.length; i++) c = CRC[(c ^ u[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; };
+function makeZip(files) {
+  const enc = new TextEncoder(), parts = [], central = []; let off = 0;
+  const d = new Date(), tm = (d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1), dt = ((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate();
+  for (const f of files) {
+    const nm = enc.encode(f.name), crc = crc32(f.data), sz = f.data.length;
+    const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true); lh.setUint16(10, tm, true); lh.setUint16(12, dt, true);
+    lh.setUint32(14, crc, true); lh.setUint32(18, sz, true); lh.setUint32(22, sz, true); lh.setUint16(26, nm.length, true); lh.setUint16(28, 0, true);
+    parts.push(lh.buffer, nm, f.data);
+    const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint16(10, 0, true); ch.setUint16(12, tm, true); ch.setUint16(14, dt, true);
+    ch.setUint32(16, crc, true); ch.setUint32(20, sz, true); ch.setUint32(24, sz, true); ch.setUint16(28, nm.length, true); ch.setUint32(42, off, true);
+    central.push(ch.buffer, nm); off += 30 + nm.length + sz;
+  }
+  let csz = 0; for (const c of central) csz += c.byteLength;
+  const end = new DataView(new ArrayBuffer(22));
+  end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, csz, true); end.setUint32(16, off, true);
+  return new Blob([...parts, ...central, end.buffer], { type: 'application/zip' });
+}
+
+/* ---------- obraz: zmniejszenie i konwersja ---------- */
+async function normalize(file, it) {
+  const bmp = await createImageBitmap(file);
+  const cap = it.transparent ? 1280 : 1600, k = Math.min(1, cap / Math.max(bmp.width, bmp.height));
+  const c = document.createElement('canvas'); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+  const g = c.getContext('2d');
+  if (!it.transparent) { g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); }
+  g.drawImage(bmp, 0, 0, c.width, c.height);
+  return new Promise((res, rej) => c.toBlob((b) => b ? res(b) : rej(new Error('toBlob')), it.transparent ? 'image/png' : 'image/jpeg', 0.92));
+}
+async function setImage(key, file) {
+  const it = ITEMS.find((x) => stem(x) === key); if (!it || !file) return false;
+  try {
+    const blob = await normalize(file, it); const old = imgs.get(key); if (old) URL.revokeObjectURL(old.url);
+    imgs.set(key, { blob, url: URL.createObjectURL(blob), exported: false }); await persist(key); return true;
+  } catch (e) { toast('Nie udało się wczytać obrazu: ' + (file.name || 'schowek')); return false; }
+}
+
+/* ---------- filtrowanie i rysowanie ---------- */
+function filtered() {
+  const q = $('#q').value.trim().toLowerCase(), cat = $('#fcat').value, kind = $('#fkind').value, hide = $('#fhide').checked;
+  return ITEMS.filter((it) => (!cat || it.category === cat) && (!kind || it.kind === kind) && (!hide || !imgs.has(stem(it))) &&
+    (!q || (it.name + ' ' + it.asset_id + ' ' + it.state).toLowerCase().includes(q)));
+}
+function refHtml(r, i) {
+  const local = !r.ready ? imgs.get(r.id + '__base') : null;
+  if (r.ready || local) {
+    const src = local ? local.url : r.url;
+    return `<div class="ref"><div class="th"><img loading="lazy" src="${esc(src)}" alt=""></div><span class="cap">Obraz ${i + 1} · ${esc(r.name)}</span><button data-act="dlref" data-i="${i}">Pobierz</button></div>`;
+  }
+  return `<div class="ref"><div class="th"><span>jeszcze nie ma</span></div><span class="cap">Obraz ${i + 1} · ${esc(r.name)}</span><button data-act="goto" data-id="${esc(r.id)}">Zrób najpierw</button></div>`;
+}
+function cardHtml(it) {
+  const k = stem(it), v = imgs.get(k);
+  const missing = it.refs.some((r) => !r.ready && !imgs.has(r.id + '__base'));
+  const slot = v
+    ? `<div class="pv"><img src="${v.url}" alt="Podgląd: ${esc(it.name)}"></div><div class="st ${v.exported ? 'sent' : ''}">${v.exported ? 'Wyeksportowano' : 'Gotowe do wysłania'} · ${(v.blob.size / 1024) | 0} KB</div><div class="row"><button data-act="pick">Zamień</button><button data-act="del">Usuń</button></div>`
+    : `<div class="drop" data-act="pick" tabindex="0" role="button" aria-label="Dodaj obraz">Upuść tu obraz,<br>kliknij lub wklej Ctrl+V</div>`;
+  return `<article class="card ${v ? 'has' : ''} ${k === activeKey ? 'active' : ''}" data-key="${esc(k)}">
+    <div class="info" style="min-width:0">
+      <div class="meta"><span class="seq">#${it.seq}</span><span>${esc(it.category)} · ${it.kind === 'base' ? 'baza' : 'poza'}</span><span class="chip">${aspectName(it.size)}</span><span class="chip">${it.transparent ? 'wycięty obiekt, białe tło' : 'cała scena'}</span>${missing ? '<span class="chip warn">brakuje referencji</span>' : ''}</div>
+      <h3>${esc(it.name)}<small>${esc(it.state)}</small></h3>
+      <div class="id">${esc(it.inbox_name)}</div>
+      ${it.refs.length ? `<div class="refs">${it.refs.map(refHtml).join('')}</div>` : '<div class="refs sub" style="color:var(--muted);font-size:13px">Bez referencji, wystarczy sam prompt.</div>'}
+      <div class="actions"><button data-act="copy" class="primary">Kopiuj prompt</button></div>
+      <details class="pr"><summary>Pokaż prompt</summary><pre>${esc(promptFor(it))}</pre></details>
+    </div>
+    <div class="slot">${slot}</div>
+  </article>`;
+}
+function render() {
+  const list = filtered(), cats = $('#fcat');
+  $('#list').innerHTML = list.length
+    ? list.slice(0, shown).map(cardHtml).join('') + (list.length > shown ? `<button class="more" data-act="more">Pokaż kolejne (${list.length - shown})</button>` : '')
+    : '<div class="empty">Brak kart dla tego filtra.</div>';
+  const mine = ITEMS.filter((it) => imgs.has(stem(it))), pending = mine.filter((it) => !imgs.get(stem(it)).exported);
+  $('#stats').innerHTML = `<span>W kolejce: <b>${ITEMS.length}</b></span><span>Obrazy w stacji: <b>${mine.length}</b></span><span>Do wysłania: <b>${pending.length}</b></span><span>Widoczne karty: <b>${list.length}</b></span>`;
+  $('#bar').style.width = (ITEMS.length ? (100 * mine.length / ITEMS.length) : 0) + '%';
+  $('#bExport').disabled = !pending.length; $('#bExport').textContent = pending.length ? `Eksportuj ZIP do wysłania (${pending.length})` : 'Eksportuj ZIP do wysłania';
+  if (!cats.options.length) fillCats();
+}
+function fillCats() {
+  const cs = [...new Set(ITEMS.map((i) => i.category))];
+  $('#fcat').innerHTML = '<option value="">Wszystkie kategorie</option>' + cs.map((c) => `<option>${esc(c)}</option>`).join('');
+}
+
+/* ---------- akcje ---------- */
+const keyOf = (el) => el.closest('.card')?.dataset.key;
+async function dlRef(it, i) {
+  const r = it.refs[i], local = !r.ready ? imgs.get(r.id + '__base') : null;
+  try {
+    if (local) return saveBlob(local.blob, r.id + '__base.png');
+    const b = await (await fetch(r.url)).blob(); saveBlob(b, baseName(r.url));
+  } catch (e) { window.open(r.url, '_blank'); }
+}
+$('#list').addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const act = b.dataset.act, key = keyOf(b), it = key && ITEMS.find((x) => stem(x) === key);
+  if (key) activeKey = key;
+  if (act === 'more') { shown += PAGE; return render(); }
+  if (act === 'copy') { toast(await copyText(promptFor(it)) ? 'Prompt skopiowany. Dołącz referencje i wklej.' : 'Nie udało się skopiować, otwórz „Pokaż prompt”.'); return; }
+  if (act === 'pick') { pendingKey = key; $('#fOne').value = ''; $('#fOne').click(); return; }
+  if (act === 'del') { const v = imgs.get(key); if (v) URL.revokeObjectURL(v.url); imgs.delete(key); await persist(key); return render(); }
+  if (act === 'dlref') return dlRef(it, +b.dataset.i);
+  if (act === 'goto') { $('#q').value = b.dataset.id; $('#fcat').value = ''; $('#fkind').value = ''; shown = PAGE; render(); scrollTo({ top: 0 }); }
+});
+$('#list').addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.drop')) { e.preventDefault(); e.target.click(); } });
+$('#list').addEventListener('pointerover', (e) => { const c = e.target.closest('.card'); if (c && c.dataset.key !== activeKey) { activeKey = c.dataset.key; document.querySelectorAll('.card.active').forEach((n) => n.classList.remove('active')); c.classList.add('active'); } });
+$('#fOne').addEventListener('change', async () => { const f = $('#fOne').files[0]; if (f && pendingKey && await setImage(pendingKey, f)) { render(); toast('Dodano obraz.'); } });
+
+// przeciąganie plików na karty
+document.addEventListener('dragover', (e) => { if (e.dataTransfer && [...e.dataTransfer.types].includes('Files')) { e.preventDefault(); const c = e.target.closest?.('.card'); document.querySelectorAll('.over').forEach((n) => n.classList.remove('over')); c?.querySelector('.drop, .pv')?.classList.add('over'); } });
+document.addEventListener('dragleave', () => document.querySelectorAll('.over').forEach((n) => n.classList.remove('over')));
+document.addEventListener('drop', async (e) => {
+  document.querySelectorAll('.over').forEach((n) => n.classList.remove('over'));
+  const c = e.target.closest?.('.card'); const f = e.dataTransfer?.files?.[0]; if (!f) return; e.preventDefault();
+  if (c && await setImage(c.dataset.key, f)) { render(); toast('Dodano obraz.'); }
+});
+// wklejanie ze schowka do aktywnej karty
+document.addEventListener('paste', async (e) => {
+  const f = [...(e.clipboardData?.files || [])].find((x) => x.type.startsWith('image/')); if (!f) return;
+  if (!activeKey) return toast('Najpierw najedź na kartę lub kliknij ją, potem wklej.');
+  e.preventDefault(); if (await setImage(activeKey, f)) { render(); toast('Wklejono obraz do wybranej karty.'); }
+});
+
+// wiele plików po kolei do pustych kart
+$('#bMany').addEventListener('click', () => { $('#fMany').value = ''; $('#fMany').click(); });
+$('#fMany').addEventListener('change', async () => {
+  const files = [...$('#fMany').files].sort((a, b) => a.lastModified - b.lastModified || a.name.localeCompare(b.name));
+  const targets = filtered().filter((it) => !imgs.has(stem(it))); let n = 0;
+  for (const f of files) { const it = targets[n]; if (!it) break; toast(`Wczytuję ${n + 1}/${files.length}…`, 0); if (await setImage(stem(it), f)) n++; }
+  render(); toast(`Przypisano ${n} z ${files.length} plików do pustych kart, po kolei od góry. Sprawdź dopasowanie na podglądach.`, 6000);
+});
+
+// eksport do wysłania
+$('#bExport').addEventListener('click', async () => {
+  const todo = ITEMS.filter((it) => imgs.has(stem(it)) && !imgs.get(stem(it)).exported);
+  if (!todo.length) return;
+  const stamp = new Date().toISOString().slice(0, 16).replace(/[-:T]/g, ''), groups = []; let cur = [], size = 0;
+  for (const it of todo) { const b = imgs.get(stem(it)).blob; if (size + b.size > ZIP_PART && cur.length) { groups.push(cur); cur = []; size = 0; } cur.push(it); size += b.size; }
+  groups.push(cur);
+  for (let i = 0; i < groups.length; i++) {
+    toast(`Pakuję część ${i + 1}/${groups.length}…`, 0);
+    const files = [];
+    for (const it of groups[i]) { const v = imgs.get(stem(it)); files.push({ name: stem(it) + (it.transparent ? '.png' : '.jpg'), data: new Uint8Array(await v.blob.arrayBuffer()) }); }
+    saveBlob(makeZip(files), `art-inbox-${stamp}-czesc${i + 1}.zip`);
+    groups[i].forEach((it) => { imgs.get(stem(it)).exported = true; });
+    await sleep(500);
+  }
+  for (const it of todo) await persist(stem(it));
+  render(); toast(`Pobrano ${groups.length} ZIP. Wrzuć je do art-inbox na GitHubie (link w „Jak tego używać”).`, 8000);
+});
+
+// referencje (ZIP) dla widocznych kart
+$('#bRefs').addEventListener('click', async () => {
+  const seen = new Map();
+  for (const it of filtered()) for (const r of it.refs) { const n = r.ready ? baseName(r.url) : r.id + '__base.png'; if (!seen.has(n)) seen.set(n, r); }
+  if (!seen.size) return toast('Karty z tego filtra nie mają referencji.');
+  if (seen.size > 120 && !confirm0(seen.size)) return;
+  const files = []; let i = 0;
+  for (const [n, r] of seen) {
+    i++; toast(`Pobieram referencje ${i}/${seen.size}…`, 0);
+    try {
+      if (r.ready) files.push({ name: n, data: new Uint8Array(await (await (await fetch(r.url)).blob()).arrayBuffer()) });
+      else { const v = imgs.get(r.id + '__base'); if (v) files.push({ name: n, data: new Uint8Array(await v.blob.arrayBuffer()) }); }
+    } catch (e) { /* pomiń niedostępny plik */ }
+  }
+  if (!files.length) return toast('Nie udało się pobrać referencji (sprawdź połączenie z internetem).');
+  saveBlob(makeZip(files), 'referencje.zip'); toast(`Referencje: ${files.length} plików w referencje.zip. Rozpakuj do folderu.`, 6000);
+});
+const confirm0 = () => true;
+
+// odśwież listę z GitHuba
+$('#bRefresh').addEventListener('click', async () => {
+  try {
+    const r = await fetch(RAW + '?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) throw 0;
+    const d = await r.json(); if (!Array.isArray(d)) throw 0;
+    ITEMS = d; $('#fcat').innerHTML = ''; shown = PAGE; render(); toast(`Lista odświeżona: ${d.length} pozycji do zrobienia.`);
+  } catch (e) { toast('Nie udało się pobrać aktualnej listy. Działa wbudowana wersja.'); }
+});
+['q', 'fcat', 'fkind', 'fhide'].forEach((id) => $('#' + id).addEventListener('input', () => { shown = PAGE; render(); }));
+
+// motyw
+$('#bTheme').addEventListener('click', () => {
+  const r = document.documentElement, dark = r.dataset.theme === 'dark' || (!r.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+  r.dataset.theme = dark ? 'light' : 'dark'; try { localStorage.setItem('art-theme', r.dataset.theme); } catch (e) { /* nic */ }
+});
+try { const t = localStorage.getItem('art-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) { /* nic */ }
+
+/* ---------- start ---------- */
+(async () => {
+  db = await idbOpen();
+  for (const [k, v] of await idbAll()) if (v && v.blob) imgs.set(k, { blob: v.blob, url: URL.createObjectURL(v.blob), exported: !!v.exported });
+  fillCats(); render();
+})();
+})();
+</script>
+</body>
+</html>
