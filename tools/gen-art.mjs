@@ -54,7 +54,7 @@ const toPng = (buf) => sharp(buf).png().toBuffer();   // referencje wysyłamy do
 const keyOf = (a, state) => `${a.category}/${basename(fileOf(a, state))}`;
 
 // kolejność produkcji: najpierw to, na czym opiera się reszta
-const PRIORITY = ['characters', 'bosses', 'enemies', 'collectibles', 'interactables', 'conduits', 'planet-tiles', 'civilians', 'planet-props', 'parallax', 'level-backgrounds', 'character-variants', 'boss-variants', 'enemy-variants', 'interface', 'story-illustrations', 'effects'];
+const PRIORITY = ['characters', 'bosses', 'enemies', 'collectibles', 'interactables', 'conduits', 'planet-tiles', 'mechanics', 'civilians', 'planet-props', 'parallax', 'level-backgrounds', 'character-variants', 'boss-variants', 'enemy-variants', 'interface', 'story-illustrations', 'effects'];
 const rank = (c) => { const i = PRIORITY.indexOf(c); return i < 0 ? 99 : i; };
 if (opt('list-categories', false)) { console.log(PRIORITY.filter((c) => assets.some((a) => a.category === c)).join(',')); process.exit(0); }
 if (!key && !dry && !recut && !opt('migrate', false) && !opt('plan', false) && !opt('ingest', false)) { console.error('Brak OPENAI_API_KEY w środowisku.'); process.exit(2); }
@@ -67,6 +67,12 @@ const POSE_EXTRAS = {   // poza → dodatkowy obiekt/postać, którego użycie p
   'CHARACTERS-001': { interact_panel: ['INTERACTABLES-006', 'item'], push: ['INTERACTABLES-009', 'item'], climb_wire: ['CONDUITS-003', 'item'], teleport_entry: ['CONDUITS-001', 'item'], revive_brother: ['CHARACTERS-002', 'character'] },
   'CHARACTERS-002': { interact_panel: ['INTERACTABLES-006', 'item'], push: ['INTERACTABLES-009', 'item'], climb_wire: ['CONDUITS-003', 'item'], teleport_entry: ['CONDUITS-001', 'item'], revive_brother: ['CHARACTERS-001', 'character'] },
 };
+// nowe pozy pionowej przebudowy: referencje do elementów mechanik (tools/add-vertical-art.mjs → art-mechanics.json)
+try {
+  const MK = JSON.parse(readFileSync(join(root, 'tools', 'art-mechanics.json'), 'utf8'));
+  for (const c of ['CHARACTERS-001', 'CHARACTERS-002']) Object.assign(POSE_EXTRAS[c], { climb_grate: [MK.grate, 'item'], spring_launch: [MK.spring, 'item'] });
+  POSE_EXTRAS['CHARACTERS-001'].ground_pound = [MK.crack, 'item'];
+} catch { /* biblioteka bez mechanics */ }
 const ICON_REFS = { 'PET Counter Icon': 'COLLECTIBLES-001', 'Can Counter Icon': 'COLLECTIBLES-003', 'Lives Icon': 'COLLECTIBLES-012' };
 function mentioned(a) {   // bohaterowie wymienieni w opisie (dla ilustracji fabularnych i menu)
   const brief = (a.prompt_en.split('SUBJECT:')[1] || '').split('PALETTE:')[0];
@@ -81,7 +87,7 @@ function baseRefs(a) {
   const r = [];
   if (a.reference_asset_id) r.push({ id: a.reference_asset_id, role: 'model' });
   if (a.category === 'character-variants') { const v = (a.name.split(' - ')[1] || '').trim(); if (ITEM_FOR_VARIANT[v]) r.push({ id: ITEM_FOR_VARIANT[v], role: 'item' }); }
-  if (['planet-tiles', 'planet-props', 'parallax', 'level-backgrounds'].includes(a.category) && a.planet) { const an = anchorOf(a.planet); if (an && an.asset_id !== a.asset_id) r.push({ id: an.asset_id, role: 'style' }); }
+  if (['planet-tiles', 'planet-props', 'parallax', 'level-backgrounds', 'mechanics'].includes(a.category) && a.planet) { const an = anchorOf(a.planet); if (an && an.asset_id !== a.asset_id) r.push({ id: an.asset_id, role: 'style' }); }
   if (a.category === 'interface' || a.category === 'story-illustrations') {
     if (ICON_REFS[a.name]) r.push({ id: ICON_REFS[a.name], role: 'item' });
     const pl = /^Planet (\S+) Icon$/.exec(a.name); if (pl) { const an = anchorOf(assets.find((x) => x.planet && slug(x.planet) === slug(pl[1]))?.planet); if (an) r.push({ id: an.asset_id, role: 'style' }); }

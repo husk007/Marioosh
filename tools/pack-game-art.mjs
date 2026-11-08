@@ -21,6 +21,7 @@ const rules = [
   ['collectibles', () => true, 160, true],
   ['conduits', (a) => [1, 6, 11, 16, 21, 26].includes(num(a.asset_id)), 224, true],
   ['interactables', (a) => [1, 2, 3, 4, 5, 7, 11, 14, 18, 20, 30].includes(num(a.asset_id)), 320, true],
+  ['mechanics', () => true, 256, true],
   ['planet-tiles', (a) => Object.values(TILE_K).includes(((num(a.asset_id) - 1) % 16) + 1), 288, false],
 ];
 const index = {}; let bytes = 0, n = 0;
