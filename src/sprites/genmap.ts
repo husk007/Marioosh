@@ -32,6 +32,11 @@ export function genHero(brother: 'M' | 'D', frame: HeroFrame, _big: boolean, nig
     case 'crouch': key = S('crouch'); if (!key) { key = S('base'); o.sx = 1.1; o.sy = 0.84; } break;
     case 'victory': key = S('victory', 'base'); break;
     case 'swim': key = S('base'); o.rot = 72; break;
+    case 'glide': key = S('glide', 'glide_umbrella'); if (!key) { key = S('base'); o.sx = 1.08; o.sy = 0.96; } break;
+    case 'hang': key = S('ledge_hang', 'hang'); if (!key) { key = S('climb_wire', 'base'); } break;
+    case 'wall': key = S('wall_slide'); if (!key) { key = S('base'); o.rot = -6; } break;
+    case 'pound': key = S('ground_pound'); if (!key) { key = S('base'); o.sx = 0.92; o.sy = 1.12; } break;
+    case 'roll0': case 'roll1': case 'roll2': case 'roll3': key = S('roll'); if (!key) { key = S('crouch', 'base'); o.sx = 1.18; o.sy = 0.62; o.rot = 0; } o.rot = (o.rot ?? 0) + (['roll0', 'roll1', 'roll2', 'roll3'].indexOf(frame)) * 90; break;
     default: key = S('idle', 'base');
   }
   if (!key) return undefined;

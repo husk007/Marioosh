@@ -103,6 +103,13 @@ export class App {
     for (const b of this.input.touchButtons) {
       if (b.action === 'switch' && this.session?.coop) continue;
       if (b.action === 'switch' && !this.session) continue;
+      if (b.id === 'dpad') {
+        const cx = b.x + b.w / 2, cy = b.y + b.h / 2, R = b.w / 2;
+        c.globalAlpha = 0.24; c.fillStyle = '#000'; c.beginPath(); c.arc(cx, cy, R, 0, Math.PI * 2); c.fill();
+        c.globalAlpha = 0.55; c.strokeStyle = '#fff'; c.lineWidth = 2; c.stroke();
+        for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2; c.beginPath(); c.moveTo(cx + Math.cos(a) * R * 0.78, cy + Math.sin(a) * R * 0.78); c.lineTo(cx + Math.cos(a - 0.3) * R * 0.5, cy + Math.sin(a - 0.3) * R * 0.5); c.lineTo(cx + Math.cos(a + 0.3) * R * 0.5, cy + Math.sin(a + 0.3) * R * 0.5); c.closePath(); c.fillStyle = '#fff'; c.globalAlpha = 0.6; c.fill(); }
+        c.globalAlpha = 1; continue;
+      }
       c.globalAlpha = 0.28; c.fillStyle = '#000'; c.beginPath(); c.arc(b.x + b.w / 2, b.y + b.h / 2, Math.min(b.w, b.h) / 2, 0, Math.PI * 2); c.fill();
       c.globalAlpha = 0.6; c.strokeStyle = '#fff'; c.lineWidth = 2; c.stroke(); c.globalAlpha = 1;
       g.text(b.label, b.x + b.w / 2, b.y + b.h / 2 - 5, { size: 10, align: 'center', alpha: 0.9, shadow: null });

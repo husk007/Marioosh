@@ -9,12 +9,14 @@ describe('ruch braci (GDD B, kryterium M1)', () => {
     it(`${BROTHERS[b].name}: przerwa 3 kafelki bez biegu`, () => { expect(jumpsGap(b, 3, false).ok).toBe(true); });
     it(`${BROTHERS[b].name}: przerwa 4 kafelki z rozbiegu`, () => { expect(jumpsGap(b, 4, true).ok).toBe(true); });
     it(`${BROTHERS[b].name}: wejście na stopień 2 kafelki`, () => { expect(maxStepUp(b, 2)).toBe(true); });
-    it(`${BROTHERS[b].name}: stopień 4 kafelki jest nieosiągalny skokiem`, () => { expect(maxStepUp(b, 4)).toBe(false); });
+    it(`${BROTHERS[b].name}: stopień 4 kafelki: skok + chwyt krawędzi`, () => { expect(maxStepUp(b, 4)).toBe(true); });
+    it(`${BROTHERS[b].name}: ściana 7 kafli jest nieosiągalna z płaskiego`, () => { expect(maxStepUp(b, 7)).toBe(false); });
   }
-  it('Darioosh skacze wyżej niż Marioosh, ale nie omija całych plansz', () => {
-    const hM = (BROTHERS.M.jump ** 2) / (2 * 1150), hD = (BROTHERS.D.jump ** 2) / (2 * 1150);
+  it('Darioosh skacze wyżej niż Marioosh (ok. 3,5 i 4,5 kafla)', () => {
+    const hM = (BROTHERS.M.jump ** 2) / (2 * 1600), hD = (BROTHERS.D.jump ** 2) / (2 * 1600);
     expect(hD).toBeGreaterThan(hM);
-    expect(jumpsGap('D', 8, true).ok).toBe(false);   // zasięg ~6,9 kafla: poziomy (max przerwa 4) nie da się "przeskoczyć"
+    expect(hM / 32).toBeGreaterThan(3.2); expect(hD / 32).toBeLessThan(5);
+    expect(jumpsGap('D', 22, true).ok).toBe(false);   // przerwy powyżej ok. 13 kafli wymagają szybowania lub sprężyny
   });
   it('coyote time: skok tuż po zejściu z krawędzi działa, po 150 ms już nie', () => {
     for (const [delay, expected] of [[0.08, true], [0.2, false]] as const) {

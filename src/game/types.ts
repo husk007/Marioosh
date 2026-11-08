@@ -3,6 +3,16 @@ import type { BossId } from '../data/worlds';
 /** Rodzaje kafelków */
 export const T = {
   EMPTY: 0, SOLID: 1, ONEWAY: 2, HAZARD: 3, LADDER: 4, CRUMBLE: 5, CONVL: 6, CONVR: 7, CRACKED: 8, CABLE: 9, GATE: 10,
+  // stoki (powierzchnia pochyła, pod nią stoi lity kafel): R = wznosi się w prawo, L = w lewo; 45° i ~26,6° (dwa kafle: A = niższa połowa, B = wyższa)
+  SL_R45: 11, SL_L45: 12, SL_R26A: 13, SL_R26B: 14, SL_L26A: 15, SL_L26B: 16,
+  SPRING_U: 17, SPRING_R: 18, SPRING_L: 19,
+  // 20 zarezerwowane (półki bossa Rogodrona)
+  CLIMB: 21,      // kratka/pnącze na ścianie: wspinaczka we wszystkich kierunkach
+  ROPE: 22,       // lina/łańcuch/rura pionowa: wspinaczka tylko w pionie, skok w bok
+  ICE: 23,        // lity, śliski (lód)
+  OIL: 24,        // lity, bardzo śliski (olej)
+  SAND: 25,       // lity, wolny/tłumiący (piasek)
+  PLATFORM_BREAK: 26, // kruszy się po uderzeniu w ziemię (Marioosh) — jak CRACKED, ale tylko od góry
 } as const;
 export type TileId = (typeof T)[keyof typeof T];
 

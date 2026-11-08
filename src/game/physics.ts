@@ -18,21 +18,72 @@ export const tileAt = (g: Grid, tx: number, ty: number): number => {
   if (ty >= g.h) return T.EMPTY;                 // pod poziomem — przepaść
   return g.tiles[ty * g.w + tx];
 };
-export const isSolidTile = (t: number): boolean => t === T.SOLID || t === T.CRACKED || t === T.CABLE || t === T.GATE || t === T.CRUMBLE || t === T.CONVL || t === T.CONVR;
+export const isSolidTile = (t: number): boolean => t === T.SOLID || t === T.CRACKED || t === T.CABLE || t === T.GATE || t === T.CRUMBLE || t === T.CONVL || t === T.CONVR || t === T.ICE || t === T.OIL || t === T.SAND || t === T.PLATFORM_BREAK;
 
-/** Przesuwa ciało z kolizjami osiami X i Y. one-way: tylko z góry. */
+// ---------------------------------------------------------------- stoki (kafle z profilem wysokości)
+export const isSlope = (t: number): boolean => t >= T.SL_R45 && t <= T.SL_L26B;
+/** wysokość powierzchni stoku nad dolną krawędzią kafla (0..32) w kolumnie lx (0..32 px od lewej krawędzi) */
+export function slopeH(t: number, lx: number): number {
+  switch (t) {
+    case T.SL_R45: return lx;
+    case T.SL_L45: return TILE - lx;
+    case T.SL_R26A: return lx / 2;
+    case T.SL_R26B: return TILE / 2 + lx / 2;
+    case T.SL_L26A: return TILE - lx / 2;
+    case T.SL_L26B: return TILE / 2 - lx / 2;
+    default: return -1;
+  }
+}
+/** kąt stoku w radianach (dodatni = wznosi się w prawo, oś Y w dół) */
+export function slopeAngle(t: number): number {
+  switch (t) {
+    case T.SL_R45: return Math.PI / 4;
+    case T.SL_L45: return -Math.PI / 4;
+    case T.SL_R26A: case T.SL_R26B: return Math.atan(0.5);
+    case T.SL_L26A: case T.SL_L26B: return -Math.atan(0.5);
+    default: return 0;
+  }
+}
+export interface Floor { y: number; tile: number; angle: number }
+/**
+ * Powierzchnia, na której można stanąć w kolumnie x: pierwsza (od góry) w przedziale [yRef-up, yRef+down].
+ * `oneWay`: czy kafle jednokierunkowe się liczą (tylko gdy stopy są nad nimi).
+ */
+export function floorAt(g: Grid, x: number, yRef: number, up: number, down: number, oneWay = true): Floor | null {
+  const tx = Math.floor(x / TILE); const lx = x - tx * TILE;
+  const r0 = Math.floor((yRef - up) / TILE), r1 = Math.floor((yRef + down) / TILE);
+  for (let ty = r0; ty <= r1; ty++) {
+    const t = tileAt(g, tx, ty); if (t === T.EMPTY) continue;
+    if (isSlope(t)) { const sy = ty * TILE + TILE - slopeH(t, lx); if (sy >= yRef - up - 0.001 && sy <= yRef + down + 0.001) return { y: sy, tile: t, angle: slopeAngle(t) }; continue; }
+    const sy = ty * TILE;
+    if (sy < yRef - up - 0.001 || sy > yRef + down + 0.001) continue;
+    if (isSolidTile(t)) return { y: sy, tile: t, angle: 0 };
+    if (t === T.ONEWAY && oneWay && sy >= yRef - 0.5) return { y: sy, tile: t, angle: 0 };
+  }
+  return null;
+}
+
+/**
+ * Przesuwa ciało z kolizjami osiami X i Y (wrogowie, bossowie, przedmioty). Obsługuje stoki: ciało idące po podłożu
+ * „przykleja się” do powierzchni (w górę i w dół stoku), a w powietrzu ląduje na powierzchni pochyłej.
+ * one-way: tylko z góry.
+ */
 export function moveBody(g: Grid, b: Body, dt: number, opt: { dropThrough?: boolean } = {}): void {
+  const wasGround = b.onGround;
   b.hitWall = 0; b.hitCeil = false; b.onGround = false; b.groundTile = 0;
+  const adx = Math.abs(b.vx * dt);
+  const stepUp = (wasGround ? 4 : 1) + adx * 1.15;     // tyle „schodka” (lub stoku) pokonujemy bez zatrzymania
   // ---- oś X
   let nx = b.x + b.vx * dt;
   if (b.vx !== 0) {
     const top = Math.floor((b.y + 0.01) / TILE), bot = Math.floor((b.y + b.h - 0.01) / TILE);
+    const feet = b.y + b.h;
     if (b.vx > 0) {
       const tx = Math.floor((nx + b.w - 0.001) / TILE);
-      for (let ty = top; ty <= bot; ty++) if (isSolidTile(tileAt(g, tx, ty))) { nx = tx * TILE - b.w; b.vx = 0; b.hitWall = 1; break; }
+      for (let ty = top; ty <= bot; ty++) if (isSolidTile(tileAt(g, tx, ty)) && !(ty * TILE >= feet - stepUp)) { nx = tx * TILE - b.w; b.vx = 0; b.hitWall = 1; break; }
     } else {
       const tx = Math.floor(nx / TILE);
-      for (let ty = top; ty <= bot; ty++) if (isSolidTile(tileAt(g, tx, ty))) { nx = (tx + 1) * TILE; b.vx = 0; b.hitWall = -1; break; }
+      for (let ty = top; ty <= bot; ty++) if (isSolidTile(tileAt(g, tx, ty)) && !(ty * TILE >= feet - stepUp)) { nx = (tx + 1) * TILE; b.vx = 0; b.hitWall = -1; break; }
     }
   }
   b.x = nx;
@@ -41,14 +92,15 @@ export function moveBody(g: Grid, b: Body, dt: number, opt: { dropThrough?: bool
   let ny = b.y + b.vy * dt;
   const l = Math.floor((b.x + 0.01) / TILE), r = Math.floor((b.x + b.w - 0.01) / TILE);
   if (b.vy >= 0) {
-    const ty = Math.floor((ny + b.h - 0.001) / TILE);
-    if (ny + b.h > prevBottom - 0.001 || b.vy === 0) {
-      for (let tx = l; tx <= r; tx++) {
-        const t = tileAt(g, tx, ty);
-        const solid = isSolidTile(t) || (t === T.ONEWAY && !opt.dropThrough && prevBottom <= ty * TILE + 0.5);
-        if (solid && ny + b.h > ty * TILE) { ny = ty * TILE - b.h; b.vy = 0; b.onGround = true; b.groundTile = t; break; }
-      }
+    const nb = ny + b.h;
+    const up = stepUp, down = Math.max(0, nb - prevBottom) + (wasGround ? 3 + adx * 1.15 : 0);
+    // stopa: najwyższa powierzchnia spośród trzech próbek (lewa, środek, prawa)
+    let best: Floor | null = null;
+    for (const sx of [b.x + 1, b.x + b.w / 2, b.x + b.w - 1]) {
+      const f = floorAt(g, sx, prevBottom, up, down, !opt.dropThrough && true);
+      if (f && (f.tile !== T.ONEWAY || prevBottom <= f.y + 0.5) && (!best || f.y < best.y)) best = f;
     }
+    if (best && (nb >= best.y - 0.001 || wasGround)) { ny = best.y - b.h; if (b.vy > 0 || wasGround) b.vy = 0; b.onGround = true; b.groundTile = best.tile; }
   } else {
     const ty = Math.floor(ny / TILE);
     for (let tx = l; tx <= r; tx++) if (isSolidTile(tileAt(g, tx, ty))) { ny = (ty + 1) * TILE; b.vy = 0; b.hitCeil = true; break; }

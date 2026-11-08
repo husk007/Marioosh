@@ -11,7 +11,7 @@ import { TILE, VH, VW } from './constants';
 import type { Enemy, PlayerEnt } from './entities';
 import { T } from './types';
 import type { World } from './world';
-import { tileAt } from './physics';
+import { isSlope, isSolidTile, slopeH, tileAt } from './physics';
 
 const tintCache = new WeakMap<Img, Map<string, Img>>();
 function tint(img: Img, color: string, a: number): Img {
@@ -19,6 +19,47 @@ function tint(img: Img, color: string, a: number): Img {
   let m = tintCache.get(img); if (!m) { m = new Map(); tintCache.set(img, m); }
   let r = m.get(key); if (!r) { r = tinted(img, color, q); m.set(key, r); }
   return r;
+}
+
+
+// ---------------------------------------------------------------- nowe kafle: stoki, sprężyny, liny, kratki, lód/olej/piasek
+const slopeCache = new Map<string, Img>();
+/** kafel stoku: faktura wypełnienia przycięta do trójkąta/trapezu + kolorowa krawędź powierzchni */
+function slopeImg(ts: { fill: Img[] }, t: number, v: number, world: number): Img {
+  const key = `${world}:${t}:${v}`; const hit = slopeCache.get(key); if (hit) return hit;
+  const c = makeCanvas(64, 64) as Img; c.ss = 2; const x = c.getContext('2d') as CanvasRenderingContext2D;
+  const y0 = 64 - slopeH(t, 0) * 2, y1 = 64 - slopeH(t, TILE) * 2;
+  x.save(); x.beginPath(); x.moveTo(0, 64); x.lineTo(0, y0); x.lineTo(64, y1); x.lineTo(64, 64); x.closePath(); x.clip();
+  const f = ts.fill[v % ts.fill.length]; if (f) x.drawImage(f, 0, 0, 64, 64); else { x.fillStyle = WORLDS[world]?.ground ?? '#555'; x.fillRect(0, 0, 64, 64); }
+  x.restore();
+  const col = WORLDS[world]?.groundTop ?? '#9a9';
+  x.strokeStyle = col; x.lineWidth = 6; x.lineCap = 'butt'; x.beginPath(); x.moveTo(0, y0 + 3); x.lineTo(64, y1 + 3); x.stroke();
+  x.strokeStyle = 'rgba(255,255,255,0.35)'; x.lineWidth = 2; x.beginPath(); x.moveTo(0, y0 + 1); x.lineTo(64, y1 + 1); x.stroke();
+  slopeCache.set(key, c); return c;
+}
+function drawSpring(g: Gfx, X: number, Y: number, dir: 'u' | 'r' | 'l', fr: number): void {
+  const col = '#ffd23f', dark = '#7a6a2a', coil = '#d8d8e8';
+  if (dir === 'u') {
+    g.rect(X + 5, Y + 28, 22, 4, '#6a6a7a');
+    for (let i = 0; i < 3; i++) g.rect(X + 8, Y + 14 + i * 4 + fr, 16, 2, coil);
+    g.rect(X + 4, Y + 10 + fr, 24, 5, col); g.rect(X + 4, Y + 14 + fr, 24, 1, dark);
+  } else {
+    const s = dir === 'r' ? 1 : -1, bx = dir === 'r' ? X : X + 32;
+    g.rect(dir === 'r' ? X : X + 28, Y + 6, 4, 20, '#6a6a7a');
+    for (let i = 0; i < 3; i++) g.rect(bx + s * (6 + i * 4) - (s < 0 ? 2 : 0) + fr * s, Y + 10, 2, 12, coil);
+    g.rect(bx + s * 18 - (s < 0 ? 5 : 0) + fr * s, Y + 6, 5, 20, col);
+  }
+}
+function drawRope(g: Gfx, X: number, Y: number, world: number): void {
+  const cx = X + 16;
+  if (world === 7) { for (let i = 0; i < 4; i++) { g.rect(cx - 3, Y + i * 8 + 1, 6, 7, '#9aa4b0'); g.rect(cx - 1, Y + i * 8 + 3, 2, 3, '#3c4a54'); } }
+  else if (world === 3) { g.rect(cx - 2, Y, 4, TILE, '#3a9a50'); g.rect(cx - 6, Y + 8, 5, 3, '#4db868'); g.rect(cx + 2, Y + 20, 5, 3, '#4db868'); }
+  else { g.rect(cx - 2, Y, 4, TILE, '#b58a50'); for (let i = 0; i < 4; i++) g.rect(cx - 3, Y + i * 8 + 2, 6, 2, '#7a5a30'); }
+}
+function drawGrate(g: Gfx, X: number, Y: number, world: number): void {
+  const c = world === 3 ? '#4db868' : world === 6 ? '#6979b2' : '#9aa0b0';
+  g.rect(X + 2, Y, 3, TILE, c, 0.9); g.rect(X + 14, Y, 3, TILE, c, 0.9); g.rect(X + 26, Y, 3, TILE, c, 0.9);
+  g.rect(X, Y + 3, TILE, 2, c, 0.9); g.rect(X, Y + 15, TILE, 2, c, 0.9); g.rect(X, Y + 27, TILE, 2, c, 0.9);
 }
 
 const decorCache = new Map<string, Img>();
@@ -66,7 +107,22 @@ export function drawWorld(w: World, g: Gfx): void {
     const t = rt.tiles[ty * room.w + tx]; if (t === T.EMPTY || t === 20) continue;
     const v = ts.fill.length === 16 ? (tx & 3) + ((ty & 3) << 2) : (tx * 7 + ty * 13) % 3; const vt = ts.top.length === 4 ? tx & 3 : (tx * 7 + ty * 13) % 3; const X = tx * TILE, Y = ty * TILE;
     switch (t) {
-      case T.SOLID: { const above = ty > 0 ? rt.tiles[(ty - 1) * room.w + tx] : T.SOLID; g.spr((above === T.SOLID || above === T.CRACKED || above === T.CABLE || above === T.GATE || above === T.CRUMBLE) ? ts.fill[v] : ts.top[vt], X, (above === T.SOLID || above === T.CRACKED || above === T.CABLE || above === T.GATE || above === T.CRUMBLE) ? Y : Y - TOP_PAD); break; }
+      case T.SOLID: case T.ICE: case T.OIL: case T.SAND: case T.PLATFORM_BREAK: {
+        const above = ty > 0 ? rt.tiles[(ty - 1) * room.w + tx] : T.SOLID;
+        const covered = isSolidTile(above) || isSlope(above);
+        if (t === T.PLATFORM_BREAK) { g.spr(ts.cracked, X, Y); break; }
+        g.spr(covered ? ts.fill[v] : ts.top[vt], X, covered ? Y : Y - TOP_PAD);
+        if (t === T.ICE) { g.rect(X, Y, TILE, TILE, '#bfe6ff', 0.34); if (!covered) g.rect(X, Y - 1, TILE, 3, '#e8f8ff', 0.9); g.rect(X + 6 + ((tx * 5) & 7), Y + 6, 8, 2, '#ffffff', 0.45); }
+        else if (t === T.OIL) { g.rect(X, Y, TILE, TILE, '#1a1030', 0.55); if (!covered) { g.rect(X, Y - 1, TILE, 4, '#2a1a48', 0.95); g.rect(X + 4 + ((fr * 3 + tx * 5) & 15), Y, 6, 2, '#7fd6c8', 0.7); } }
+        else if (t === T.SAND) { g.rect(X, Y, TILE, TILE, '#e6c88a', 0.5); if (!covered) g.rect(X, Y - 1, TILE, 3, '#f4dcae', 0.9); }
+        break;
+      }
+      case T.SL_R45: case T.SL_L45: case T.SL_R26A: case T.SL_R26B: case T.SL_L26A: case T.SL_L26B: g.spr(slopeImg(ts, t, v, room.world), X, Y); break;
+      case T.SPRING_U: drawSpring(g, X, Y, 'u', fr); break;
+      case T.SPRING_R: drawSpring(g, X, Y, 'r', fr); break;
+      case T.SPRING_L: drawSpring(g, X, Y, 'l', fr); break;
+      case T.ROPE: drawRope(g, X, Y, room.world); break;
+      case T.CLIMB: drawGrate(g, X, Y, room.world); break;
       case T.ONEWAY: g.spr(ts.oneway, X, Y); break;
       case T.HAZARD: g.spr(ts.hazard[fr], X, Y); break;
       case T.LADDER: g.spr(ts.ladder, X, Y); break;
@@ -215,9 +271,12 @@ export function heroFrameFor(p: PlayerEnt): HeroFrame {
   const mv = p.mv, b = mv.body;
   if (p.dead || p.hurtT > 0) return 'hurt';
   if (p.atk.phase !== 'none') return 'attack';
-  if (mv.climbing) return Math.floor(p.anim * 6) % 2 ? 'climb1' : 'climb0';
+  if (mv.hang || mv.ledge) return 'hang';
+  if (mv.climbing) return Math.abs(b.vy) < 5 && Math.abs(b.vx) < 5 ? 'climb0' : Math.floor(p.anim * 7) % 2 ? 'climb1' : 'climb0';
   if (mv.swimming) return 'swim';
-  if (!b.onGround) return b.vy > 90 ? 'fall' : 'jump';
+  if (!b.onGround) { if (mv.pounding) return 'pound'; if (mv.wallSlide) return 'wall'; if (mv.gliding) return 'glide'; return b.vy > 90 ? 'fall' : 'jump'; }
+  if (mv.rolling) return (['roll0', 'roll1', 'roll2', 'roll3'] as const)[Math.floor(p.anim * 14) & 3];
+  if (mv.duck) return 'crouch';
   if (Math.abs(b.vx) > 12) return Math.floor(p.anim * (Math.abs(b.vx) > 200 ? 12 : 8)) % 2 ? 'walk1' : 'walk0';
   return 'idle';
 }

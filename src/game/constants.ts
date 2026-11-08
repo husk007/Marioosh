@@ -10,24 +10,43 @@ export const PACKAGES_PER_LIFE = 100;
 export type Brother = 'M' | 'D';
 
 export interface BrotherParams {
-  walk: number; run: number; accel: number; airAccel: number; decel: number;
+  walk: number; run: number; accel: number; airAccel: number; decel: number; fric: number;
   jump: number; stompBounce: number; hitW: number; hitH: number; bigW: number; bigH: number;
   keyRange: number; keyCooldown: number; keyDamage: number; name: string;
+  /** szybowanie: maks. prędkość opadania (px/s); 0 = brak */
+  glideFall: number;
+  /** ślizg po ścianie: maks. prędkość opadania; odbicie od ściany tylko gdy wallJump */
+  wallSlide: number; wallJump: boolean;
+  /** uderzenie w ziemię (rozbija pęknięte podłoża, ogłusza wrogów) */
+  pound: boolean;
+  /** wytrzymałość na kratkach/pnączach w sekundach (99 = bez limitu) */
+  stamina: number;
+  swim: number; sink: number; climbUp: number; climbDown: number;
 }
 
-/** Tabela parametrów ruchu (GDD B). Oś Y dodatnia w dół. */
+/** Tabela parametrów ruchu (px, s). Oś Y dodatnia w dół. Marioosh: silny, ciężki (uderzenie w ziemię); Darioosh: szybki, zwinny (odbicie od ściany, długie szybowanie). */
 export const BROTHERS: Record<Brother, BrotherParams> = {
-  M: { walk: 150, run: 235, accel: 1100, airAccel: 650, decel: 1350, jump: -420, stompBounce: -310,
-       hitW: 22, hitH: 30, bigW: 24, bigH: 42, keyRange: 46, keyCooldown: 0.44, keyDamage: 2, name: 'Marioosh' },
-  D: { walk: 165, run: 255, accel: 1300, airAccel: 780, decel: 1500, jump: -455, stompBounce: -325,
-       hitW: 20, hitH: 30, bigW: 22, bigH: 40, keyRange: 40, keyCooldown: 0.33, keyDamage: 1, name: 'Darioosh' },
+  M: { walk: 300, run: 420, accel: 800, airAccel: 600, decel: 3200, fric: 1000, jump: -600, stompBounce: -440, hitW: 22, hitH: 30, bigW: 24, bigH: 42,
+       keyRange: 46, keyCooldown: 0.44, keyDamage: 2, name: 'Marioosh', glideFall: 140, wallSlide: 200, wallJump: false, pound: true, stamina: 3, swim: 150, sink: 90, climbUp: 130, climbDown: 230 },
+  D: { walk: 340, run: 520, accel: 950, airAccel: 700, decel: 3600, fric: 1100, jump: -680, stompBounce: -470, hitW: 20, hitH: 30, bigW: 22, bigH: 40,
+       keyRange: 40, keyCooldown: 0.33, keyDamage: 1, name: 'Darioosh', glideFall: 85, wallSlide: 110, wallJump: true, pound: false, stamina: 99, swim: 190, sink: 40, climbUp: 150, climbDown: 250 },
 };
 
+/** grawitacja bohaterów (wrogowie i bossowie używają GRAVITY) */
+export const HERO_GRAVITY = 1600;
+export const HERO_MAX_FALL = 960;
+/** po puszczeniu skoku prędkość wznoszenia jest obcinana do tej wartości (px/s) */
+export const JUMP_CUT = 320;
+export const SLOPE_ACC = 900;
+export const MAX_SPEED = 1100;
+export const SPRING_V = 1150;
+export const SPRING_H = 900;
 export const GRAVITY = 1150;
 export const RISE_RELEASE_GRAVITY_MULT = 1.8;
 export const MAX_FALL = 700;
 export const COYOTE = 0.1;
 export const JUMP_BUFFER = 0.12;
+export const WALL_JUMP_LOCK = 0.16;
 export const KEY_WINDUP = 0.08;
 export const KEY_ACTIVE = 0.12;
 export const STOMP_MIN_VY = 80;

@@ -6,7 +6,10 @@
  */
 import { hiCanvas, shade, type Img } from '../engine/gfx';
 
-export type HeroFrame = 'idle' | 'walk0' | 'walk1' | 'jump' | 'attack' | 'climb0' | 'climb1' | 'swim' | 'hurt' | 'fall' | 'crouch' | 'victory';
+export type HeroFrame = 'idle' | 'walk0' | 'walk1' | 'jump' | 'attack' | 'climb0' | 'climb1' | 'swim' | 'hurt' | 'fall' | 'crouch' | 'victory'
+  | 'glide' | 'hang' | 'wall' | 'pound' | 'roll0' | 'roll1' | 'roll2' | 'roll3';
+/** pozy bez własnego rysunku proceduralnego korzystają z najbliższej istniejącej */
+const ALIAS: Partial<Record<HeroFrame, HeroFrame>> = { glide: 'jump', hang: 'climb0', wall: 'climb1', pound: 'fall', roll0: 'crouch', roll1: 'crouch', roll2: 'crouch', roll3: 'crouch' };
 export const HERO_W = 40, HERO_H = 48;
 
 interface Pal {
@@ -22,7 +25,8 @@ const OUTC = 'rgba(22,14,32,0.82)';
 
 interface Pose { bob: number; lean: number; nearLeg: [number, number, number, number]; farLeg: [number, number, number, number]; nearArm: [number, number, number]; farArm: [number, number, number]; wrench: 'belt' | 'held'; wAng: number; face: 'ok' | 'hurt' | 'open'; }
 /** nogi: [kolanoX, kolanoY, stopaX, stopaY] jako ułamki długości nogi LL (Y) i jednostki (X); ramiona: [kąt°, zgięcie, —] (0° = w dół, 90° = do przodu, 180° = w górę) */
-function pose(f: HeroFrame, LL: number): Pose {
+function pose(f0: HeroFrame, LL: number): Pose {
+  const f = ALIAS[f0] ?? f0;
   const L = (y: number) => y * LL;
   switch (f) {
     case 'walk0': return { bob: 0.5, lean: 0.8, nearLeg: [2.2, L(0.52), 4.6, L(1) - 0.2], farLeg: [-1.6, L(0.5), -4.4, L(1) - 2.2], nearArm: [-38, 1.2, 0], farArm: [40, 1.5, 0], wrench: 'belt', wAng: 0, face: 'ok' };

@@ -69,8 +69,8 @@ export class Input {
     const b = (id: string, action: Action | 'pause', x: number, y: number, w: number, h: number, label: string): TouchButton => ({ id, action, x, y, w, h, label });
     const u = 44 * s;
     this.touchButtons = [
-      b('l', 'left', 8, VH - u - 14, u, u, '◀'), b('r', 'right', 8 + u + 8, VH - u - 14, u, u, '▶'),
-      b('u', 'up', 8 + (u + 8) / 2, VH - u * 2 - 22, u, u * 0.8, '▲'), b('d', 'down', 8 + (u + 8) / 2, VH - 12 - u * 0.1 + 4, u, u * 0.4, '▼'),
+      // krzyżak 8-kierunkowy (sektory 45°): jedna strefa zamiast czterech przycisków
+      b('dpad', 'left', 10, VH - u * 2.7 - 6, u * 2.7, u * 2.7, ''),
       b('j', 'jump', VW - u * 1.5 - 10, VH - u * 1.5 - 12, u * 1.5, u * 1.5, 'A'),
       b('a', 'attack', VW - u * 2.6 - 18, VH - u - 14, u, u, 'B'),
       b('run', 'run', VW - u * 1.5 - 10 - u - 8, VH - u * 2.1 - 16, u * 0.9, u * 0.9, 'R'),
@@ -84,6 +84,11 @@ export class Input {
     const out: Record<string, boolean> = {};
     if (!this.touchEnabled) return out;
     for (const t of this.touches.values()) for (const b of this.touchButtons) {
+      if (b.id === 'dpad') {
+        const cx = b.x + b.w / 2, cy = b.y + b.h / 2, R = b.w / 2, dx = t.x - cx, dy = t.y - cy, d = Math.hypot(dx, dy);
+        if (d < R * 1.3 && d > R * 0.16) { const ax = dx / d, ay = dy / d; if (ax > 0.38) out.right = true; if (ax < -0.38) out.left = true; if (ay > 0.38) out.down = true; if (ay < -0.38) out.up = true; }
+        continue;
+      }
       if (t.x >= b.x - 6 && t.x <= b.x + b.w + 6 && t.y >= b.y - 6 && t.y <= b.y + b.h + 6) out[b.action] = true;
     }
     return out;

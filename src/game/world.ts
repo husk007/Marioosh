@@ -259,7 +259,7 @@ export class World {
   // ------------------------------------------------------------------ gracz
   private inputFor(p: PlayerEnt, inp: PlayerInput): MoveInput {
     const h = inp.held, pr = inp.pressed;
-    return { left: h.left, right: h.right, up: h.up, down: h.down, jumpHeld: h.jump, jumpPressed: pr.jump, run: h.run };
+    return { left: h.left, right: h.right, up: h.up, down: h.down, jumpHeld: h.jump, jumpPressed: pr.jump, run: h.run, downPressed: pr.down };
   }
 
   private updatePlayer(p: PlayerEnt, inp: PlayerInput, dt: number): void {
@@ -290,6 +290,8 @@ export class World {
     this.landOnPlatforms(p, prevBottom, preVy);
     if (mv.jumped) { this.sfx('jump'); }
     if (mv.landed) this.sfx('land');
+    if (mv.sprung) { this.sfx('powerup'); this.shake(2); this.burst(px(b), b.y + b.h, '#ffd23f', 8, 160, 200); }
+    if (mv.pounded) this.groundPound(p);
     p.face = mv.face; p.bounceHold = inp.held.jump;
     // crumble tiles
     if (b.onGround && b.groundTile === T.CRUMBLE) {
@@ -312,6 +314,20 @@ export class World {
     // ślad dla towarzysza
     p.trail.push({ x: b.x + b.w / 2, y: b.y + b.h }); if (p.trail.length > 40) p.trail.shift();
     // przedmioty (zbieranie w updateItems)
+  }
+
+  /** uderzenie w ziemię (Marioosh): rozbija pęknięte podłoża pod stopami, ogłusza wrogów obok, trzęsie ekranem */
+  private groundPound(p: PlayerEnt): void {
+    const rt = this.rt; const b = p.mv.body; const ty = Math.floor((b.y + b.h + 1) / TILE);
+    this.sfx('rock'); this.shake(7); this.burst(px(b), b.y + b.h, '#c8b89a', 14, 190, 300);
+    for (let tx = Math.floor((b.x - 4) / TILE); tx <= Math.floor((b.x + b.w + 4) / TILE); tx++) {
+      const i = ty * rt.grid.w + tx; const t = rt.tiles[i];
+      if (t === T.CRACKED || t === T.PLATFORM_BREAK) { rt.tiles[i] = T.EMPTY; this.sfx('break'); this.burst(tx * TILE + 16, ty * TILE + 16, '#a89878', 10, 160, 400); }
+    }
+    for (const e of rt.enemies) {
+      if (e.dead || Math.abs(px(e.b) - px(b)) > 64 || Math.abs(e.b.y + e.b.h - (b.y + b.h)) > 28) continue;
+      const r = hitEnemy(e, 'stomp', 2, false); this.afterEnemyHit(e, r, p); if (!e.dead) { e.stun = Math.max(e.stun, 1.4); e.b.vy = -160; }
+    }
   }
 
   private switchBrother(p: PlayerEnt): void {
@@ -625,6 +641,8 @@ export class World {
       if (e.dead) continue;
       if (!rectsOverlap(b.x, b.y, b.w, b.h, e.b.x + 2, e.b.y + 2, e.b.w - 4, e.b.h - 3)) continue;
       if (U.star > 0) { e.dead = true; e.deadT = 0.8; e.b.vy = -200; this.session.addScore(STATS[e.kind].score); this.sfx('stomp'); this.burst(px(e.b), py(e.b), '#ffd23f', 12, 150); continue; }
+      // toczenie (Sonic): szybka kula rozbija wrogów, których da się uderzyć z góry
+      if (p.mv.rolling && Math.abs(b.vx) > 160 && stompable(e)) { const r = hitEnemy(e, 'stomp', 1, false); this.afterEnemyHit(e, r, p); b.vx *= 0.9; continue; }
       const feet = b.y + b.h; const above = feet - Math.max(0, b.vy) * 0.02 <= e.b.y + Math.min(14, e.b.h * 0.5);
       if (b.vy >= STOMP_MIN_VY && above && stompable(e)) {
         const r = hitEnemy(e, 'stomp', 1, false); this.afterEnemyHit(e, r, p);
@@ -746,18 +764,50 @@ export class World {
 
   // ------------------------------------------------------------------ kamera
   snapCamera(): void { this.updateCamera(1, true); }
+  private camLook = 0; private camLa = 0; private camFocus = 200;
   private updateCamera(dt: number, snap = false): void {
     const r = this.rt.room; const alive = this.players.filter((p) => !p.dead || p.deadT > 0.6);
     const list = alive.length ? alive : this.players;
-    let tx = 0, ty = 0;
-    for (const p of list) { tx += px(p.mv.body) + p.face * 64; ty += py(p.mv.body); }
-    tx = tx / list.length - VW / 2; ty = ty / list.length - VH * 0.55;
     const maxX = Math.max(0, r.w * TILE - VW), maxY = Math.max(0, r.h * TILE - VH);
+    // ---- poziomo: okno przy postaci + wyprzedzenie proporcjonalne do prędkości
+    let cx = 0, fy = 0, cyc = 0, air = false, speedLook = 0, grounded = true, fast = false, climbing = false, falling = 0;
+    for (const p of list) {
+      const b = p.mv.body; cx += px(b); fy += b.y + b.h; cyc += py(b);
+      speedLook += clamp(b.vx / 420, -1, 1);
+      if (!b.onGround) { air = true; grounded = false; }
+      if (b.vy > falling) falling = b.vy;
+      if (p.mv.climbing || p.mv.hang || p.mv.ledge) climbing = true;
+      if (p.mv.sprung || b.vy < -700) fast = true;
+    }
+    const n = list.length; cx /= n; fy /= n; cyc /= n; speedLook /= n;
+    const hold = list[0];
+    // ---- ręczne rozglądanie: ↑/↓ na stojąco po 0,5 s
+    const inp = this.lastInputs?.[0]; const still = !!hold && hold.mv.body.onGround && Math.abs(hold.mv.body.vx) < 8;
+    if (inp && still && (inp.held.up || inp.held.down) && !hold.mv.duck) this.camLook += dt; else this.camLook = Math.max(0, this.camLook - dt * 3);
+    const look = this.camLook > 0.5 && inp ? (inp.held.up ? -120 : 120) : 0;
+    this.camLa += (speedLook * 112 - this.camLa) * (snap ? 1 : 1 - Math.exp(-5 * dt));
+    let tx = cx + this.camLa - VW / 2;
+    // ---- pionowo: stopy na wysokości focus (z przyciąganiem do platformy), w powietrzu okno 60..300 px od góry ekranu
+    const wantFocus = climbing ? 240 : falling > 600 ? 120 : 200;
+    this.camFocus += (wantFocus - this.camFocus) * (snap ? 1 : 1 - Math.exp(-6 * dt));
+    let ty: number;
+    const tyGround = fy - this.camFocus + look;
+    if (grounded || climbing) ty = tyGround;
+    else {
+      // w powietrzu kamera stoi, dopóki postać nie wyjdzie poza okno
+      const winTop = cyc - 300, winBot = cyc - 60; ty = clamp(this.cam.y, winTop, winBot);
+      if (falling > 600) ty = Math.max(ty, cyc - 150);
+    }
     tx = clamp(tx, 0, maxX); ty = clamp(ty, 0, maxY);
     if (this.rt.boss?.started && this.rt.room.bossArena) { tx = clamp(tx, Math.max(0, this.rt.boss.x0 - 40), Math.min(maxX, this.rt.boss.x1 - VW + 40)); }
+    void air;
     if (snap) { this.cam.x = tx; this.cam.y = ty; return; }
-    const k = 1 - Math.exp(-6 * dt);
-    this.cam.x += (tx - this.cam.x) * k; this.cam.y += (ty - this.cam.y) * k;
+    const kx = 1 - Math.exp(-9 * dt), ky = 1 - Math.exp(-(grounded ? 7 : 12) * dt);
+    this.cam.x += clamp((tx - this.cam.x) * kx, -1100 * dt, 1100 * dt);
+    const maxVy = (fast ? 1900 : 960) * dt;
+    this.cam.y += clamp((ty - this.cam.y) * ky, -maxVy, maxVy);
+    // zasada bezpieczeństwa: postać zawsze w [48, 312] px od góry ekranu
+    const sy = cyc - this.cam.y; if (sy < 48) this.cam.y = clamp(cyc - 48, 0, maxY); else if (sy > 312) this.cam.y = clamp(cyc - 312, 0, maxY);
   }
 
   // ------------------------------------------------------------------ API dla scen
