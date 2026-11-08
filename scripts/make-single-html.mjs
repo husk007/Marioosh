@@ -15,7 +15,7 @@ html = html.replace(/<link rel="(manifest|icon)"[^>]*>\s*/g, '');
 // grafiki: pakiet gry (po nazwie pliku) i SVG HD (po ścieżce, przez podmianę Image.src)
 const gen = {}; for (const f of walk(join(dist, 'art', 'game'))) if (f.endsWith('.webp')) gen[f.split('/').pop()] = uri(f);
 const svg = {}; for (const f of existsSync(join(dist, 'art', 'hd')) ? walk(join(dist, 'art', 'hd')) : []) if (f.endsWith('.svg')) svg[f.slice(dist.length + 1)] = uri(f);
-const prelude = `window.__MARIOOSH_DEBUG=true;window.__GENMAP=${JSON.stringify(gen)};(function(){var M=${JSON.stringify(svg)},d=Object.getOwnPropertyDescriptor(HTMLImageElement.prototype,'src');Object.defineProperty(HTMLImageElement.prototype,'src',{configurable:true,get:function(){return d.get.call(this)},set:function(v){var s=String(v),i=s.indexOf('art/hd/');d.set.call(this,i>=0&&M[s.slice(i)]?M[s.slice(i)]:v)}})})();\n`;
+const prelude = `window.__MARIOOSH_DEBUG=true;window.__NO_FILE_MUSIC=true;window.__GENMAP=${JSON.stringify(gen)};(function(){var M=${JSON.stringify(svg)},d=Object.getOwnPropertyDescriptor(HTMLImageElement.prototype,'src');Object.defineProperty(HTMLImageElement.prototype,'src',{configurable:true,get:function(){return d.get.call(this)},set:function(v){var s=String(v),i=s.indexOf('art/hd/');d.set.call(this,i>=0&&M[s.slice(i)]?M[s.slice(i)]:v)}})})();\n`;
 const m = /<script type="module" crossorigin src="\.\/(assets\/[^"]+\.js)"><\/script>/.exec(html);
 if (!m) throw new Error('nie znaleziono skryptu modułu w dist/index.html');
 const js = readFileSync(join(dist, m[1]), 'utf8').replace(/<\/script/gi, '<\\/script');

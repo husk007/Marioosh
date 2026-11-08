@@ -1,4 +1,4 @@
-/** Syntezator dźwięku i muzyki (WebAudio) — całość oryginalna, bez plików audio. */
+/** Dźwięk i muzyka: efekty i muzyka zastępcza są syntezowane (WebAudio); właściwa muzyka to pliki public/audio/music/<klucz>.m4a (gdy są i da się je odtworzyć). */
 export type SfxName =
   | 'jump' | 'land' | 'swing' | 'hit' | 'stomp' | 'pet' | 'can' | 'golden' | 'oneup' | 'spark' | 'teleport'
   | 'petrify' | 'checkpoint' | 'switch' | 'bossHit' | 'bossDie' | 'star' | 'powerup' | 'hurt' | 'die'
@@ -23,6 +23,12 @@ const T: Record<string, Track> = {
 };
 export const TRACKS = Object.keys(T);
 
+declare global { interface Window { __NO_FILE_MUSIC?: boolean } }
+/** utwory, które mają pliki (public/audio/music); pozostałe zawsze grają z syntezatora */
+const FILE_MUSIC = new Set(['title', 'map', 'w0', 'w1', 'w2', 'w3', 'w4', 'w5', 'w6', 'w7', 'w8', 'boss', 'star']);
+const FILE_GAIN = 0.55, XFADE = 3, FADE_IN = 0.9, FADE_OUT = 0.7;
+interface Slot { el: HTMLAudioElement; gain: GainNode | null; lvl: number; rate: number; name: string | null }
+
 const NOTE: Record<string, number> = { C: 0, 'C#': 1, Db: 1, D: 2, 'D#': 3, Eb: 3, E: 4, F: 5, 'F#': 6, Gb: 6, G: 7, 'G#': 8, Ab: 8, A: 9, 'A#': 10, Bb: 10, B: 11 };
 export function noteFreq(n: string): number {
   const m = /^([A-G][b#]?)(-?\d)$/.exec(n);
@@ -40,9 +46,12 @@ export class AudioEngine {
   onSfx: ((n: SfxName) => void) | null = null;
   private noiseBuf: AudioBuffer | null = null;
   private lastSfx = new Map<string, number>();
+  // --- muzyka z plików: dwa elementy <audio> naprzemiennie (płynne zapętlenie i przejścia) ---
+  private slots: Slot[] = []; private act: Slot | null = null; private fileBus: GainNode | null = null;
+  private fileOK = true; private fileTimer: number | null = null; private duckF = 1; private pendingFile = false;
 
   unlock(): void {
-    if (this.ctx) { if (this.ctx.state === 'suspended') void this.ctx.resume(); return; }
+    if (this.ctx) { if (this.ctx.state === 'suspended') void this.ctx.resume(); if (this.pendingFile && this.act) { this.pendingFile = false; void this.act.el.play().catch(() => { this.pendingFile = true; }); } return; }
     const AC = (window as any).AudioContext || (window as any).webkitAudioContext;
     if (!AC) return;
     this.ctx = new AC();
@@ -57,9 +66,11 @@ export class AudioEngine {
     const send = c.createGain(); send.gain.value = 0.34; this.musicIn.connect(send); send.connect(conv); conv.connect(this.musicBus);
     const dl = c.createDelay(1); dl.delayTime.value = 0.36; const fb = c.createGain(); fb.gain.value = 0.3; const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2200;
     const ds = c.createGain(); ds.gain.value = 0.2; this.musicIn.connect(ds); ds.connect(dl); dl.connect(lp); lp.connect(fb); fb.connect(dl); lp.connect(this.musicBus);
+    this.fileBus = c.createGain(); this.fileBus.connect(this.master);
     this.applyVolumes();
     const len = c.sampleRate; this.noiseBuf = c.createBuffer(1, len, c.sampleRate);
     const d = this.noiseBuf.getChannelData(0); for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    for (const sl of this.slots) this.attach(sl);
     if (this.track) { const t = this.track; this.track = null; this.music(t); }
   }
   private impulse(sec: number, decay: number): AudioBuffer {
@@ -68,17 +79,85 @@ export class AudioEngine {
     return b;
   }
   setVolumes(music: number, sfx: number): void { this.musicVol = music; this.sfxVol = sfx; this.applyVolumes(); }
-  private applyVolumes(): void { if (!this.ctx) return; this.musicBus.gain.value = this.musicVol * 0.3; this.sfxBus.gain.value = this.sfxVol * 0.7; }
-  duck(on: boolean): void { if (this.ctx) this.musicBus.gain.setTargetAtTime(this.musicVol * (on ? 0.1 : 0.3), this.ctx.currentTime, 0.05); }
+  private applyVolumes(): void { this.applyFileVols(); if (!this.ctx) return; this.musicBus.gain.value = this.musicVol * 0.3; this.sfxBus.gain.value = this.sfxVol * 0.7; }
+  duck(on: boolean): void { this.duckF = on ? 0.33 : 1; this.applyFileVols(); if (this.ctx) this.musicBus.gain.setTargetAtTime(this.musicVol * (on ? 0.1 : 0.3), this.ctx.currentTime, 0.05); }
 
   // ---------- muzyka ----------
   music(name: string | null): void {
     if (name === this.track) return;
     this.track = name; this.step = 0;
     if (this.timer !== null) { clearInterval(this.timer); this.timer = null; }
+    if (name && FILE_MUSIC.has(name) && this.fileOK && !window.__NO_FILE_MUSIC && this.fileStart(name)) return;
+    this.fileStop();
     if (!name || !this.ctx || !T[name]) return;
     this.nextT = this.ctx.currentTime + 0.1;
     this.timer = window.setInterval(() => this.schedule(), 40);
+  }
+
+  // ---------- muzyka z plików ----------
+  private mkSlot(): Slot {
+    const el = new Audio(); el.preload = 'auto'; el.loop = false;
+    const sl: Slot = { el, gain: null, lvl: 0, rate: 0, name: null };
+    el.addEventListener('error', () => this.fileFailed());
+    this.slots.push(sl); return sl;
+  }
+  /** przez graf WebAudio (głośność na każdym urządzeniu, także iOS); pod file:// pozostaje element.volume */
+  private attach(sl: Slot): void {
+    if (sl.gain || !this.ctx || !this.fileBus || location.protocol === 'file:') return;
+    try { const src = this.ctx.createMediaElementSource(sl.el); sl.gain = this.ctx.createGain(); src.connect(sl.gain); sl.gain.connect(this.fileBus); } catch { sl.gain = null; }
+  }
+  private applyFileVol(sl: Slot): void {
+    const v = Math.max(0, Math.min(1, sl.lvl * this.musicVol * FILE_GAIN * this.duckF));
+    if (sl.gain) { sl.gain.gain.value = v; sl.el.volume = 1; } else sl.el.volume = v;
+  }
+  private applyFileVols(): void { for (const sl of this.slots) this.applyFileVol(sl); }
+  private fileFailed(): void {
+    if (!this.fileOK) return; this.fileOK = false; this.fileStop();
+    const t = this.track; this.track = null; if (t) this.music(t);   // wraca muzyka z syntezatora
+  }
+  private play(sl: Slot, name: string, fade: number): boolean {
+    this.attach(sl);
+    const url = new URL('audio/music/' + name + '.m4a', document.baseURI).toString();
+    sl.name = name; sl.el.src = url; sl.el.currentTime = 0; sl.lvl = 0; sl.rate = 1 / fade; this.applyFileVol(sl);
+    const p = sl.el.play(); if (p) p.catch(() => { this.pendingFile = true; });   // autoodtwarzanie wymaga gestu — ponowimy po unlock()
+    return true;
+  }
+  private fileStart(name: string): boolean {
+    if (!document.createElement('audio').canPlayType('audio/mp4; codecs="mp4a.40.2"')) { this.fileOK = false; return false; }
+    if (this.act && this.act.name === name && !this.act.el.paused) return true;
+    // stary utwór wygasza się, nowy wchodzi na wolnym elemencie
+    for (const sl of this.slots) if (sl.name && sl !== this.act) { sl.rate = -1 / FADE_OUT; }
+    if (this.act) this.act.rate = -1 / FADE_OUT;
+    const free = this.slots.find((s) => s !== this.act && (s.el.paused || s.lvl <= 0.001)) ?? (this.slots.length < 2 ? this.mkSlot() : this.slots.find((s) => s !== this.act)!);
+    this.act = free; this.play(free, name, FADE_IN);
+    if (this.fileTimer === null) this.fileTimer = window.setInterval(() => this.fileTick(), 50);
+    return true;
+  }
+  private fileStop(): void {
+    for (const sl of this.slots) if (sl.name) sl.rate = -1 / FADE_OUT;
+    this.act = null; this.pendingFile = false;
+  }
+  private fileTick(): void {
+    const dt = 0.05; let alive = false;
+    for (const sl of this.slots) {
+      if (sl.rate !== 0) {
+        sl.lvl = Math.max(0, Math.min(1, sl.lvl + sl.rate * dt)); this.applyFileVol(sl);
+        if (sl.rate > 0 && sl.lvl >= 1) sl.rate = 0;
+        if (sl.rate < 0 && sl.lvl <= 0) { sl.rate = 0; sl.el.pause(); sl.name = null; }
+      }
+      if (sl.name) alive = true;
+    }
+    const a = this.act;
+    if (a && a.name) {
+      if (a.el.paused && this.pendingFile && this.ctx && this.ctx.state === 'running') { this.pendingFile = false; void a.el.play().catch(() => { this.pendingFile = true; }); }
+      const d = a.el.duration;
+      // zapętlenie: tuż przed końcem uruchom ten sam utwór na drugim elemencie i płynnie przejdź
+      if (isFinite(d) && d > XFADE * 2 && d - a.el.currentTime < XFADE && !a.el.paused) {
+        const other = this.slots.find((s) => s !== a) ?? this.mkSlot();
+        a.rate = -1 / XFADE; const nm = a.name; this.act = other; this.play(other, nm, XFADE);
+      }
+    }
+    if (!alive && !this.act && this.fileTimer !== null) { clearInterval(this.fileTimer); this.fileTimer = null; }
   }
   get current(): string | null { return this.track; }
   private schedule(): void {
