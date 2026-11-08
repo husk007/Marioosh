@@ -2,9 +2,9 @@
 
 _Wygenerowano automatycznie (`node tools/art-roadmap.mjs`) — nie edytuj ręcznie._
 
-**Postęp: 289 gotowe** · do zrobienia w zakresie: **550** · poza zakresem (SKIP, patrz scope.json): 389 · razem w bibliotece: 1228
+**Postęp: 285 gotowe** · do zrobienia w zakresie: **554** · poza zakresem (SKIP, patrz scope.json): 389 · razem w bibliotece: 1228
 
-**FIRST_TODO_WINDOW: W028**   · okien z pracą: 58 (po 10 pozycji, numeracja stała)
+**FIRST_TODO_WINDOW: W014**   · okien z pracą: 62 (po 10 pozycji, numeracja stała)
 
 ## Kategorie
 
@@ -16,7 +16,7 @@ _Wygenerowano automatycznie (`node tools/art-roadmap.mjs`) — nie edytuj ręczn
 | collectibles | 30/30 | 0/0 |
 | interactables | 37/37 | 0/0 |
 | conduits | 30/30 | 0/0 |
-| planet-tiles | 144/144 | 0/0 |
+| planet-tiles | 140/144 | 0/0 |
 | civilians | 3/40 | 3/40 |
 | planet-props | 0/108 | 0/0 |
 | parallax | 0/45 | 0/0 |
@@ -34,6 +34,10 @@ Plik okna: `art-tasks/windows/W###.md`. Kolejność produkcji: najpierw wszystki
 
 | Okno | Pozycje | TODO | Zawartość |
 |---|---|---|---|
+| W014 | 131–140 | 1 | planet-tiles |
+| W015 | 141–150 | 1 | planet-tiles |
+| W022 | 211–220 | 1 | planet-tiles |
+| W027 | 261–270 | 1 | planet-tiles |
 | W028 | 271–280 | 6 | civilians |
 | W029 | 281–290 | 10 | civilians |
 | W030 | 291–300 | 10 | civilians |

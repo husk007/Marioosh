@@ -1,7 +1,7 @@
 {
  "enemies/ENEMIES-001_rogus__base.webp": {
   "asset_id": "ENEMIES-001",
-  "name": "Rogu\u015b",
+  "name": "Roguś",
   "category": "enemies",
   "state": "base",
   "target_frames": 1,
@@ -166,7 +166,7 @@
  },
  "bosses/BOSSES-004_kaktogor__base.webp": {
   "asset_id": "BOSSES-004",
-  "name": "Kaktog\u00f3r",
+  "name": "Kaktogór",
   "category": "bosses",
   "state": "base",
   "target_frames": 1,
@@ -178,7 +178,7 @@
  },
  "bosses/BOSSES-003_zlomotaur__base.webp": {
   "asset_id": "BOSSES-003",
-  "name": "Z\u0142omotaur",
+  "name": "Złomotaur",
   "category": "bosses",
   "state": "base",
   "target_frames": 1,
@@ -214,7 +214,7 @@
  },
  "bosses/BOSSES-004_kaktogor__idle.webp": {
   "asset_id": "BOSSES-004",
-  "name": "Kaktog\u00f3r",
+  "name": "Kaktogór",
   "category": "bosses",
   "state": "idle",
   "target_frames": 10,
@@ -226,7 +226,7 @@
  },
  "bosses/BOSSES-003_zlomotaur__idle.webp": {
   "asset_id": "BOSSES-003",
-  "name": "Z\u0142omotaur",
+  "name": "Złomotaur",
   "category": "bosses",
   "state": "idle",
   "target_frames": 10,
@@ -238,7 +238,7 @@
  },
  "bosses/BOSSES-005_rogopletw-wielki__base.webp": {
   "asset_id": "BOSSES-005",
-  "name": "Rogop\u0142etw Wielki",
+  "name": "Rogopłetw Wielki",
   "category": "bosses",
   "state": "base",
   "target_frames": 1,
@@ -274,7 +274,7 @@
  },
  "enemies/ENEMIES-001_rogus__idle.webp": {
   "asset_id": "ENEMIES-001",
-  "name": "Rogu\u015b",
+  "name": "Roguś",
   "category": "enemies",
   "state": "idle",
   "target_frames": 6,
@@ -286,7 +286,7 @@
  },
  "enemies/ENEMIES-004_zukorog__base.webp": {
   "asset_id": "ENEMIES-004",
-  "name": "\u017bukor\u00f3g",
+  "name": "Żukoróg",
   "category": "enemies",
   "state": "base",
   "target_frames": 1,
@@ -298,7 +298,7 @@
  },
  "enemies/ENEMIES-006_pszczolrog__base.webp": {
   "asset_id": "ENEMIES-006",
-  "name": "Pszcz\u00f3\u0142rog",
+  "name": "Pszczółrog",
   "category": "enemies",
   "state": "base",
   "target_frames": 1,
@@ -310,7 +310,7 @@
  },
  "enemies/ENEMIES-005_cmorog__base.webp": {
   "asset_id": "ENEMIES-005",
-  "name": "\u0106mor\u00f3g",
+  "name": "Ćmoróg",
   "category": "enemies",
   "state": "base",
   "target_frames": 1,
@@ -322,7 +322,7 @@
  },
  "enemies/ENEMIES-001_rogus__walk.webp": {
   "asset_id": "ENEMIES-001",
-  "name": "Rogu\u015b",
+  "name": "Roguś",
   "category": "enemies",
   "state": "walk",
   "target_frames": 8,
@@ -334,7 +334,7 @@
  },
  "enemies/ENEMIES-007_rogowrobel__base.webp": {
   "asset_id": "ENEMIES-007",
-  "name": "Rogowr\u00f3bel",
+  "name": "Rogowróbel",
   "category": "enemies",
   "state": "base",
   "target_frames": 1,
@@ -346,24 +346,12 @@
  },
  "enemies/ENEMIES-008_krukorog__base.webp": {
   "asset_id": "ENEMIES-008",
-  "name": "Krukor\u00f3g",
+  "name": "Krukoróg",
   "category": "enemies",
   "state": "base",
   "target_frames": 1,
   "reference": null,
   "size": "1024x1024",
-  "quality": "medium",
-  "model": "gpt-image-2",
-  "cutout": "checker"
- },
- "character-variants/CHARACTER_VARIANTS-002_marioosh-coil-equipped__base.webp": {
-  "asset_id": "CHARACTER_VARIANTS-002",
-  "name": "Marioosh - coil_equipped",
-  "category": "character-variants",
-  "state": "base",
-  "target_frames": 1,
-  "reference": null,
-  "size": "1024x1536",
   "quality": "medium",
   "model": "gpt-image-2",
   "cutout": "checker"
@@ -414,11 +402,11 @@
   "size": "1536x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "boss-variants/BOSS_VARIANTS-005_zlomotaur-vulnerable__base.webp": {
   "asset_id": "BOSS_VARIANTS-005",
-  "name": "Z\u0142omotaur - vulnerable",
+  "name": "Złomotaur - vulnerable",
   "category": "boss-variants",
   "state": "base",
   "target_frames": 1,
@@ -430,7 +418,7 @@
  },
  "boss-variants/BOSS_VARIANTS-006_zlomotaur-released__base.webp": {
   "asset_id": "BOSS_VARIANTS-006",
-  "name": "Z\u0142omotaur - released",
+  "name": "Złomotaur - released",
   "category": "boss-variants",
   "state": "base",
   "target_frames": 1,
@@ -442,7 +430,7 @@
  },
  "enemy-variants/ENEMY_VARIANTS-001_zukorog-combat-state__base.webp": {
   "asset_id": "ENEMY_VARIANTS-001",
-  "name": "\u017bukor\u00f3g - combat state",
+  "name": "Żukoróg - combat state",
   "category": "enemy-variants",
   "state": "base",
   "target_frames": 1,
@@ -454,7 +442,7 @@
  },
  "enemy-variants/ENEMY_VARIANTS-004_slimorog-combat-state__base.webp": {
   "asset_id": "ENEMY_VARIANTS-004",
-  "name": "\u015alimor\u00f3g - combat state",
+  "name": "Ślimoróg - combat state",
   "category": "enemy-variants",
   "state": "base",
   "target_frames": 1,
@@ -466,7 +454,7 @@
  },
  "enemy-variants/ENEMY_VARIANTS-003_rogoroza-combat-state__base.webp": {
   "asset_id": "ENEMY_VARIANTS-003",
-  "name": "Rogor\u00f3\u017ca - combat state",
+  "name": "Rogoróża - combat state",
   "category": "enemy-variants",
   "state": "base",
   "target_frames": 1,
@@ -490,7 +478,7 @@
  },
  "enemy-variants/ENEMY_VARIANTS-005_kamieniorog-combat-state__base.webp": {
   "asset_id": "ENEMY_VARIANTS-005",
-  "name": "Kamienior\u00f3g - combat state",
+  "name": "Kamienioróg - combat state",
   "category": "enemy-variants",
   "state": "base",
   "target_frames": 1,
@@ -546,7 +534,7 @@
   "size": "1024x1536",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "civilians/CIVILIANS-001_lumenians-restored__idle.webp": {
   "asset_id": "CIVILIANS-001",
@@ -622,7 +610,7 @@
  },
  "bosses/BOSSES-007_krukorog-krolewski__base.webp": {
   "asset_id": "BOSSES-007",
-  "name": "Krukor\u00f3g Kr\u00f3lewski",
+  "name": "Krukoróg Królewski",
   "category": "bosses",
   "state": "base",
   "target_frames": 1,
@@ -634,7 +622,7 @@
  },
  "enemies/ENEMIES-011_rogopletw__base.webp": {
   "asset_id": "ENEMIES-011",
-  "name": "Rogop\u0142etw",
+  "name": "Rogopłetw",
   "category": "enemies",
   "state": "base",
   "target_frames": 1,
@@ -646,7 +634,7 @@
  },
  "enemies/ENEMIES-009_gekorog__base.webp": {
   "asset_id": "ENEMIES-009",
-  "name": "Gekor\u00f3g",
+  "name": "Gekoróg",
   "category": "enemies",
   "state": "base",
   "target_frames": 1,
@@ -658,7 +646,7 @@
  },
  "enemies/ENEMIES-012_osmiorog__base.webp": {
   "asset_id": "ENEMIES-012",
-  "name": "O\u015bmior\u00f3g",
+  "name": "Ośmioróg",
   "category": "enemies",
   "state": "base",
   "target_frames": 1,
@@ -682,7 +670,7 @@
  },
  "enemies/ENEMIES-013_kakturozec__base.webp": {
   "asset_id": "ENEMIES-013",
-  "name": "Kakturo\u017cec",
+  "name": "Kakturożec",
   "category": "enemies",
   "state": "base",
   "target_frames": 1,
@@ -694,7 +682,7 @@
  },
  "enemies/ENEMIES-015_rogoroza__base.webp": {
   "asset_id": "ENEMIES-015",
-  "name": "Rogor\u00f3\u017ca",
+  "name": "Rogoróża",
   "category": "enemies",
   "state": "base",
   "target_frames": 1,
@@ -706,7 +694,7 @@
  },
  "enemies/ENEMIES-016_slimorog__base.webp": {
   "asset_id": "ENEMIES-016",
-  "name": "\u015alimor\u00f3g",
+  "name": "Ślimoróg",
   "category": "enemies",
   "state": "base",
   "target_frames": 1,
@@ -718,7 +706,7 @@
  },
  "enemies/ENEMIES-014_rogopnacze__base.webp": {
   "asset_id": "ENEMIES-014",
-  "name": "Rogopn\u0105cze",
+  "name": "Rogopnącze",
   "category": "enemies",
   "state": "base",
   "target_frames": 1,
@@ -738,11 +726,11 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "enemies/ENEMIES-018_kamieniorog__base.webp": {
   "asset_id": "ENEMIES-018",
-  "name": "Kamienior\u00f3g",
+  "name": "Kamienioróg",
   "category": "enemies",
   "state": "base",
   "target_frames": 1,
@@ -822,7 +810,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "collectibles/COLLECTIBLES-008_magnetic-plug__base.webp": {
   "asset_id": "COLLECTIBLES-008",
@@ -834,7 +822,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "collectibles/COLLECTIBLES-006_xl-fuse__base.webp": {
   "asset_id": "COLLECTIBLES-006",
@@ -882,7 +870,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "collectibles/COLLECTIBLES-010_insulation-gloves__base.webp": {
   "asset_id": "COLLECTIBLES-010",
@@ -930,7 +918,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "collectibles/COLLECTIBLES-016_scarlet-journal-page__base.webp": {
   "asset_id": "COLLECTIBLES-016",
@@ -966,7 +954,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "collectibles/COLLECTIBLES-019_packaging-bundle__base.webp": {
   "asset_id": "COLLECTIBLES-019",
@@ -978,7 +966,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "collectibles/COLLECTIBLES-020_boss-horn-seal__base.webp": {
   "asset_id": "COLLECTIBLES-020",
@@ -1030,7 +1018,7 @@
  },
  "collectibles/COLLECTIBLES-024_life-crystal-shard-2-zlomaria__base.webp": {
   "asset_id": "COLLECTIBLES-024",
-  "name": "Life Crystal Shard 2 - Z\u0142omaria",
+  "name": "Life Crystal Shard 2 - Złomaria",
   "category": "collectibles",
   "state": "base",
   "target_frames": 1,
@@ -1134,7 +1122,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "interactables/INTERACTABLES-003_ecoport-return-machine__base.webp": {
   "asset_id": "INTERACTABLES-003",
@@ -1158,7 +1146,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "interactables/INTERACTABLES-005_floor-pressure-switch__base.webp": {
   "asset_id": "INTERACTABLES-005",
@@ -1242,7 +1230,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "interactables/INTERACTABLES-012_balance-platform__base.webp": {
   "asset_id": "INTERACTABLES-012",
@@ -1254,7 +1242,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "interactables/INTERACTABLES-013_disappearing-platform__base.webp": {
   "asset_id": "INTERACTABLES-013",
@@ -1314,7 +1302,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "interactables/INTERACTABLES-017_interplanetary-socket__base.webp": {
   "asset_id": "INTERACTABLES-017",
@@ -1350,7 +1338,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "interactables/INTERACTABLES-022_energy-barrier-gate__base.webp": {
   "asset_id": "INTERACTABLES-022",
@@ -1362,7 +1350,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "interactables/INTERACTABLES-021_petrification-beam-turret__base.webp": {
   "asset_id": "INTERACTABLES-021",
@@ -1374,7 +1362,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "interactables/INTERACTABLES-023_lamp-of-scarlet-statue__base.webp": {
   "asset_id": "INTERACTABLES-023",
@@ -1434,7 +1422,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "interactables/INTERACTABLES-027_water-sluice-gate__base.webp": {
   "asset_id": "INTERACTABLES-027",
@@ -1470,7 +1458,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "interactables/INTERACTABLES-030_reactor-core__base.webp": {
   "asset_id": "INTERACTABLES-030",
@@ -1482,7 +1470,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "interactables/INTERACTABLES-032_stonefall-warning-marker__base.webp": {
   "asset_id": "INTERACTABLES-032",
@@ -1554,7 +1542,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "conduits/CONDUITS-002_blue-conduit-horizontal__base.webp": {
   "asset_id": "CONDUITS-002",
@@ -1602,7 +1590,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "conduits/CONDUITS-005_blue-conduit-junction__base.webp": {
   "asset_id": "CONDUITS-005",
@@ -1614,7 +1602,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "conduits/CONDUITS-006_green-conduit-entrance__base.webp": {
   "asset_id": "CONDUITS-006",
@@ -1626,7 +1614,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "conduits/CONDUITS-008_green-conduit-vertical__base.webp": {
   "asset_id": "CONDUITS-008",
@@ -1686,7 +1674,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "conduits/CONDUITS-011_yellow-conduit-entrance__base.webp": {
   "asset_id": "CONDUITS-011",
@@ -1698,7 +1686,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "conduits/CONDUITS-013_yellow-conduit-vertical__base.webp": {
   "asset_id": "CONDUITS-013",
@@ -1746,7 +1734,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "checker"
+  "cutout": "post"
  },
  "conduits/CONDUITS-017_red-conduit-horizontal__base.webp": {
   "asset_id": "CONDUITS-017",
@@ -1942,7 +1930,7 @@
  },
  "planet-tiles/PLANET_TILES-017_zlomaria-solid-center__base.webp": {
   "asset_id": "PLANET_TILES-017",
-  "name": "Z\u0142omaria - solid-center",
+  "name": "Złomaria - solid-center",
   "category": "planet-tiles",
   "state": "base",
   "target_frames": 1,
@@ -2038,20 +2026,6 @@
   "model": "gpt-image-2",
   "cutout": "checker"
  },
- "planet-tiles/PLANET_TILES-002_lumenia-top-center__base.webp": {
-  "asset_id": "PLANET_TILES-002",
-  "name": "Lumenia - top-center",
-  "category": "planet-tiles",
-  "state": "base",
-  "target_frames": 1,
-  "refs": [
-   "PLANET_TILES-001_lumenia-solid-center__base.webp"
-  ],
-  "size": "1024x1024",
-  "quality": "medium",
-  "model": "gpt-image-2",
-  "cutout": "none"
- },
  "planet-tiles/PLANET_TILES-004_lumenia-top-right-corner__base.webp": {
   "asset_id": "PLANET_TILES-004",
   "name": "Lumenia - top-right-corner",
@@ -2134,7 +2108,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "none"
+  "cutout": "post"
  },
  "planet-tiles/PLANET_TILES-010_lumenia-slope-up__base.webp": {
   "asset_id": "PLANET_TILES-010",
@@ -2206,20 +2180,6 @@
   "model": "gpt-image-2",
   "cutout": "checker"
  },
- "planet-tiles/PLANET_TILES-014_lumenia-hazard-base__base.webp": {
-  "asset_id": "PLANET_TILES-014",
-  "name": "Lumenia - hazard-base",
-  "category": "planet-tiles",
-  "state": "base",
-  "target_frames": 1,
-  "refs": [
-   "PLANET_TILES-001_lumenia-solid-center__base.webp"
-  ],
-  "size": "1024x1024",
-  "quality": "medium",
-  "model": "gpt-image-2",
-  "cutout": "none"
- },
  "planet-tiles/PLANET_TILES-016_lumenia-hidden-room-wall__base.webp": {
   "asset_id": "PLANET_TILES-016",
   "name": "Lumenia - hidden-room-wall",
@@ -2236,7 +2196,7 @@
  },
  "planet-tiles/PLANET_TILES-021_zlomaria-left-wall__base.webp": {
   "asset_id": "PLANET_TILES-021",
-  "name": "Z\u0142omaria - left-wall",
+  "name": "Złomaria - left-wall",
   "category": "planet-tiles",
   "state": "base",
   "target_frames": 1,
@@ -2250,7 +2210,7 @@
  },
  "planet-tiles/PLANET_TILES-019_zlomaria-top-left-corner__base.webp": {
   "asset_id": "PLANET_TILES-019",
-  "name": "Z\u0142omaria - top-left-corner",
+  "name": "Złomaria - top-left-corner",
   "category": "planet-tiles",
   "state": "base",
   "target_frames": 1,
@@ -2260,11 +2220,11 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "none"
+  "cutout": "post"
  },
  "planet-tiles/PLANET_TILES-020_zlomaria-top-right-corner__base.webp": {
   "asset_id": "PLANET_TILES-020",
-  "name": "Z\u0142omaria - top-right-corner",
+  "name": "Złomaria - top-right-corner",
   "category": "planet-tiles",
   "state": "base",
   "target_frames": 1,
@@ -2274,11 +2234,11 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "none"
+  "cutout": "post"
  },
  "planet-tiles/PLANET_TILES-018_zlomaria-top-center__base.webp": {
   "asset_id": "PLANET_TILES-018",
-  "name": "Z\u0142omaria - top-center",
+  "name": "Złomaria - top-center",
   "category": "planet-tiles",
   "state": "base",
   "target_frames": 1,
@@ -2288,11 +2248,11 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "none"
+  "cutout": "post"
  },
  "planet-tiles/PLANET_TILES-023_zlomaria-bottom-center__base.webp": {
   "asset_id": "PLANET_TILES-023",
-  "name": "Z\u0142omaria - bottom-center",
+  "name": "Złomaria - bottom-center",
   "category": "planet-tiles",
   "state": "base",
   "target_frames": 1,
@@ -2306,7 +2266,7 @@
  },
  "planet-tiles/PLANET_TILES-022_zlomaria-right-wall__base.webp": {
   "asset_id": "PLANET_TILES-022",
-  "name": "Z\u0142omaria - right-wall",
+  "name": "Złomaria - right-wall",
   "category": "planet-tiles",
   "state": "base",
   "target_frames": 1,
@@ -2320,7 +2280,7 @@
  },
  "planet-tiles/PLANET_TILES-024_zlomaria-bottom-left-corner__base.webp": {
   "asset_id": "PLANET_TILES-024",
-  "name": "Z\u0142omaria - bottom-left-corner",
+  "name": "Złomaria - bottom-left-corner",
   "category": "planet-tiles",
   "state": "base",
   "target_frames": 1,
@@ -2334,7 +2294,7 @@
  },
  "planet-tiles/PLANET_TILES-025_zlomaria-bottom-right-corner__base.webp": {
   "asset_id": "PLANET_TILES-025",
-  "name": "Z\u0142omaria - bottom-right-corner",
+  "name": "Złomaria - bottom-right-corner",
   "category": "planet-tiles",
   "state": "base",
   "target_frames": 1,
@@ -2348,7 +2308,7 @@
  },
  "planet-tiles/PLANET_TILES-028_zlomaria-one-way-platform__base.webp": {
   "asset_id": "PLANET_TILES-028",
-  "name": "Z\u0142omaria - one-way-platform",
+  "name": "Złomaria - one-way-platform",
   "category": "planet-tiles",
   "state": "base",
   "target_frames": 1,
@@ -2362,7 +2322,7 @@
  },
  "planet-tiles/PLANET_TILES-026_zlomaria-slope-up__base.webp": {
   "asset_id": "PLANET_TILES-026",
-  "name": "Z\u0142omaria - slope-up",
+  "name": "Złomaria - slope-up",
   "category": "planet-tiles",
   "state": "base",
   "target_frames": 1,
@@ -2372,11 +2332,11 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "none"
+  "cutout": "post"
  },
  "planet-tiles/PLANET_TILES-027_zlomaria-slope-down__base.webp": {
   "asset_id": "PLANET_TILES-027",
-  "name": "Z\u0142omaria - slope-down",
+  "name": "Złomaria - slope-down",
   "category": "planet-tiles",
   "state": "base",
   "target_frames": 1,
@@ -2390,7 +2350,7 @@
  },
  "planet-tiles/PLANET_TILES-029_zlomaria-moving-platform__base.webp": {
   "asset_id": "PLANET_TILES-029",
-  "name": "Z\u0142omaria - moving-platform",
+  "name": "Złomaria - moving-platform",
   "category": "planet-tiles",
   "state": "base",
   "target_frames": 1,
@@ -2404,7 +2364,7 @@
  },
  "planet-tiles/PLANET_TILES-031_zlomaria-breakable-ground__base.webp": {
   "asset_id": "PLANET_TILES-031",
-  "name": "Z\u0142omaria - breakable-ground",
+  "name": "Złomaria - breakable-ground",
   "category": "planet-tiles",
   "state": "base",
   "target_frames": 1,
@@ -2418,7 +2378,7 @@
  },
  "planet-tiles/PLANET_TILES-030_zlomaria-hazard-base__base.webp": {
   "asset_id": "PLANET_TILES-030",
-  "name": "Z\u0142omaria - hazard-base",
+  "name": "Złomaria - hazard-base",
   "category": "planet-tiles",
   "state": "base",
   "target_frames": 1,
@@ -2428,11 +2388,11 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "none"
+  "cutout": "post"
  },
  "planet-tiles/PLANET_TILES-032_zlomaria-hidden-room-wall__base.webp": {
   "asset_id": "PLANET_TILES-032",
-  "name": "Z\u0142omaria - hidden-room-wall",
+  "name": "Złomaria - hidden-room-wall",
   "category": "planet-tiles",
   "state": "base",
   "target_frames": 1,
@@ -2526,7 +2486,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "none"
+  "cutout": "post"
  },
  "planet-tiles/PLANET_TILES-040_florion-bottom-left-corner__base.webp": {
   "asset_id": "PLANET_TILES-040",
@@ -2568,7 +2528,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "none"
+  "cutout": "post"
  },
  "planet-tiles/PLANET_TILES-044_florion-one-way-platform__base.webp": {
   "asset_id": "PLANET_TILES-044",
@@ -2652,7 +2612,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "none"
+  "cutout": "post"
  },
  "planet-tiles/PLANET_TILES-050_aqualis-top-center__base.webp": {
   "asset_id": "PLANET_TILES-050",
@@ -2694,7 +2654,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "none"
+  "cutout": "post"
  },
  "planet-tiles/PLANET_TILES-053_aqualis-left-wall__base.webp": {
   "asset_id": "PLANET_TILES-053",
@@ -2946,7 +2906,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "none"
+  "cutout": "post"
  },
  "planet-tiles/PLANET_TILES-071_skaltria-bottom-center__base.webp": {
   "asset_id": "PLANET_TILES-071",
@@ -3116,20 +3076,6 @@
   "model": "gpt-image-2",
   "cutout": "checker"
  },
- "planet-tiles/PLANET_TILES-085_vespera-left-wall__base.webp": {
-  "asset_id": "PLANET_TILES-085",
-  "name": "Vespera - left-wall",
-  "category": "planet-tiles",
-  "state": "base",
-  "target_frames": 1,
-  "refs": [
-   "PLANET_TILES-081_vespera-solid-center__base.webp"
-  ],
-  "size": "1024x1024",
-  "quality": "medium",
-  "model": "gpt-image-2",
-  "cutout": "checker"
- },
  "planet-tiles/PLANET_TILES-086_vespera-right-wall__base.webp": {
   "asset_id": "PLANET_TILES-086",
   "name": "Vespera - right-wall",
@@ -3142,7 +3088,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "none"
+  "cutout": "post"
  },
  "planet-tiles/PLANET_TILES-087_vespera-bottom-center__base.webp": {
   "asset_id": "PLANET_TILES-087",
@@ -3184,7 +3130,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "none"
+  "cutout": "post"
  },
  "planet-tiles/PLANET_TILES-090_vespera-slope-up__base.webp": {
   "asset_id": "PLANET_TILES-090",
@@ -3254,7 +3200,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "none"
+  "cutout": "post"
  },
  "planet-tiles/PLANET_TILES-095_vespera-breakable-ground__base.webp": {
   "asset_id": "PLANET_TILES-095",
@@ -3324,7 +3270,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "none"
+  "cutout": "post"
  },
  "planet-tiles/PLANET_TILES-100_ferroks-top-right-corner__base.webp": {
   "asset_id": "PLANET_TILES-100",
@@ -3492,7 +3438,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "none"
+  "cutout": "post"
  },
  "planet-tiles/PLANET_TILES-112_ferroks-hidden-room-wall__base.webp": {
   "asset_id": "PLANET_TILES-112",
@@ -3590,7 +3536,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "none"
+  "cutout": "post"
  },
  "planet-tiles/PLANET_TILES-123_katoblis-slope-down__base.webp": {
   "asset_id": "PLANET_TILES-123",
@@ -3604,7 +3550,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "none"
+  "cutout": "post"
  },
  "planet-tiles/PLANET_TILES-122_katoblis-slope-up__base.webp": {
   "asset_id": "PLANET_TILES-122",
@@ -3632,7 +3578,7 @@
   "size": "1024x1024",
   "quality": "medium",
   "model": "gpt-image-2",
-  "cutout": "none"
+  "cutout": "post"
  },
  "planet-tiles/PLANET_TILES-124_katoblis-one-way-platform__base.webp": {
   "asset_id": "PLANET_TILES-124",
@@ -3777,20 +3723,6 @@
  "planet-tiles/PLANET_TILES-135_pradowo-secret-bottom-center__base.webp": {
   "asset_id": "PLANET_TILES-135",
   "name": "Pradowo secret - bottom-center",
-  "category": "planet-tiles",
-  "state": "base",
-  "target_frames": 1,
-  "refs": [
-   "PLANET_TILES-129_pradowo-secret-solid-center__base.webp"
-  ],
-  "size": "1024x1024",
-  "quality": "medium",
-  "model": "gpt-image-2",
-  "cutout": "checker"
- },
- "planet-tiles/PLANET_TILES-136_pradowo-secret-bottom-left-corner__base.webp": {
-  "asset_id": "PLANET_TILES-136",
-  "name": "Pradowo secret - bottom-left-corner",
   "category": "planet-tiles",
   "state": "base",
   "target_frames": 1,
