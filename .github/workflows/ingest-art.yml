@@ -1,0 +1,31 @@
+name: Wczytaj grafiki z art-inbox
+# Uruchamia się po wrzuceniu plików do art-inbox/ (np. przez zadanie ChatGPT) albo ręcznie.
+on:
+  push:
+    branches: [main]
+    paths: ['art-inbox/**']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: ingest-art
+  cancel-in-progress: false
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci
+      - name: Wczytaj, wytnij tło, zamień na WebP
+        run: node tools/gen-art.mjs --ingest art-inbox
+      - name: Odśwież ROADMAP
+        run: node tools/art-roadmap.mjs
+      - name: Zapisz
+        run: |
+          git config user.name "gen-art[bot]"; git config user.email "gen-art@users.noreply.github.com"
+          git add -A art-inbox art-tasks public/art/gen
+          git diff --cached --quiet && { echo "Brak zmian"; exit 0; }
+          git commit -q -m "art: wczytano grafiki z art-inbox, odświeżono ROADMAP"
+          git pull -q --rebase origin main && git push -q origin HEAD:main

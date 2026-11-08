@@ -23,6 +23,7 @@ import { fileURLToPath } from 'node:url';
 import { cutout } from './cutout.mjs';
 import sharp from 'sharp';
 
+let ingesting = false;
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 const opt = (n, d) => { const i = args.indexOf('--' + n); return i < 0 ? d : (args[i + 1] !== undefined && !args[i + 1].startsWith('--') && args[i + 1] !== '' ? args[i + 1] : true); };
@@ -56,7 +57,7 @@ const keyOf = (a, state) => `${a.category}/${basename(fileOf(a, state))}`;
 const PRIORITY = ['characters', 'bosses', 'enemies', 'collectibles', 'interactables', 'conduits', 'planet-tiles', 'civilians', 'planet-props', 'parallax', 'level-backgrounds', 'character-variants', 'boss-variants', 'enemy-variants', 'interface', 'story-illustrations', 'effects'];
 const rank = (c) => { const i = PRIORITY.indexOf(c); return i < 0 ? 99 : i; };
 if (opt('list-categories', false)) { console.log(PRIORITY.filter((c) => assets.some((a) => a.category === c)).join(',')); process.exit(0); }
-if (!key && !dry && !recut && !opt('migrate', false)) { console.error('Brak OPENAI_API_KEY w środowisku.'); process.exit(2); }
+if (!key && !dry && !recut && !opt('migrate', false) && !opt('plan', false) && !opt('ingest', false)) { console.error('Brak OPENAI_API_KEY w środowisku.'); process.exit(2); }
 
 // --- reguły referencji ---------------------------------------------------------------------------
 const anchorOf = (planet) => assets.find((x) => x.category === 'planet-tiles' && x.planet === planet && /solid-center$/i.test(x.name));
@@ -178,9 +179,42 @@ const same = (x, y) => JSON.stringify(x) === JSON.stringify(y);
 const baseNeeded = (a) => force || !existsSync(fileOf(a, 'base')) || !same(recorded(keyOf(a, 'base')) ?? [], expectedBase(a));
 const poseNeeded = (a, s) => force || !existsSync(fileOf(a, s)) || !same(recorded(keyOf(a, s)) ?? [], expectedPose(a, s));
 
+
+const isAnchor = (a) => a.category === 'planet-tiles' && /solid-center$/i.test(a.name);
+// --- --plan: pełna kolejka produkcji (JSON) dla ROADMAP / zadania w ChatGPT ----------------------------
+const RAW = 'https://raw.githubusercontent.com/husk007/Marioosh/main/public/art/gen/';
+if (opt('plan', false)) {
+  const ordered = [...assets].sort((x, y) => rank(x.category) - rank(y.category) || (isAnchor(y) ? 1 : 0) - (isAnchor(x) ? 1 : 0));
+  const items = [];
+  const refInfo = (rs) => rs.map((r) => { const ra = byId[r.id], f = `${ra.category}/${basename(fileOf(ra, 'base'))}`; return { id: r.id, name: ra.name, role: r.role, file: f, url: RAW + f, ready: existsSync(fileOf(ra, 'base')) }; });
+  const push = (a, state, refs, text, frames, done) => items.push({ seq: items.length + 1, kind: state === 'base' ? 'base' : 'pose', asset_id: a.asset_id, name: a.name, category: a.category, state, frames, inbox_name: `${a.asset_id}__${state}.png`, repo_file: `${a.category}/${basename(fileOf(a, state))}`, size: sizeFor(a), transparent: wantsAlpha(a), refs: refInfo(refs), done, prompt: refPrompt(refs) + text + AVOID(a) });
+  for (const a of ordered) push(a, 'base', baseRefs(a), a.prompt_en, 1, !baseNeeded(a));
+  for (const a of ordered) for (const j of poseJobs.filter((j) => j.asset_id === a.asset_id)) push(a, j.state, poseRefs(a, j.state), j.prompt_en, j.target_frames, !poseNeeded(a, j.state));
+  writeFileSync(String(opt('plan', '')), JSON.stringify(items));
+  console.log(`Plan: ${items.length} pozycji, gotowych ${items.filter((i) => i.done).length}`); process.exit(0);
+}
+
+// --- --ingest <katalog>: PNG/WebP/JPG z zewnątrz (np. zadanie ChatGPT) -> wycięcie tła, WebP, manifest -------------
+if (opt('ingest', false)) {
+  ingesting = true; let n = 0, bad = 0;
+  const dir = String(opt('ingest', ''));
+  const NAME = /^([A-Z_]+-\d+)(?:_[a-z0-9-]+)?__([a-z0-9_]+?)(~noref)?\.(png|webp|jpe?g)$/i;
+  for (const f of existsSync(dir) ? readdirSync(dir) : []) {
+    const m = NAME.exec(f); if (!m) { if (!/^\.|README/i.test(f)) { console.log('pomijam (zła nazwa):', f); bad++; } continue; }
+    const a = byId[m[1].toUpperCase()], state = m[2].toLowerCase(), noref = !!m[3];
+    const job = poseJobs.find((j) => j.asset_id === a?.asset_id && j.state === state);
+    if (!a || (state !== 'base' && !job)) { console.log('pomijam (nieznany asset/poza):', f); bad++; continue; }
+    const refs = state === 'base' ? baseRefs(a) : poseRefs(a, state);
+    try {
+      await finish(a, state, await sharp(readFileSync(join(dir, f))).png().toBuffer(), noref ? [] : refs, state === 'base' ? 1 : job.target_frames, noref ? { refs_missing: true } : undefined);
+      unlinkSync(join(dir, f)); n++; console.log('ingest ok', f, '→', keyOf(a, state));
+    } catch (e) { console.log('FAIL', f, e.message); bad++; }
+  }
+  console.log(`Wczytano: ${n}, odrzucono: ${bad}`); process.exit(0);
+}
+
 // --- plan ----------------------------------------------------------------------------------------
 const doBase = mode === 'base' || mode === 'both', doPoses = mode === 'poses' || mode === 'both';
-const isAnchor = (a) => a.category === 'planet-tiles' && /solid-center$/i.test(a.name);
 let selected = assets.filter((a) => (!categories.length || categories.includes(a.category)) && (!ids.length || ids.includes(a.asset_id)));
 selected.sort((x, y) => rank(x.category) - rank(y.category) || (isAnchor(y) ? 1 : 0) - (isAnchor(x) ? 1 : 0));
 const jobsOf = (a) => poseJobs.filter((j) => j.asset_id === a.asset_id && (!states.length || states.includes(j.state)));
@@ -190,13 +224,13 @@ const poseTasks = doPoses ? selected.flatMap((a) => jobsOf(a).filter((j) => pose
 console.log(`Assetów: ${selected.length}, obrazów do wygenerowania: ${nBase + poseTasks.length} (baz: ${nBase}, póz: ${poseTasks.length}; tryb ${mode}, model ${model}, jakość ${quality})`);
 
 // --- generowanie ---------------------------------------------------------------------------------
-async function finish(a, state, png, refs, frames) {
+async function finish(a, state, png, refs, frames, extraMeta) {
   let cut = 'n/a';
   if (wantsAlpha(a)) { const r = cutout(png, null); png = r.buf; cut = r.mode; if (r.mode === 'none') console.log('  uwaga: nie wykryto tła do wycięcia (kafelek/pełny kadr?):', a.asset_id, state); }
   const { full, small } = await encode(a, png);
   const fp = fileOf(a, state); mkdirSync(dirname(fp), { recursive: true }); writeFileSync(fp, small);
   mkdirSync(dirname(origOf(a, state)), { recursive: true }); writeFileSync(origOf(a, state), full);
-  manifest[keyOf(a, state)] = { asset_id: a.asset_id, name: a.name, category: a.category, state, target_frames: frames, refs: refs.map((r) => basename(fileOf(byId[r.id], 'base'))), size: sizeFor(a), quality, model, cutout: cut };
+  manifest[keyOf(a, state)] = { asset_id: a.asset_id, name: a.name, category: a.category, state, target_frames: frames, refs: refs.map((r) => basename(fileOf(byId[r.id], 'base'))), size: sizeFor(a), quality: ingesting ? 'chatgpt' : quality, model: ingesting ? 'chatgpt-task' : model, cutout: cut, ...(extraMeta || {}) };
   save(); return small;
 }
 let ok = 0, fail = 0, stop = false;
