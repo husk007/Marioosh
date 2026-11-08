@@ -64,9 +64,9 @@ export function drawWorld(w: World, g: Gfx): void {
   const fr = Math.floor(w.time * 6) & 1;
   for (let ty = ty0; ty <= ty1; ty++) for (let tx = tx0; tx <= tx1; tx++) {
     const t = rt.tiles[ty * room.w + tx]; if (t === T.EMPTY || t === 20) continue;
-    const v = (tx * 7 + ty * 13) % 3; const X = tx * TILE, Y = ty * TILE;
+    const v = ts.fill.length === 16 ? (tx & 3) + ((ty & 3) << 2) : (tx * 7 + ty * 13) % 3; const vt = ts.top.length === 4 ? tx & 3 : (tx * 7 + ty * 13) % 3; const X = tx * TILE, Y = ty * TILE;
     switch (t) {
-      case T.SOLID: { const above = ty > 0 ? rt.tiles[(ty - 1) * room.w + tx] : T.SOLID; g.spr((above === T.SOLID || above === T.CRACKED || above === T.CABLE || above === T.GATE || above === T.CRUMBLE) ? ts.fill[v] : ts.top[v], X, (above === T.SOLID || above === T.CRACKED || above === T.CABLE || above === T.GATE || above === T.CRUMBLE) ? Y : Y - TOP_PAD); break; }
+      case T.SOLID: { const above = ty > 0 ? rt.tiles[(ty - 1) * room.w + tx] : T.SOLID; g.spr((above === T.SOLID || above === T.CRACKED || above === T.CABLE || above === T.GATE || above === T.CRUMBLE) ? ts.fill[v] : ts.top[vt], X, (above === T.SOLID || above === T.CRACKED || above === T.CABLE || above === T.GATE || above === T.CRUMBLE) ? Y : Y - TOP_PAD); break; }
       case T.ONEWAY: g.spr(ts.oneway, X, Y); break;
       case T.HAZARD: g.spr(ts.hazard[fr], X, Y); break;
       case T.LADDER: g.spr(ts.ladder, X, Y); break;
@@ -119,6 +119,7 @@ export function drawWorld(w: World, g: Gfx): void {
     if (!pl.solid && pl.mode === 'phase') { g.rect(pl.x, pl.y, pl.w, 8, '#9ad0ff', 0.12); continue; }
     if (!pl.solid) continue;
     const blink = pl.warn && Math.floor(w.time * 14) % 2 === 0;
+    if (ts.plat) { g.spr(ts.plat, pl.x, pl.y - 4, { w: pl.w, h: 18, alpha: blink ? 0.45 : 1 }); continue; }
     g.rect(pl.x, pl.y, pl.w, 10, blink ? '#fff' : '#8d93a0'); g.rect(pl.x, pl.y, pl.w, 3, '#c9ced6'); g.rect(pl.x, pl.y + 10, pl.w, 2, '#2a2c3a');
     for (let i = 6; i < pl.w; i += 14) g.rect(pl.x + i, pl.y + 4, 4, 3, '#ffd23f');
   }

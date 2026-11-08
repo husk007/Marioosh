@@ -72,7 +72,7 @@ jobs:
               done
             done
           done
-          node tools/art-roadmap.mjs; git add art-tasks
+          node tools/art-roadmap.mjs; git add art-tasks public/art/game
           if ! git diff --cached --quiet; then git commit -q -m "art: odświeżono ROADMAP"; git pull -q --rebase origin main && git push -q origin HEAD:main; fi
           exit $FAILED
       - name: Pełne wersje (bez pomniejszenia) jako artefakt

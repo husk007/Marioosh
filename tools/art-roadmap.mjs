@@ -44,4 +44,5 @@ writeFileSync(join(root, 'art-tasks', 'ROADMAP.md'), md.join('\n'));
 const stationItems = items.filter(open_).map(({ seq, kind, asset_id, name, category, state, inbox_name, size, transparent, refs, prompt }) => ({ seq, kind, asset_id, name, category, state, inbox_name, size, transparent, refs: refs.map(({ id, name, role, url, ready }) => ({ id, name, role, url, ready })), prompt }));
 writeFileSync(join(root, 'art-tasks', 'station-data.json'), JSON.stringify(stationItems));
 execFileSync('node', [join(root, 'tools', 'build-station.mjs')], { stdio: 'inherit' });
+execFileSync('node', [join(root, 'tools', 'pack-game-art.mjs')], { stdio: 'inherit' });   // pakiet grafik dla gry
 console.log(`ROADMAP: ${done} gotowe, ${nTodo} do zrobienia, ${nSkip} SKIP, okien z pracą: ${todoWins.length}, pierwsze: ${first ? wname(first) : '-'}`);

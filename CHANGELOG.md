@@ -1,5 +1,13 @@
 # Zmiany
 
+## 0.2.0 (wstępne wydanie HD)
+- **Gra korzysta z biblioteki grafik HD** (wygenerowanych w `public/art/gen`): bracia (Marioosh, Darioosh), Scarlet, wszyscy wrogowie (18 + dron), ośmiu bossów wraz z pozami „odsłonięty / ogłuszony”, przedmioty i ikony HUD, posągi i uwolnieni mieszkańcy, rury (kolory), checkpoint, wyjście, EcoPort, dźwignie, skrzynie oraz kafle gruntu i platformy ośmiu planet (wypełnienie, górna krawędź, platformy jednostronne, kruszące się bloki).
+- Pozy bez własnej grafiki (skok, upadek, przysiad, ból, pływanie) używają grafiki bazowej z lekką deformacją; po wygenerowaniu pozy gra użyje jej automatycznie.
+- Stare sprite'y proceduralne zostają jako awaryjny zapas, gdy brakuje pliku.
+- Nowy pakiet gry `public/art/game` (162 pliki, ok. 3 MB; narzędzie `tools/pack-game-art.mjs`) zamiast całej biblioteki; build nie zawiera już źródłowych 25 MB.
+- Czyszczenie biblioteki: usunięto 5 błędnych grafik (zła postać Marioosha, dwa kafle-sceny, tło wklejone w kafel, kafel izometryczny), naprawiono tła w 48 plikach (`tools/clean-art.mjs`).
+- Znane ograniczenia: statyczne pozy (brak klatek animacji), tła i paralaksa nadal z SVG/kodu, kafle nie są w pełni bezszwowe (widoczne powtarzanie co 128 px), część rekwizytów (lampy, znaki, pociski) wciąż proceduralna.
+
 ## 0.1.6
 - **Grafika HD (fala 1):** 12 ilustracji SVG wrogów i 9 teł planet wczytywanych jako gładka grafika HD (z awaryjnym powrotem do rysunku proceduralnego).
 - Poprawka integracji: sprite'y HD są przycinane do widocznej zawartości, skalowane z zachowaniem proporcji (koniec ze ściśniętymi roślinami) i stoją stopami na ziemi (wcześniej część wrogów lewitowała nad podłożem).

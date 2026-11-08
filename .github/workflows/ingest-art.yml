@@ -29,7 +29,7 @@ jobs:
       - name: Zapisz
         run: |
           git config user.name "gen-art[bot]"; git config user.email "gen-art@users.noreply.github.com"
-          git add -A art-inbox art-tasks public/art/gen
+          git add -A art-inbox art-tasks public/art/gen public/art/game
           git diff --cached --quiet && { echo "Brak zmian"; exit 0; }
           git commit -q -m "art: wczytano grafiki z art-inbox, odświeżono ROADMAP"
           git pull -q --rebase origin main && git push -q origin HEAD:main

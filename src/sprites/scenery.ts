@@ -6,6 +6,7 @@ import { hiCanvas, shade, mix, type Img } from '../engine/gfx';
 import { Rng } from '../engine/rng';
 import { WORLDS, type WorldTheme } from '../data/worlds';
 import { VH, VW } from '../game/constants';
+import { hasTiles, tileFillGrid, tileTopStrips, tileWhole, tilePlatform, TILE_KIND } from './gen';
 
 type G = CanvasRenderingContext2D;
 const TAU = Math.PI * 2;
@@ -14,7 +15,7 @@ const OUT = 'rgba(20,12,30,0.8)';
 /** Dodatkowy margines nad górnym kafelkiem (źdźbła trawy, nity ponad krawędzią). */
 export const TOP_PAD = 8;
 
-export interface TileSet { top: Img[]; fill: Img[]; oneway: Img; hazard: Img[]; ladder: Img; crumble: Img; cracked: Img; conv: [Img[], Img[]]; gate: Img; bgBlock: Img; cableBase: Img; }
+export interface TileSet { top: Img[]; fill: Img[]; plat?: Img; oneway: Img; hazard: Img[]; ladder: Img; crumble: Img; cracked: Img; conv: [Img[], Img[]]; gate: Img; bgBlock: Img; cableBase: Img; }
 const tileCache = new Map<number, TileSet>();
 
 function vgrad(g: G, y0: number, y1: number, ...stops: string[]): CanvasGradient {
@@ -200,7 +201,16 @@ export function tileset(world: number): TileSet {
     g.strokeStyle = OUT; g.lineWidth = 0.9; g.strokeRect(2.5, -1, 27, 34); }
   const bg = hiCanvas(32, 32); { bg.g.fillStyle = shade(t.ground, 0.55); bg.g.fillRect(0, 0, 32, 32); bg.g.fillStyle = 'rgba(0,0,0,0.2)'; bg.g.fillRect(0, 0, 32, 1.5); }
   const cb = hiCanvas(32, 32); { fillTile(cb.g, t, new Rng('cb' + world)); cb.g.fillStyle = 'rgba(0,0,0,0.12)'; cb.g.fillRect(0, 0, 32, 32); }
-  const set: TileSet = { top, fill, oneway: ow.c, hazard: hz, ladder: ld.c, crumble: cr.c, cracked: ck.c, conv, gate: gt.c, bgBlock: bg.c, cableBase: cb.c };
+  let oneway: Img = ow.c, crumble: Img = cr.c, cracked: Img = ck.c, plat: Img | undefined;
+  let topOut = top, fillOut = fill;
+  if (hasTiles(world)) {
+    // grafika HD planety: wypełnienie to siatka 4×4 wycinków jednego obrazu, górna krawędź to 4 paski kafla „top-center”
+    const fg = tileFillGrid(world); if (fg) fillOut = fg;
+    const ts4 = tileTopStrips(world, TOP_PAD); if (ts4) topOut = ts4;
+    const ow2 = tilePlatform(world, TILE_KIND.oneway, 32, 14); if (ow2) { oneway = ow2; plat = tilePlatform(world, TILE_KIND.oneway, 96, 18); }
+    const br = tileWhole(world, TILE_KIND.breakable); if (br) { cracked = br; crumble = br; }
+  }
+  const set: TileSet = { top: topOut, fill: fillOut, plat, oneway, hazard: hz, ladder: ld.c, crumble, cracked, conv, gate: gt.c, bgBlock: bg.c, cableBase: cb.c };
   tileCache.set(world, set); return set;
 }
 
