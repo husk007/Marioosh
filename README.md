@@ -35,6 +35,8 @@ Dwuwymiarowa platformówka o dwóch braciach, ośmiu planetach, jednym przedłu�
 | Pauza | `Esc` / `P` | | Start |
 | Pełny ekran | `F` w menu / `F11` (desktop) | | |
 
+**Ruch (v0.3):** `↑` na kratce/linie — wspinaczka; skok w powietrzu — szybowanie; w powietrzu przy ścianie — ślizg, a **Darioosh** odbija się od niej skokiem; `↓` w powietrzu — **Marioosh** uderza w ziemię (rozbija pęknięte posadzki); `↓` w biegu — toczenie na zboczu; w wodzie 8 kierunków, skok = kopnięcie/dash.
+
 Na telefonach pojawiają się przyciski dotykowe (rozmiar w ustawieniach). Klawisze można przypisać w *Ustawienia → Klawisze*.
 
 ## Uruchomienie
@@ -86,7 +88,7 @@ tests/ e2e/   testy                   .github/    CI, Pages, Release
 **Migracja grafiki HD:** dostępna jest pierwsza seria 12 przeciwników i 9 teł planet w SVG. Wcześniejsze portrety referencyjne braci i bossów oraz pełne animacje nie są jeszcze zastąpione finalnymi ilustracjami; trwa stopniowa wymiana assetów. Grafiki pochodzące od użytkownika służą za wzorce kierunku artystycznego, ale nie są jeszcze częścią repozytorium.
 
 Wersja **0.1.0** — pierwsza kompletna, grywalna implementacja projektu z etapu 2. Uczciwie:
-- Poziomy są **generowane proceduralnie** z blueprintu (`src/data/levels.json`) deterministycznym ziarnem, a nie ręcznie projektowane; ich przejezdność weryfikują testy geometrii oraz bot, ale **7 poziomów** (W3-L4, W6-L2, W7-L1…L4, W8-L4) jest poza zasięgiem bota i wymaga testu ręcznego ([tryb testera](docs/TESTING.md#tryb-testera-ręczne-sprawdzenie-poziomów): `?debug=1`). Balans (prędkości, HP bossów) to wartości startowe.
+- Poziomy są **generowane proceduralnie** z blueprintu (`src/data/levels.json`) deterministycznym ziarnem (wysokie, pionowe plansze — `docs/design/07_PRZEBUDOWA_PIONOWA_v0_3.md`), a nie ręcznie projektowane. Przejezdność trasy głównej dla **każdego brata osobno** weryfikuje bot (31 poziomów; wieża W6-L2 — testy etapów), sekrety zależne od brata — testy symulacji. Nie zastępuje to grania: czucie fizyki i balans (wytrzymałość kratki, sprężyny, HP bossów) to wartości startowe do sprawdzenia ręcznie ([tryb testera](docs/TESTING.md#tryb-testera-ręczne-sprawdzenie-poziomów): `?debug=1`). Brak pełnych pętli 360° — zbocza do 45°.
 - Paczki Windows/Linux/Android/iOS **kompilują się w CI** (GitHub Actions), ale **nie były uruchamiane** na docelowych systemach/urządzeniach; uruchomiono i przetestowano wersję web (Chromium, e2e).
 - Tryb *Night Shift* jest wdrożony tylko częściowo: +12% prędkości gry, −10% czasu, nocna poświata i ciemny strój. Nie zmienia układu tras ani nie dodaje poziomów bonusowych z roadmapy.
 - Tłumaczenia wykonane maszynowo/redakcyjnie — zalecana weryfikacja przez rodzimych użytkowników (zwłaszcza suahili i arabski). Zob. [`docs/LOCALIZATION.md`](docs/LOCALIZATION.md).

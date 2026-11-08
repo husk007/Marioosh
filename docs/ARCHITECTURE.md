@@ -24,12 +24,12 @@ Zależności idą tylko w dół: `game/*` nie zna DOM-u; audio jest wstrzykiwane
 
 ## Pętla i fizyka
 - Rozdzielczość wirtualna **640×360**, skalowanie całkowite z letterboxem; stały krok **60 Hz** (akumulator) niezależny od odświeżania ekranu.
-- `moveBody`: ruch osiami osobno, kolizje z kafelkami (pełne, jednostronne, kolce, drabiny, taśmy, kruszące, bramy) oraz ruchomymi platformami (`carryOnPlatforms`/`landOnPlatforms`).
-- Ruch zgodny z GDD: coyote 0,1 s, bufor skoku, skok o zmiennej wysokości (puszczenie przycisku zwiększa grawitację), woda, drabiny.
+- `moveBody` (wrogowie, bossowie): ruch osiami osobno, kolizje z kafelkami (pełne, jednostronne, **zbocza z profilem wysokości**, kolce, drabiny/kratki/liny, taśmy, kruszące, bramy) oraz ruchomymi platformami (`carryOnPlatforms`/`landOnPlatforms`).
+- Ruch bohaterów (`movement.ts`, v0.3): coyote 0,1 s, bufor skoku, skok o zmiennej wysokości, rozpęd na zboczach (`slopeF`), toczenie, szybowanie, ślizg i odbicie od ściany (tylko Darioosh), łapanie krawędzi, wspinaczka z wytrzymałością, uderzenie w ziemię (tylko Marioosh), sprężyny, pływanie 8-kierunkowe.
 - Wejście: `poll()` raz na krok; zbocza (`pressed`) są zatrzaskiwane do skonsumowania, więc krótkie tapnięcia nie giną (w tym w menu).
 
 ## Poziomy
-`src/data/levels.json` (z paczki projektu) opisuje 32 poziomy: tryb (bieg/woda/wieża/boss), długość, budżety obiektów, sekrety. `levelgen.ts` zamienia wpis w tilemapę **deterministycznie** (ziarno = id poziomu): segmenty (płasko, przepaść, schody, kolce, ściany z przewodem, ruchome/znikające platformy, taśmy, zagadki), pokoje bonusowe/sekretne, posągi, bramy z przełącznikami, checkpointy, EcoPort, wyjście lub arenę bossa. Testy (`tests/levelgen.test.ts`) pilnują m.in. maksymalnej przepaści, budżetów, unikalnych id i obecności wymaganych obiektów.
+`src/data/levels.json` (z paczki projektu) opisuje 32 poziomy: tryb (bieg/woda/wieża/boss), długość, budżety obiektów, sekrety. `levelgen.ts` zamienia wpis w tilemapę **deterministycznie** (ziarno = id poziomu) i dostarcza wspólne elementy (pickupy, wrogowie, areny bossów, skrzynki, pokoje bonusowe, wieżę). Trasę główną biegu buduje **`levelgen2.ts` (`buildRun2`)**: wysoki pokój (46 wierszy), ciąg elementów (zbocza, wspinaczka, sprężyny, zrzuty, sekrety…) z profilem wysokości; `route[x]` zapamiętuje wiersz trasy. Wieża W6-L2 to etapy (`TOWER_STAGES`). Zasady: `docs/design/07_PRZEBUDOWA_PIONOWA_v0_3.md`. Testy: `levelgen`, `secrets`, `tower`, `reach` (bot), `hints`.
 
 ## Dane i zapis
 - Zapis: `marioosh.save.v1.slotN` (JSON z polem `v`), zapis atomowy (`.tmp` → właściwy klucz), `migrate()` naprawia/odrzuca dane. Ustawienia: `marioosh.settings.v1`.

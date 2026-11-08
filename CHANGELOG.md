@@ -1,5 +1,15 @@
 # Zmiany
 
+## 0.3.0 — przebudowa pionowa („Sonic / Rayman”)
+- **Płaski bieg w prawo zastąpiono wysokimi poziomami z ruchem w górę i w dół.** Wszystkie 32 poziomy zaprojektowano od nowa nowym generatorem (`levelgen2.ts`): zbocza 45° i 26°, rozpęd i skocznie, wspinaczka po kratkach i linach, sprężyny, zrzuty i zjazdy, lód/olej/piasek, trasy górne.
+- **Nowa fizyka braci:** szybowanie, ślizg po ścianie, łapanie krawędzi, toczenie, pływanie w 8 kierunkach, pionowa kamera. Marioosh: uderzenie w ziemię (rozbija pęknięte posadzki), kratka męczy go po ok. 3 s. Darioosh: odbicie od ściany, dłuższe szybowanie, kratka bez limitu.
+- **Sekrety zależne od brata** w każdym poziomie biegu: kapsuła tylko dla Marioosha, szyb tylko dla Dariooosha, trasa górna dla obu.
+- **Wieża W6-L2** przebudowana na etapy (schody, kratka, sprężyna) z testami dla obu braci.
+- **Podpowiedzi** do nowych mechanik (6 języków), pokazywane przy pierwszym napotkaniu elementu.
+- **Testy:** bot osiągalności przechodzi 31 poziomów osobno jako Marioosh i Darioosh (62 testy); testy sekretów, zboczy, wieży, podpowiedzi — łącznie ponad 410 testów.
+- **Art Station / grafika:** nowa kategoria „mechanics” (10 zasobów) i 16 nowych póz braci w kolejce produkcji; opis w `docs/design/07_PRZEBUDOWA_PIONOWA_v0_3.md`.
+- Znane ograniczenia: brak pełnych pętli (zbocza do 45°), wieża testowana etapami (nie botem end-to-end), nowe elementy rysowane proceduralnie do czasu wygenerowania grafik, balans do sprawdzenia w grze.
+
 ## 0.2.0 (wstępne wydanie HD)
 - **Gra korzysta z biblioteki grafik HD** (wygenerowanych w `public/art/gen`): bracia (Marioosh, Darioosh), Scarlet, wszyscy wrogowie (18 + dron), ośmiu bossów wraz z pozami „odsłonięty / ogłuszony”, przedmioty i ikony HUD, posągi i uwolnieni mieszkańcy, rury (kolory), checkpoint, wyjście, EcoPort, dźwignie, skrzynie oraz kafle gruntu i platformy ośmiu planet (wypełnienie, górna krawędź, platformy jednostronne, kruszące się bloki).
 - Pozy bez własnej grafiki (skok, upadek, przysiad, ból, pływanie) używają grafiki bazowej z lekką deformacją; po wygenerowaniu pozy gra użyje jej automatycznie.

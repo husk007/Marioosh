@@ -100,7 +100,7 @@ export function styleFor(id: string, world: number, stage: number): Style {
 
 /** wskazówki — krótkie, jednorazowe podpowiedzi (klucze i18n) */
 export const HINTS: Record<string, { x: number; key: string }[]> = {
-  'W1-L1': [{ x: 3, key: 'hint.move' }, { x: 20, key: 'hint.attack' }, { x: 33, key: 'hint.stomp' }, { x: 36, key: 'hint.cable' }, { x: 26, key: 'hint.statue' }, { x: 56, key: 'hint.hiddenBox' }, { x: 66, key: 'hint.horns' }, { x: 100, key: 'hint.run' }, { x: 148, key: 'hint.exit' }],
+  'W1-L1': [{ x: 3, key: 'hint.move' }, { x: 20, key: 'hint.attack' }, { x: 148, key: 'hint.exit' }],   // podpowiedzi o mechanikach dodaje generator przy pierwszym wystąpieniu elementu
   'W1-L2': [{ x: 4, key: 'hint.cable' }, { x: 60, key: 'hint.switch' }],
   'W2-L2': [{ x: 100, key: 'hint.eco' }], 'W2-L4': [{ x: 100, key: 'bosshint.zlomotaur' }], 'W1-L4': [{ x: 99, key: 'bosshint.rogomir' }],
   'W3-L4': [{ x: 100, key: 'bosshint.kaktogor' }], 'W3-L3': [{ x: 6, key: 'hint.switch' }],

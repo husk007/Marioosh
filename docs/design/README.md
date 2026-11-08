@@ -11,6 +11,7 @@ Ten pakiet rozszerza koncepcję gry „Klątwa Katoblepasa” do postaci dokumen
 5. `04_BIBLIA_GRAFICZNA_v0_2.md` – wygląd postaci i planet, palety, sprite'y, dźwięk, HUD.
 6. `05_LEVELS_v0_2.json` – ustrukturyzowane wpisy 32 poziomów, cztery sekcje każdego etapu, budżety i sekrety; **to nie jest kompletna tilemapa**.
 7. `06_ROADMAP_v0_2.md` – kolejność implementacji i kryteria odbioru.
+8. `07_PRZEBUDOWA_PIONOWA_v0_3.md` – **v0.3:** przebudowa na wysoki, pionowy platformer (zbocza, wspinaczka, sprężyny, sekrety zależne od brata); uzupełnia i w razie sprzeczności zastępuje fizykę z GDD v0.2.
 
 ## Ustalenia wymagające dalszego testowania
 
