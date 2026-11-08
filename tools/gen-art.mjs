@@ -17,10 +17,11 @@
 //   kafelki, rekwizyty, paralaksa, tła poziomów ← kafelek wzorcowy planety („solid-center”) jako próbka palety/materiału
 //   ilustracje fabularne, portrety, menu ← bazy bohaterów/Katoblepasa wymienionych w opisie
 // Nazewnictwo: public/art/gen/<kategoria>/<ID>_<slug>__<poza>.png  (poza „base” = neutralna referencja). manifest.json zapisuje użyte referencje.
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, renameSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, renameSync, unlinkSync } from 'node:fs';
 import { dirname, join, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { cutout } from './cutout.mjs';
+import sharp from 'sharp';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -37,14 +38,25 @@ const poseJobs = JSON.parse(readFileSync(join(root, 'tools', 'art-poses.json'), 
 const byId = Object.fromEntries(assets.map((a) => [a.asset_id, a]));
 const outDir = join(root, 'public', 'art', 'gen');
 const slug = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l').replace(/Ł/g, 'L').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
-const fileOf = (a, state) => join(outDir, a.category, `${a.asset_id}_${slug(a.name)}__${state}.png`);
+const origDir = process.env.ART_ORIGINALS_DIR || join(root, 'art-originals');   // pełna rozdzielczość (poza repo; workflow wrzuca jako artefakt)
+const fileOf = (a, state) => join(outDir, a.category, `${a.asset_id}_${slug(a.name)}__${state}.webp`);
+const origOf = (a, state) => join(origDir, a.category, `${a.asset_id}_${slug(a.name)}__${state}.webp`);
+// do repo trafia pomniejszone WebP (dłuższy bok: duże tła/ilustracje 1280 px, reszta 768 px); pełna wersja idzie do art-originals/
+const BIG = (a) => ['level-backgrounds', 'parallax', 'story-illustrations'].includes(a.category) || (a.category === 'interface' && /Background|Map Card/i.test(a.name));
+async function encode(a, png) {
+  const m = BIG(a) ? 1280 : 768;
+  const full = await sharp(png).webp({ quality: 95, alphaQuality: 100 }).toBuffer();
+  const small = await sharp(png).resize({ width: m, height: m, fit: 'inside', withoutEnlargement: true }).webp({ quality: 88, alphaQuality: 100 }).toBuffer();
+  return { full, small };
+}
+const toPng = (buf) => sharp(buf).png().toBuffer();   // referencje wysyłamy do API jako PNG
 const keyOf = (a, state) => `${a.category}/${basename(fileOf(a, state))}`;
 
 // kolejność produkcji: najpierw to, na czym opiera się reszta
 const PRIORITY = ['characters', 'bosses', 'enemies', 'collectibles', 'interactables', 'conduits', 'planet-tiles', 'civilians', 'planet-props', 'parallax', 'level-backgrounds', 'character-variants', 'boss-variants', 'enemy-variants', 'interface', 'story-illustrations', 'effects'];
 const rank = (c) => { const i = PRIORITY.indexOf(c); return i < 0 ? 99 : i; };
 if (opt('list-categories', false)) { console.log(PRIORITY.filter((c) => assets.some((a) => a.category === c)).join(',')); process.exit(0); }
-if (!key && !dry && !recut) { console.error('Brak OPENAI_API_KEY w środowisku.'); process.exit(2); }
+if (!key && !dry && !recut && !opt('migrate', false)) { console.error('Brak OPENAI_API_KEY w środowisku.'); process.exit(2); }
 
 // --- reguły referencji ---------------------------------------------------------------------------
 const anchorOf = (planet) => assets.find((x) => x.category === 'planet-tiles' && x.planet === planet && /solid-center$/i.test(x.name));
@@ -133,20 +145,32 @@ async function call(a, prompt, refPngs) {
 const manifestPath = join(outDir, 'manifest.json');
 const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : {};
 const save = () => { mkdirSync(outDir, { recursive: true }); writeFileSync(manifestPath, JSON.stringify(manifest, null, 1)); };
-const recorded = (k) => { const m = manifest[k]; return m ? (m.refs ?? (m.reference ? [m.reference] : [])) : null; };
+const recorded = (k) => { const m = manifest[k]; return m ? (m.refs ?? (m.reference ? [m.reference] : [])).map((x) => x.replace(/\.png$/, '.webp')) : null; };
 if (recut) {
   let n = 0;
-  for (const c of readdirSync(outDir, { withFileTypes: true }).filter((e) => e.isDirectory())) for (const f of readdirSync(join(outDir, c.name)).filter((f) => f.endsWith('.png'))) {
-    const fp = join(outDir, c.name, f), r = cutout(readFileSync(fp), null);
-    if (r.mode !== 'none') { writeFileSync(fp, r.buf); n++; }
+  for (const c of readdirSync(outDir, { withFileTypes: true }).filter((e) => e.isDirectory())) for (const f of readdirSync(join(outDir, c.name)).filter((f) => f.endsWith('.webp'))) {
+    const fp = join(outDir, c.name, f), r = cutout(await toPng(readFileSync(fp)), null);
+    if (r.mode !== 'none') { writeFileSync(fp, await sharp(r.buf).webp({ quality: 88, alphaQuality: 100 }).toBuffer()); n++; }
   }
   console.log('Ponownie wycięto tło w', n, 'plikach'); process.exit(0);
 }
-if (existsSync(outDir)) for (const a of assets) {   // stare nazwy <ID>.png
-  const old = join(outDir, a.category, a.asset_id + '.png');
-  if (existsSync(old) && !existsSync(fileOf(a, 'base'))) renameSync(old, fileOf(a, 'base'));
+// migracja: wcześniejsze pełne PNG -> pomniejszone WebP (+ pełna wersja w art-originals), bez ponownego generowania
+async function migratePng() {
+  let n = 0;
+  if (!existsSync(outDir)) return;
+  const byFile = new Map(); for (const a of assets) for (const st of ['base', ...new Set(poseJobs.filter((j) => j.asset_id === a.asset_id).map((j) => j.state))]) byFile.set(basename(fileOf(a, st)).replace(/\.webp$/, '.png'), [a, st]);
+  for (const c of readdirSync(outDir, { withFileTypes: true }).filter((e) => e.isDirectory())) for (const f of readdirSync(join(outDir, c.name)).filter((f) => f.endsWith('.png'))) {
+    const hit = byFile.get(f); const fp = join(outDir, c.name, f);
+    if (!hit) { console.log('migracja: pomijam nieznany plik', f); continue; }
+    const [a, st] = hit, png = readFileSync(fp), { full, small } = await encode(a, png);
+    mkdirSync(dirname(origOf(a, st)), { recursive: true }); writeFileSync(origOf(a, st), full); writeFileSync(fileOf(a, st), small);
+    unlinkSync(fp); n++;
+  }
+  for (const [k, v] of Object.entries(manifest)) { if (k.endsWith('.png')) { delete manifest[k]; manifest[k.replace(/\.png$/, '.webp')] = v; } if (v.refs) v.refs = v.refs.map((x) => x.replace(/\.png$/, '.webp')); }
+  if (n) { console.log('migracja PNG → WebP:', n, 'plików'); save(); }
 }
-
+await migratePng();
+if (opt('migrate', false)) process.exit(0);
 // --- „nieświeżość”: plik istnieje, ale powstał bez wymaganych dziś referencji -------------------------
 const expectedBase = (a) => baseRefs(a).map((r) => basename(fileOf(byId[r.id], 'base')));
 const expectedPose = (a, s) => poseRefs(a, s).map((r) => basename(fileOf(byId[r.id], 'base')));
@@ -169,9 +193,11 @@ console.log(`Assetów: ${selected.length}, obrazów do wygenerowania: ${nBase + 
 async function finish(a, state, png, refs, frames) {
   let cut = 'n/a';
   if (wantsAlpha(a)) { const r = cutout(png, null); png = r.buf; cut = r.mode; if (r.mode === 'none') console.log('  uwaga: nie wykryto tła do wycięcia (kafelek/pełny kadr?):', a.asset_id, state); }
-  const fp = fileOf(a, state); mkdirSync(dirname(fp), { recursive: true }); writeFileSync(fp, png);
+  const { full, small } = await encode(a, png);
+  const fp = fileOf(a, state); mkdirSync(dirname(fp), { recursive: true }); writeFileSync(fp, small);
+  mkdirSync(dirname(origOf(a, state)), { recursive: true }); writeFileSync(origOf(a, state), full);
   manifest[keyOf(a, state)] = { asset_id: a.asset_id, name: a.name, category: a.category, state, target_frames: frames, refs: refs.map((r) => basename(fileOf(byId[r.id], 'base'))), size: sizeFor(a), quality, model, cutout: cut };
-  save(); return png;
+  save(); return small;
 }
 let ok = 0, fail = 0, stop = false;
 const baseMemo = new Map();
@@ -182,7 +208,7 @@ function getBase(a) {
     const fp = fileOf(a, 'base'), refs = baseRefs(a);
     if (!(selectedIds.has(a.asset_id) ? baseNeeded(a) && doBase : (!existsSync(fp)))) return readFileSync(fp);
     if (dry) { console.log(`[dry] baza ${a.asset_id} ${a.name} ${sizeFor(a)} refs=[${refs.map((r) => r.id + ':' + r.role).join(', ')}]`); return Buffer.alloc(0); }
-    const refPngs = []; for (const r of refs) refPngs.push(await getBase(byId[r.id]));
+    const refPngs = []; for (const r of refs) refPngs.push(await toPng(await getBase(byId[r.id])));
     const png = await finish(a, 'base', await call(a, refPrompt(refs) + a.prompt_en + AVOID(a), refPngs), refs, 1);
     ok++; console.log('ok  ', a.asset_id, a.name, 'base', refs.length ? `(refs: ${refs.map((r) => r.id).join(', ')})` : ''); return png;
   })();
@@ -195,7 +221,7 @@ const guard = (e, what) => { fail++; console.log('FAIL', what, '-', e.message); 
 if (doBase) await pool(selected.filter(baseNeeded), async (a) => { try { await getBase(a); } catch (e) { guard(e, a.asset_id + ' base'); } });
 if (doPoses && !stop) await pool(poseTasks, async ({ a, j }) => {
   try {
-    const refs = poseRefs(a, j.state), refPngs = []; for (const r of refs) refPngs.push(await getBase(byId[r.id]));
+    const refs = poseRefs(a, j.state), refPngs = []; for (const r of refs) refPngs.push(await toPng(await getBase(byId[r.id])));
     if (dry) { console.log(`[dry] poza ${a.asset_id} ${a.name} ${j.state} (klatek ${j.target_frames}) refs=[${refs.map((r) => r.id + ':' + r.role).join(', ')}]`); return; }
     await finish(a, j.state, await call(a, refPrompt(refs) + j.prompt_en + AVOID(a), refPngs), refs, j.target_frames); ok++; console.log('ok  ', a.asset_id, a.name, j.state);
   } catch (e) { guard(e, `${a.asset_id} ${j.state}`); }

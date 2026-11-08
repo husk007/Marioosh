@@ -19,3 +19,6 @@ Dodano dziewięć autorskich, pełnoekranowych teł SVG (planety 0–8) w `publi
 
 ## Generator grafik (OpenAI)
 `tools/gen-art.mjs` generuje PNG-i z biblioteki promptów (`tools/art-prompts.json`, 629 assetów) przez OpenAI Images API do `public/art/gen/<kategoria>/<ID>.png`. Klucz tylko z `OPENAI_API_KEY` (lokalnie lub sekret GitHub Actions — workflow „Generuj grafiki (OpenAI)”). Pliki z `public/art/gen/` nie są jeszcze wpięte w grę.
+
+### Format plików w repo
+Do repo trafiają pomniejszone WebP (dłuższy bok 768 px; duże tła, paralaksa i ilustracje 1280 px) — `public/art/gen/<kategoria>/<ID>_<nazwa>__<poza>.webp`. Pełne wersje (bez pomniejszenia, WebP q95) są tworzone w `art-originals/` (poza gitem) i wysyłane jako artefakt workflow „art-originals-<id>” (30 dni).
