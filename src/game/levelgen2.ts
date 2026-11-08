@@ -25,11 +25,11 @@ type Piece = (x: number, room: number) => number;       // zwraca liczbę zajęt
 
 /** krótki „program nauczania” poziomu 1-1: kolejne elementy wprowadzają mechaniki po kolei */
 const PLAN: Record<string, string[]> = {
-  'W1-L1': ['loft', 'vaultM', 'vaultD', 'hill', 'climb', 'ramp', 'gap', 'spring', 'drop', 'slide'],
+  'W1-L1': ['hill', 'climb', 'vaultM', 'loft', 'vaultD', 'drop', 'slide', 'ramp', 'spring'],
 };
 
 /** wagi elementów wg świata (dodawane do wag bazowych) */
-const NEW_BASE: Record<string, number> = { flat: 3, gap: 3, stairs: 1, hill: 3, ramp: 2, slide: 2, climb: 2, spring: 1.5, drop: 2, pit: 1, haz: 0, wall: 1, moving: 1, puzzle: 1, crumble: 0, phase: 0, conv: 0, ice: 0, sand: 0, oil: 0, loft: 1.2, vaultD: 0.7, vaultM: 0.7 };
+const NEW_BASE: Record<string, number> = { flat: 1, gap: 2.5, stairs: 0.5, hill: 4, ramp: 3, slide: 3, climb: 4, spring: 3.5, drop: 3.5, pit: 1, haz: 0, wall: 1, moving: 1, puzzle: 1, crumble: 0, phase: 0, conv: 0, ice: 0, sand: 0, oil: 0, loft: 1.2, vaultD: 0.7, vaultM: 0.7 };
 const NEW_WORLD: Record<number, Record<string, number>> = {
   0: { conv: 1, puzzle: 1 },
   1: { hill: 4, climb: 2, puzzle: 1 },
@@ -51,6 +51,10 @@ const LEVEL_BOOST: Record<string, Record<string, number>> = {
 export interface Reward { kind: 'loft' | 'vaultD' | 'vaultM'; /** początek elementu (kolumna) i wiersz podłoża */ x: number; gy: number; x0: number; x1: number; slots: { x: number; y: number }[] }
 /** zbudowane nagrody wg poziomu (do testów osiągalności sekretów) */
 export const REWARDS = new Map<string, Reward[]>();
+/** wiersz powierzchni trasy głównej w każdej kolumnie (do testów i narzędzi) */
+export const ROUTES = new Map<string, Int16Array>();
+/** kolejność użytych elementów (do diagnostyki) */
+export const PIECES = new Map<string, string[]>();
 
 export function buildRun2(j: LevelJson, rng: Rng, style: Style, boss: BossId | undefined, opts: GenOpts) {
   const W = j.width_tiles, id = j.level_id, world = j.world;
@@ -76,8 +80,9 @@ export function buildRun2(j: LevelJson, rng: Rng, style: Style, boss: BossId | u
 
   // --- profil wysokości: lista celów (w wierszach) rozmieszczona wzdłuż poziomu
   const nWay = 6, way: number[] = [base - 2];
-  for (let i = 1; i < nWay; i++) way.push(rng.int(TOP_GY + 2, base - 2));
-  way.push(boss ? base : rng.int(TOP_GY + 2, base - 6));
+  // na przemian wysoko i nisko: duże wahania wysokości, jak w Sonicu (wzgórza, doliny, wieże)
+  for (let i = 1; i < nWay; i++) way.push(i % 2 === 1 ? rng.int(TOP_GY + 1, TOP_GY + 9) : rng.int(base - 10, base - 3));
+  way.push(boss ? base : rng.int(TOP_GY + 1, TOP_GY + 7));
   // strefa „na poziomie bazowym”: dojście do areny bossa / sali przewodów (trasa musi tam zejść na dno)
   const baseAnchor = merged.find((a) => a.kind.includes('arena') || a.kind.includes('hub'));
   const baseFrom = baseAnchor ? baseAnchor.x0 - 34 : Infinity;
@@ -102,7 +107,7 @@ export function buildRun2(j: LevelJson, rng: Rng, style: Style, boss: BossId | u
   const slopeCol = (x: number, row: number, tile: number) => { b.col(x, 0, H - 1, T.EMPTY); b.col(x, row + 1, H - 1, T.SOLID); b.set(x, row, tile); b.route[x] = row; };
 
   const pieces: Record<string, Piece> = {
-    flat: (x, room) => { const n = rng.int(4, 8); flat(x, x + n); return Math.min(n, room); },
+    flat: (x, room) => { const n = rng.int(3, 6); flat(x, x + n); return Math.min(n, room); },
     gap: (x) => {
       const d = diffAt(x); const w = d === 0 ? 2 : d === 1 ? rng.int(2, 3) : rng.int(2, 4);
       if (water) { const n = w + 3; const g0 = gy; gy = Math.min(base, gy + 2); b.ground(x, x + n, gy); for (let q = x; q < x + n; q++) b.route[q] = gy; void g0; return n; }
@@ -137,7 +142,7 @@ export function buildRun2(j: LevelJson, rng: Rng, style: Style, boss: BossId | u
     /** ściana (5–10 wierszy) z kratką lub liną: wspinaczka w górę; nad ścianą płaskowyż */
     climb: (x) => {
       const hmax = Math.min(gy - TOP_GY, 10); const hs = water ? [6, 8, 10, 12] : [5, 6, 8, 10]; const opts = hs.filter((v) => v <= (water ? gy - TOP_GY : hmax));
-      if (!opts.length) return -1; const h = rng.pick(opts);
+      if (!opts.length) return -1; const h = rng.chance(0.6) ? Math.max(...opts) : rng.pick(opts);
       flat(x, x + 4);
       if (!water) for (let r = gy - h; r < gy; r++) b.set(x + 3, r, CLIMBT);
       const top = gy - h; b.ground(x + 4, x + 10, top); for (let q = x + 4; q < x + 10; q++) b.route[q] = top;
@@ -146,14 +151,14 @@ export function buildRun2(j: LevelJson, rng: Rng, style: Style, boss: BossId | u
     /** sprężyna pod ścianą 9–11 wierszy (apex ≈ 12,9 kafla) */
     spring: (x) => {
       if (water) return -1;
-      const h = rng.pick([9, 10, 11]); if (gy - h < TOP_GY) return -1;
+      const h = rng.chance(0.6) ? 11 : rng.pick([9, 10, 11]); if (gy - h < TOP_GY) return -1;
       flat(x, x + 3); b.set(x + 1, gy - 1, T.SPRING_U); reserve(x + 1, x + 2);
       const top = gy - h; b.ground(x + 3, x + 9, top); for (let q = x + 3; q < x + 9; q++) b.route[q] = top;
       gy = top; return 9;
     },
     /** zrzut w dół o 5–9 wierszy */
     drop: (x) => {
-      const d = rng.pick([5, 7, 9]); if (gy + d > base) return -1;
+      const feas = [5, 7, 9].filter((v) => gy + v <= base); if (!feas.length) return -1; const d = rng.chance(0.6) ? Math.max(...feas) : rng.pick(feas);
       flat(x, x + 2); gy += d; flat(x + 2, x + 8); return 8;
     },
     pit: (x) => {
@@ -241,6 +246,7 @@ export function buildRun2(j: LevelJson, rng: Rng, style: Style, boss: BossId | u
   };
 
   const plan = [...(PLAN[id] ?? [])];
+  const log: string[] = []; PIECES.set(id, log);
   const done = new Set<string>(); const tries: Record<string, number> = {};
   const MUST: [number, string][] = [[0.1, 'hill'], [0.2, 'climb'], [0.3, 'vaultM'], [0.5, 'loft'], [0.68, 'vaultD']];
   const fillSpan = (a: number, c: number) => {
@@ -258,8 +264,8 @@ export function buildRun2(j: LevelJson, rng: Rng, style: Style, boss: BossId | u
         const want = gy - target(x + 10);                                  // > 0: za nisko, trzeba w górę
         const weights = names.map((n) => {
           let wgt = Math.max(0, LEVEL_BOOST[id]?.[n] ?? NEW_WORLD[world]?.[n] ?? NEW_BASE[n] ?? 0);
-          if (want > 3) { if (UP.has(n)) wgt *= 3; if (DOWN.has(n)) wgt *= 0.15; }
-          else if (want < -3) { if (DOWN.has(n)) wgt *= 3; if (UP.has(n)) wgt *= 0.15; }
+          if (want > 3) { if (UP.has(n)) wgt *= 5; if (DOWN.has(n)) wgt *= 0.1; }
+          else if (want < -3) { if (DOWN.has(n)) wgt *= 5; if (UP.has(n)) wgt *= 0.1; }
           return wgt;
         });
         const tot = weights.reduce((s, v) => s + v, 0);
@@ -279,9 +285,10 @@ export function buildRun2(j: LevelJson, rng: Rng, style: Style, boss: BossId | u
         used = pieces[pick](x, room);
         if (used < 0) { if (planned && (tries[pick] = (tries[pick] ?? 0) + 1) < 4) plan.push(pick); used = pieces.flat(x, room); pick = 'flat'; } else done.add(pick);
       }
+      log.push(`${pick}@${x}/${gy}`);
       if (x + used > c - 1) used = Math.min(used, c - x);
       x += used;
-      if (pick !== 'flat' && x < c) { const tail = Math.min(rng.int(3, 4), c - x); flat(x, x + tail); x += tail; }
+      if (pick !== 'flat' && x < c) { const tail = Math.min(UP.has(pick) || DOWN.has(pick) || pick === 'hill' ? rng.int(2, 3) : rng.int(3, 4), c - x); flat(x, x + tail); x += tail; }
     }
   };
 
@@ -362,7 +369,7 @@ export function buildRun2(j: LevelJson, rng: Rng, style: Style, boss: BossId | u
   if (id === 'W8-L2') hubMaze(b, rng, j);
   if (id === 'W8-L3') hallOfStatues(b, rng, j);
 
-  REWARDS.set(id, rewards);
+  REWARDS.set(id, rewards); ROUTES.set(id, b.route);
   const main = b.toRoom(world, 'main', !!style.dark, { x: P(3) + 16, y: P(spawnRow) });
   main.bossArena = boss ? { x0: arenaX0, x1: W } : undefined;
   const allRooms = (b as unknown as { _rooms?: Room[] })._rooms; if (allRooms) rooms.push(...allRooms);

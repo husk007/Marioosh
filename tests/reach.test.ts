@@ -3,31 +3,29 @@ import { LEVEL_IDS, getLevel } from '../src/game/levels';
 import { runBot } from './bot';
 
 /**
- * Regresja osiągalności: prosty bot (tests/bot.ts, tryb „god” — wrogowie nie ranią, kolce i przepaście tak)
- * musi dotrzeć do wyjścia lub areny bossa. Bot jest prosty i NIE potrafi wszystkiego — poziomy poniżej
- * są znane jako „poza zasięgiem bota” i wymagają testu ręcznego (patrz docs/TESTING.md).
- * Lista jest celowo jawna: usuwaj wpisy, gdy bot się poprawi.
+ * Regresja osiągalności: bot (tests/bot.ts, tryb „god” — wrogowie nie ranią, kolce i przepaście tak) musi
+ * dotrzeć do wyjścia lub areny bossa — OSOBNO jako Marioosh i jako Darioosh, po trasie głównej, którą generator
+ * gwarantuje obu braciom. Wieża (W6-L2, tryb pionowy) ma własne testy etapów w tests/tower.test.ts.
+ * Lista wyjątków jest jawna: usuwaj wpisy, gdy bot się poprawi.
  */
 const BOT_LIMITS: Record<string, string> = {
-  'W3-L4': 'lądowanie na 3-kafelkowej wysepce po skoku z platformy (bot nie hamuje w powietrzu)',
-  'W6-L2': 'tryb wieży (pionowy) — bot biegnie tylko poziomo',
-  'W7-L1': 'kombinacje przepaść+kolce+ruchome platformy (bot ginie w pętli)',
-  'W7-L2': 'jw.',
-  'W7-L3': 'jw. (poziom z częścią pionową)',
-  'W7-L4': 'jw. (arena bossa)',
-  'W8-L4': 'finałowy poziom z zagadką — bot nie rozwiązuje',
+  'W6-L2': 'tryb wieży (pionowy) — testowany etapami w tests/tower.test.ts',
 };
+const only = process.env.LV?.split(',');
 
 describe('osiągalność poziomów (bot)', () => {
   for (const id of LEVEL_IDS) {
+    if (only && !only.includes(id)) continue;
     const L = getLevel(id);
-    const name = `${id} (${L.mode})`;
-    if (BOT_LIMITS[id]) { it.skip(`${name} — poza zasięgiem bota: ${BOT_LIMITS[id]}`, () => {}); continue; }
-    it(name, () => {
-      const r = runBot(id, 400);
-      const ok = r.cleared || r.reachedArena;
-      if (!ok) console.log(id, JSON.stringify(r));
-      expect(ok, JSON.stringify(r)).toBe(true);
-    }, 120000);
+    for (const br of ['M', 'D'] as const) {
+      const name = `${id} (${L.mode}) ${br === 'M' ? 'Marioosh' : 'Darioosh'}`;
+      if (BOT_LIMITS[id]) { it.skip(`${name} — ${BOT_LIMITS[id]}`, () => {}); continue; }
+      it(name, () => {
+        const r = runBot(id, 300, 0, undefined, true, br);
+        const ok = r.cleared || r.reachedArena;
+        if (!ok) console.log(id, br, JSON.stringify(r));
+        expect(ok, JSON.stringify(r)).toBe(true);
+      }, 200000);
+    }
   }
 });

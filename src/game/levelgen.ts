@@ -48,7 +48,15 @@ export class RoomB {
   /** trwałe podłoże (nie znika ani się nie kruszy) */
   stable(x: number, from = 7): boolean { for (let y = from; y < this.h; y++) { const t = this.get(x, y); if (t === T.SOLID || t === T.ONEWAY || t === T.CONVL || t === T.CONVR) return true; if (t !== T.EMPTY && t !== T.LADDER && t !== T.CABLE && t !== T.GATE && t !== T.CLIMB && t !== T.ROPE) return false; } return false; }
   /** czy nad kolumną x można postawić skrzynkę: stałe podłoże pod skrzynką i po obu stronach, skąd przedmiot spadnie na ziemię */
-  crateOK(x: number): boolean { const s = this.ground1(x); return s > 3 && this.stable(x, s) && this.stable(x - 1, s - 3) && this.stable(x + 1, s - 3); }
+  crateOK(x: number): boolean {
+    const s = this.ground1(x); if (!(s > 3 && this.stable(x, s) && this.stable(x - 1, s - 3) && this.stable(x + 1, s - 3))) return false;
+    // nie przy ścianach, zboczach, linach i sprężynach: skrzynka nie może zasłaniać drogi w górę
+    for (let dx = -3; dx <= 3; dx++) {
+      const r = this.route[x + dx]; if (r >= 0 && Math.abs(r - s) > 1) return false;
+      for (let y = Math.max(0, s - 12); y < s; y++) { const t = this.get(x + dx, y); if (t === T.CLIMB || t === T.ROPE || t === T.SPRING_U) return false; }
+    }
+    return true;
+  }
   toRoom(world: number, name: string, dark: boolean, spawn: { x: number; y: number }): Room {
     return { w: this.w, h: this.h, tiles: this.tiles, water: this.water, specs: this.specs, world, dark, name, spawn };
   }
@@ -410,22 +418,48 @@ export function hallOfStatues(b: RoomB, rng: Rng, j: LevelJson) {
 }
 
 // ---------------------------------------------------------------- wieża (6-2): poziom pionowy
+/** etapy wieży (do testów osiągalności): schody z platform, wspinaczka po kratce, sprężyna */
+export interface TowerStage { kind: 'stairs' | 'climb' | 'spring'; x0: number; w: number; row: number; xg?: number; fromRow?: number }
+export const TOWER_STAGES = new Map<string, TowerStage[]>();
 export function buildTower(j: LevelJson, rng: Rng, style: Style) {
   const id = j.level_id, W = 30, H = 100; const b = new RoomB(W, H);
   b.block(0, 0, 1, H); b.block(W - 1, 0, 1, H);
   const base = H - 3; b.ground(1, W - 1, base); b.col(0, 0, H - 1); b.col(W - 1, 0, H - 1);
   const plats: { x0: number; w: number; row: number }[] = [];
-  let row = base, x0 = 12, n = 0;
-  while (row > 16) {
-    row -= 2;                                             // 64 px różnicy — osiągalne dla obu braci
-    const w = rng.int(4, 5);
-    x0 = Math.max(2, Math.min(W - 2 - w, x0 + rng.int(-6, 6)));
-    if (n % 7 === 6) { b.specs.push({ t: 'platform', x: P(x0), y: P(row), w, mode: 'phase', range: 0, speed: 3.6, offset: 0 }); }
-    else b.oneway(x0, w, row);
-    plats.push({ x0, w, row }); n++;
+  const stages: TowerStage[] = []; TOWER_STAGES.set(id, stages);
+  const cl = (v: number, w: number) => Math.max(2, Math.min(W - 2 - w, v));
+  // kolejna półka schodów zawsze nachodzi na poprzednią co najmniej 3 kafle — skok w górę nie wymaga wtedy ruchu w bok
+  const lap = (v: number, w: number) => { const q = plats.length ? plats[plats.length - 1] : { x0: 2, w: W - 4 }; return cl(Math.max(q.x0 - w + 3, Math.min(q.x0 + q.w - 3, v)), w); };
+  let row = base, x0 = 12, n = 0, st = 0;
+  const climbT = T.CLIMB;
+  const kinds: TowerStage['kind'][] = ['stairs', 'climb', 'stairs', 'spring', 'stairs', 'climb', 'spring', 'stairs'];
+  const addPlat = (px: number, w: number, r: number, kind: TowerStage['kind']) => {
+    b.oneway(px, w, r);
+    plats.push({ x0: px, w, row: r }); n++;
+  };
+  while (row > 28) {
+    let kind = kinds[st++ % kinds.length];
+    if ((kind === 'climb' && row - 10 < 14) || (kind === 'spring' && row - 11 < 14)) kind = 'stairs';
+    if (kind === 'stairs') {
+      for (let k = 0; k < 3 && row > 22; k++) {
+        row -= rng.pick([2, 2, 3]); const w = rng.int(5, 6);
+        x0 = lap(x0 + rng.int(-5, 5), w); addPlat(x0, w, row, 'stairs'); stages.push({ kind, x0, w, row });
+      }
+    } else if (kind === 'climb') {
+      // kratka wisi swobodnie: Marioosh męczy się po ok. 3 s (10 wierszy = ok. 2,5 s), Darioosh wspina się bez limitu
+      const cur = plats.length ? plats[plats.length - 1] : { x0: 2, w: W - 4, row: base };
+      const xg = cur.x0 + Math.floor(cur.w / 2), h = 10;
+      for (let r = row - h - 1; r < row; r++) b.set(xg, r, climbT);   // kratka sięga o kafel ponad półkę; półka leży obok niej (bez dziury w podłodze)
+      const fromRow = row; row -= h; const w = 6; x0 = xg + 1 + w <= W - 2 ? xg + 1 : xg - w; addPlat(x0, w, row, 'climb'); stages.push({ kind, x0, w, row, xg, fromRow });
+    } else {
+      const cur = plats.length ? plats[plats.length - 1] : { x0: 2, w: W - 4, row: base };
+      const xs = cur.x0 + 1; b.set(xs, row - 1, T.SPRING_U);
+      const fromRow = row; row -= 11; const w = 7; x0 = cl(xs - 2, w); addPlat(x0, w, row, 'spring'); stages.push({ kind, x0, w, row, xg: xs, fromRow });
+    }
   }
+  while (row > 22) { row -= 2; const w = rng.int(5, 6); x0 = lap(x0 + rng.int(-5, 5), w); addPlat(x0, w, row, 'stairs'); stages.push({ kind: 'stairs', x0, w, row }); }
   // szczyt: szeroka półka z metą
-  const summit = row - 2; b.block(1, summit, W - 2, 3);
+  const summit = row - 3; b.oneway(1, W - 2, summit);   // szczyt: jednokierunkowa podłoga — wskakuje się od spodu, mieści się w skoku Marioosha
   const frac = (tx: number) => Math.min(0.97, Math.max(0.03, tx / j.width_tiles));
   const at = (f: number) => plats[Math.min(plats.length - 1, Math.floor(f * plats.length))];
   j.petrified_residents_x_tile.forEach((tx, i) => { const p = at(frac(tx)); b.specs.push({ t: 'statue', idx: i, x: P(p.x0 + 2) + 16, y: P(p.row), id: `${id}-S${i + 1}` }); });
