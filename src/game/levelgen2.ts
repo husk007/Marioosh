@@ -321,6 +321,16 @@ export function buildRun2(j: LevelJson, rng: Rng, style: Style, boss: BossId | u
   }
   if (water) for (let i = 0; i < b.water.length; i++) b.water[i] = 1;
 
+  // --- podpowiedzi do nowych mechanik: przy pierwszym wystąpieniu danego elementu na trasie (raz na poziom)
+  const HINT_OF: Record<string, string> = { hill: 'hint.slope', ramp: 'hint.slope', slide: 'hint.slope', climb: 'hint.climb', spring: 'hint.spring', loft: 'hint.spring', vaultM: 'hint.pound', vaultD: 'hint.walljump', gap: 'hint.glide', ice: 'hint.ice', sand: 'hint.sand', oil: 'hint.oil' };
+  { const seen = new Set<string>(); const lastX = new Set<number>();
+    for (const e of log) {
+      const m = /^(\w+)@(\d+)/.exec(e); if (!m) continue; const key = HINT_OF[m[1]]; if (!key || seen.has(key)) continue;
+      let hx = Math.max(2, +m[2] - 5); while (lastX.has(hx)) hx += 5;      // dwie podpowiedzi nigdy w tym samym miejscu
+      seen.add(key); lastX.add(hx); b.specs.push({ t: 'hint', x: P(hx), y: 0, w: P(5), key });
+    }
+  }
+
   // --- posągi, checkpoint, wyjście
   j.petrified_residents_x_tile.forEach((sx, i) => { const s = b.surface(sx); specs.push({ t: 'statue', idx: i, x: P(sx) + 16, y: P(s < 0 ? gy : s), id: `${id}-S${i + 1}` }); });
   const cpS = b.surface(j.checkpoint_x_tile); specs.push({ t: 'checkpoint', x: P(j.checkpoint_x_tile) + 16, y: P(cpS) });
