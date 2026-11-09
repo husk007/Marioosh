@@ -19,7 +19,7 @@ Dokument opisuje, co z `08–11` jest w kodzie, jak to sprawdzono i gdzie implem
 | **W1-L1, W1-L2, W1-L4** (z bossem Rogomirem) | ✔ | `maps/w1l1.ts`, `w1l2.ts`, `w1l4.ts` |
 | Wrogowie ×1,4 (hitbox i sprite), telegrafy ataku 0,5 s (Roguś, Gekoróg-typ) | ✔ częściowo | `enemies.ts`, `worldDraw.ts` |
 | Fragmenty grawitacji: **W5-L1** (Skaltria 1,14 g) i **W6-L1** (Vespera 0,86 g, opcjonalna wyspa za przerwą 5 kafli) | ✔ (prototypy, tylko tryb testera) | `maps/proto.ts`, `tests/authored-negative.test.ts` |
-| Rogomir bez stompa: 3 generatory (okno 28 s), pancerz, szarża wolniejsza od biegu, pomosty-schrony, skala bossa ×1,5 | ✔ | `bosses.ts`, `maps/w1l4.ts`, `tests/boss.test.ts` |
+| Rogomir bez stompa: 3 generatory (okno 28 s), pancerz, szarża wolniejsza od biegu, ciągły pomost-schron (przejście nad bossem, drabiny przy ścianach, utknięcie 5,5 s), skala bossa ×1,5 | ✔ | `bosses.ts`, `maps/w1l4.ts`, `tests/boss.test.ts` |
 
 ## 2. Jak sprawdzono przejezdność
 `tests/reach.ts` buduje graf stanów, w którym **krawędzie to makra symulowane prawdziwym `stepMovement`** (chód, bieg + skok z rozbiegu, zeskok przez platformę, drabina), a dodatkowo abstrakcyjne przejścia: drzwi, windy, przełączniki → bramy (iteracyjnie). Bez trybu „god”: kolce, wypadnięcie z poziomu i upadek ≥ 2,4 m kończą krawędź. `tests/authored.test.ts` wymaga, by **każdy brat osobno** dotarł do checkpointów, wyjścia, wszystkich przełączników, posągów i wszystkich opakowań oraz by budżet PET/puszek zgadzał się z `levels.json`. `tests/authored-negative.test.ts` dowodzi, że analizator nie jest zbyt łaskawy (bez drabiny/windy/przełącznika poziom przestaje być przejezdny).

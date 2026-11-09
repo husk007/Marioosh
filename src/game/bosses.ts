@@ -72,12 +72,12 @@ export function hitBoss(b: BossRT, how: 'key' | 'spark' | 'stomp'): boolean {
   return true;
 }
 
-function chargeLike(b: BossRT, c: BossCtx, dt: number, base: number, stuckT: number, onStuck?: () => void, windupT = 0.75) {
+function chargeLike(b: BossRT, c: BossCtx, dt: number, base: number, stuckT: number, onStuck?: () => void, windupT = 0.75, chargeT = 3, ramp = 35) {
   switch (b.st) {
     case 'intro': grav(b, c, dt); if (b.t <= 0) { b.st = 'idle'; b.t = 1.2; } break;
     case 'idle': b.b.vx = 0; grav(b, c, dt); faceP(b, c); if (b.t <= 0) { b.st = 'windup'; b.t = windupT; c.sfx('warn'); } break;
-    case 'windup': b.b.vx = 0; grav(b, c, dt); if (b.t <= 0) { b.st = 'charge'; b.t = 3; } break;
-    case 'charge': b.b.vx = b.dir * (base + b.cycle * 35); grav(b, c, dt); clampArena(b);
+    case 'windup': b.b.vx = 0; grav(b, c, dt); if (b.t <= 0) { b.st = 'charge'; b.t = chargeT; } break;
+    case 'charge': b.b.vx = b.dir * (base + b.cycle * ramp); grav(b, c, dt); clampArena(b);
       if (b.b.hitWall || b.t <= 0) { b.st = 'stuck'; b.t = stuckT; b.b.vx = 0; c.shake(5); c.sfx('rock'); onStuck?.(); } break;
     case 'stuck': b.b.vx = 0; grav(b, c, dt); if (b.t <= 0) { b.st = 'recover'; b.t = 0.6; b.cycle++; } break;
     case 'recover': b.b.vx = 0; grav(b, c, dt); if (b.t <= 0) { b.st = 'idle'; b.t = 0.9; } break;
@@ -96,7 +96,7 @@ export function updateBoss(b: BossRT, dt: number, c: BossCtx): void {
       else if (!b.armor && live < gens.length && b.data.hp0 === b.hp) { b.armor = true; }   // okno się skończyło — pancerz wraca
       if (b.data.hp0 === undefined) b.data.hp0 = b.hp;
       if (b.hp < b.data.hp0) { b.data.hp0 = b.hp; for (const s of gens) { s.on = false; s.latch = 0; } b.armor = true; }
-      chargeLike(b, c, dt, 150, 2.8, undefined, 0.95);
+      chargeLike(b, c, dt, 150, 5.5, undefined, 0.95, 14, 8);   // szarża zawsze kończy się na ścianie areny; po utknięciu 5,5 s na zejście drabiną (ok. 2,4 s) i cios
       break;
     }
     case 'ceratopsor': {

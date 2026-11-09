@@ -1,7 +1,7 @@
 /**
  * W1-L4 „Przetwornia Żukoroga” (docs/design/09 §4): wielopoziomowa hala mocy → arena Rogomira.
  * Hala: schody na taras z rozdzielnicą A → zejście → winda techniczna na pomost z rozdzielnicą B → brama (2 rozdzielnice) → arena.
- * Arena: trzy pomosty z generatorami (L, środek, P) osiągalne drabinami; Rogomir szarżuje po podłodze POD pomostami (pomost jest bezpieczny),
+ * Arena: jeden ciągły pomost z trzema generatorami, drabiny przy ścianach i w środku; Rogomir szarżuje po podłodze POD pomostem (pomost jest bezpieczny),
  * a po odłączeniu wszystkich trzech generatorów (okno 28 s) traci pancerz — gdy utknie, uderz go kluczem. Trafienie podłącza generatory z powrotem.
  * Brak skakania po głowach: kontakt z Rogomirem zawsze rani, poza chwilą, gdy utknął.
  */
@@ -22,10 +22,10 @@ export function buildW1L4(): LevelData {
   c.rect(37, 3, 37, 9, '#'); c.rect(51, 3, 51, 9, '#');
   // brama do areny
   c.rect(56, 3, 56, 14, '1');
-  // arena: trzy pomosty (4 kafle nad podłogą — Rogomir przechodzi pod nimi), drabiny przy końcach, ściany ochronne
-  c.rect(60, 11, 69, 11, '='); c.ladder(70, 11, 14); c.rect(59, 3, 59, 11, '#'); c.rect(71, 3, 71, 11, '#');
-  c.rect(80, 11, 89, 11, '='); c.ladder(79, 11, 14); c.ladder(90, 11, 14); c.rect(78, 3, 78, 11, '#'); c.rect(91, 3, 91, 11, '#');
-  c.rect(101, 11, 110, 11, '='); c.ladder(100, 11, 14); c.rect(99, 3, 99, 11, '#');
+  // arena: jeden ciągły pomost (4 kafle nad podłogą — Rogomir przechodzi pod nim) przez całą szerokość, drabiny przy lewej ścianie, w środku i przy prawej ścianie.
+  // Pomost pozwala przejść nad bossem w dowolną stronę; do ciosu schodzisz drabiną tam, gdzie boss utknął przy ścianie.
+  c.rect(60, 11, 110, 11, '='); c.rect(59, 3, 59, 11, '#');
+  for (const x of [62, 85, 108]) c.ladder(x, 11, 14);
 
   // znaczniki: hala
   c.set(2, 14, 'S'); c.set(36, 0, '?');
@@ -44,10 +44,10 @@ export function buildW1L4(): LevelData {
   c.set(7, 14, 'z'); c.set(26 + 2, 11, 'z'); c.set(42, 14, 'z'); c.set(54, 14, 'z');
   // arena
   c.set(59, 14, 'T');
-  for (const x of [62, 66]) c.set(x, 10, 'p');
-  c.set(87, 10, 'p');
-  c.set(63, 10, 'G'); c.set(84, 10, 'G'); c.set(107, 10, 'G');
-  for (const x of [70 - 3, 85, 100 - 3]) c.set(x, 14, 'k');
+  for (const x of [64, 74]) c.set(x, 10, 'p');
+  c.set(94, 10, 'p');
+  c.set(68, 10, 'G'); c.set(82, 10, 'G'); c.set(100, 10, 'G');
+  for (const x of [67, 85, 97]) c.set(x, 14, 'k');
   c.set(94, 14, 'B');
 
   const room = new AuthoredRoom('W1-L4:main', c.rows(), { name: 'main', world: 1, bossArena: { x0: 58, x1: 111 } });

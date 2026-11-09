@@ -64,4 +64,33 @@ describe('Rogomir v0.4 (bez skakania po głowie)', () => {
     let vmax = 0; for (let i = 0; i < 400; i++) { w.update(DT, [idle(), idle()]); vmax = Math.max(vmax, Math.abs(b.b.vx)); }
     expect(vmax).toBeGreaterThan(100); expect(vmax).toBeLessThan(168);
   });
+  it('pomost jest ciągły: można przebiec nad bossem przez całą arenę (z lewej na prawą) bez obrażeń', () => {
+    const w = arena(); const p = w.players[0]; const b = w.rt.boss!; const m = p.mv.body;
+    m.x = 61 * TILE; m.y = 11 * TILE - m.h; p.safe = { x: m.x + m.w / 2, y: 11 * TILE };
+    b.started = true; b.b.x = 90 * TILE;
+    const inp = idle(); inp.held.right = true; inp.held.run = true;
+    for (let i = 0; i < 60 * 14; i++) w.update(DT, [inp, idle()]);
+    expect(m.x).toBeGreaterThan(105 * TILE); expect(p.hp).toBe(MAX_HP); expect(m.y + m.h).toBeCloseTo(11 * TILE, 0);
+  });
+  it('szarża kończy się zawsze przy ścianie areny, a utknięcie trwa ≥ 5,5 s (czas na zejście drabiną i cios)', () => {
+    const w = arena(); const p = w.players[0]; const b = w.rt.boss!; const m = p.mv.body;
+    m.x = 70 * TILE; m.y = 11 * TILE - m.h; p.safe = { x: m.x + m.w / 2, y: 11 * TILE };
+    b.started = true; b.b.x = 90 * TILE;
+    let stuckStart = -1; const stuckAt: number[] = []; const lens: number[] = [];
+    for (let i = 0; i < 60 * 40; i++) {
+      w.update(DT, [idle(), idle()]);
+      if (b.st === 'stuck' && stuckStart < 0) { stuckStart = i; stuckAt.push(b.b.x); }
+      if (b.st !== 'stuck' && stuckStart >= 0) { lens.push((i - stuckStart) * DT); stuckStart = -1; }
+    }
+    expect(stuckAt.length).toBeGreaterThanOrEqual(2);
+    for (const x of stuckAt) expect(x < 58 * TILE + 4 || x + b.b.w > 111 * TILE - 4).toBe(true);
+    for (const l of lens) expect(l).toBeGreaterThan(5.4);
+  });
+  it('zejście drabiną z pomostu na podłogę arony trwa < 3,5 s (zostaje ≥ 2 s okna utknięcia bossa na cios)', () => {
+    const w = arena(); const p = w.players[0]; const m = p.mv.body; w.rt.boss!.started = false;
+    m.x = 62.5 * TILE - m.w / 2; m.y = 11 * TILE - m.h; m.vx = m.vy = 0; step(w, 3);
+    const inp = idle(); inp.held.down = true; let t = 0;
+    while (t < 5 && !(m.onGround && m.y + m.h > 14 * TILE)) { w.update(DT, [inp, idle()]); t += DT; }
+    expect(m.y + m.h).toBeCloseTo(15 * TILE, 0); expect(t).toBeLessThan(3.5);
+  });
 });

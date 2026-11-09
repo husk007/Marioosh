@@ -5,7 +5,7 @@
 - **Grawitacja per planeta** (0,86–1,14 g, `PLANET_PHYSICS`).
 - **Zasady gry:** HP 3 + tarcza, **bez żyć, game over i zegara**, bez przeskoku na głowę wrogów; przepaść = −1 HP i powrót na ostatnie bezpieczne miejsce; kaucja tylko z opakowań. HUD z trzema sercami.
 - **Poziomy projektowane ręcznie** (ASCII + logika): drzwi i terminale pełnej wielkości, windy z postojem, schody 26°. Gotowe: **W1-L1, W1-L2, W1-L4**. Pozostałe 29 oznaczone WIP na mapie.
-- **Rogomir** przeprojektowany: trzy generatory zdejmują pancerz, szarża wolniejsza od biegu, pomosty-schrony, skala ×1,5.
+- **Rogomir** przeprojektowany: trzy generatory zdejmują pancerz, szarża wolniejsza od biegu, ciągły pomost-schron (przejście nad bossem, drabiny przy ścianach, utknięcie 5,5 s), skala ×1,5.
 - **Testy:** nowy analizator przejezdności oparty na prawdziwym kontrolerze ruchu (bez trybu „god”) dla obu braci, testy negatywne, testy walki z Rogomirem; testy v0.3 przeniesione do `tests/legacy/`.
 - Dokumentacja: `docs/design/08–12` (specyfikacja v0.4 i stan implementacji), `07` oznaczony jako historyczny.
 
