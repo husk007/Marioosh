@@ -8,7 +8,7 @@ import { BossCtx, bossHarmful, hitBoss, makeBoss, updateBoss } from './bosses';
 import {
   BROTHERS, INVULN_AFTER_HIT, KEY_ACTIVE, KEY_WINDUP, PETRIFY_DECAY, PETRIFY_DELAY, PETRIFY_MAX, PETRIFY_RATE, PETRIFY_TIER1, PETRIFY_TIER2,
   PICKUP_RADIUS, SPARK_BOUNCES, SPARK_LIFE, SPARK_MAX, SPARK_SPEED, STATUE_TIME_COOP, TELEPORT_TIME, MAX_HP, effectiveGravity, TILE, TIME_EXTENDER, TIME_GLOVES,
-  TIME_MAGNET, TIME_STAR, VH, VW, type Brother,
+  TIME_MAGNET, TIME_STAR, VH, VW, AIR_MAX, AIR_WARN, AIR_REFILL, DROWN_INTERVAL, type Brother,
 } from './constants';
 import {
   Beam, Crate, Current, Decor, EcoEnt, Enemy, GateEnt, Hint, Item, LanternEnt, Particle, Plat, PlayerEnt, Projectile, RoomRT, StatueEnt, SwitchEnt, noUpgrades,
@@ -74,6 +74,7 @@ export class World {
     const rt: RoomRT = {
       room, tiles, grid, enemies: [], items: [], crates: [], cables: [], statues: [], switches: [], gates: [], plats: [], checkpoints: [], exits: [], ecos: [],
       lamps: [], lanterns: [], hints: [], currents: [], rains: [], decor: [], signs: [], crumble: new Map(), boss: null,
+      water: room.water.slice(), floods: [], spans: [],
     };
     const S = this.session;
     for (const s of room.specs) {
@@ -103,6 +104,8 @@ export class World {
         case 'lantern': rt.lanterns.push({ id: s.id, x: s.x, y: s.y, lit: false }); break;
         case 'hint': rt.hints.push({ x: s.x, w: s.w, key: s.key, shown: false }); break;
         case 'rain': rt.rains.push({ x0: s.x0, x1: s.x1, interval: s.interval }); break;
+        case 'span': rt.spans.push({ gate: s.gate, cells: s.cells, done: false }); break;
+        case 'flood': rt.floods.push({ x0: s.x0, x1: s.x1, y0: s.y0 ?? 0, y1: s.y1 ?? 9999, from: s.from, to: s.to, speed: s.speed, gate: s.gate, cur: s.from }); break;
         case 'current': rt.currents.push({ x: s.x, y: s.y, w: s.w, h: s.h, fx: s.fx, fy: s.fy }); break;
         case 'decor': rt.decor.push({ k: s.k, x: s.x, y: s.y, hits: 0, state: 0 }); break;
         case 'sign': rt.signs.push({ x: s.x, y: s.y, symbol: s.symbol }); break;
@@ -122,7 +125,7 @@ export class World {
     return {
       idx, brother, mv, upg: { M: noUpgrades(), D: noUpgrades() }, invuln: 0, dead: false, deadT: 0, downed: false,
       atk: { phase: 'none', t: 0, cd: 0, swing: 0, hitList: new Set() }, sparks: 0, petrify: 0, petDelay: 0, statue: 0, tele: null, anim: 0, hurtT: 0, face: 1,
-      respawn: { x, y }, trail: [], bounceHold: false, spawnProtect: 1.0, hp: MAX_HP, safe: { x, y },
+      respawn: { x, y }, trail: [], bounceHold: false, spawnProtect: 1.0, hp: MAX_HP, safe: { x, y }, air: AIR_MAX, drownT: 0,
     };
   }
 
@@ -139,7 +142,7 @@ export class World {
   }
   waterAt(x: number, y: number): boolean {
     const r = this.rt.room; const tx = Math.floor(x / TILE), ty = Math.floor(y / TILE);
-    return tx >= 0 && ty >= 0 && tx < r.w && ty < r.h && r.water[ty * r.w + tx] === 1;
+    return tx >= 0 && ty >= 0 && tx < r.w && ty < r.h && this.rt.water[ty * r.w + tx] === 1;
   }
   private aiCtx(): AICtx & BossCtx {
     const self = this;
@@ -168,7 +171,7 @@ export class World {
     this.session.run.time += dt;
     const rt = this.rt; const ctx = this.aiCtx();
     this.updatePlatforms(dt);
-    this.updateSwitchesGates(dt);
+    this.updateSwitchesGates(dt); this.updateFloods(dt);
     this.updateCrumble(dt);
     this.players.forEach((p, i) => this.updatePlayer(p, inputs[i] ?? inputs[0], dt));
     this.coopSafety();
@@ -230,6 +233,32 @@ export class World {
       }
     }
   }
+  /** powietrze: głowa pod wodą → ubywa; nad wodą / w suchej komorze → szybko przybywa; po wyczerpaniu obrażenia co DROWN_INTERVAL */
+  private updateAir(p: PlayerEnt, head: boolean, dt: number): void {
+    if (head) {
+      p.air = Math.max(0, p.air - dt);
+      if (p.air <= 0) { p.drownT -= dt; if (p.drownT <= 0) { p.drownT = DROWN_INTERVAL; this.sfx('hit'); this.hurtPlayer(p, px(p.mv.body), true); } }
+      else p.drownT = 0.4;
+      if (Math.random() < dt * 1.6) this.parts.push({ x: px(p.mv.body) + (Math.random() - 0.5) * 8, y: p.mv.body.y + 8, vx: 0, vy: -50, life: 0.9, max: 0.9, color: '#bfe6f6', size: 2, grav: -30 });
+    } else { p.air = Math.min(AIR_MAX, p.air + dt * AIR_REFILL); p.drownT = 0.4; }
+  }
+  private updateFloods(dt: number): void {
+    const rt = this.rt;
+    for (const sp of rt.spans) {
+      if (sp.done) continue; const sw = rt.switches.filter((s) => s.gate === sp.gate);
+      if (sw.length && sw.every((s) => s.on)) { sp.done = true; for (const [x, y] of sp.cells) if (rt.tiles[y * rt.grid.w + x] === T.EMPTY) rt.tiles[y * rt.grid.w + x] = T.ONEWAY; this.say('toast.bridge'); this.sfx('switch'); this.shake(3); }
+    }
+    if (!rt.floods.length) return;
+    for (const f of rt.floods) {
+      const sw = rt.switches.filter((s) => s.gate === f.gate); const open = sw.length > 0 && sw.every((s) => s.on);
+      if (open && !f.open) { f.open = true; this.say('toast.valve'); this.sfx('switch'); }
+      const target = open ? f.to : f.from;
+      const d = target - f.cur; if (d === 0 && f.applied) continue;
+      f.cur += Math.sign(d) * Math.min(Math.abs(d), f.speed * dt); f.applied = true;
+      const top = Math.ceil(f.cur - 1e-6);
+      for (let y = Math.max(0, f.y0); y <= Math.min(rt.grid.h - 1, f.y1); y++) for (let x = f.x0; x <= f.x1; x++) rt.water[y * rt.grid.w + x] = y >= top ? 1 : 0;
+    }
+  }
   private updateSwitchesGates(dt: number): void {
     const rt = this.rt;
     for (const s of rt.switches) if (s.on && s.latch > 0) { s.latch -= dt; if (s.latch <= 0) s.on = false; }
@@ -286,11 +315,12 @@ export class World {
     const mi = this.inputFor(p, inp);
     if (p.atk.phase === 'wind' || p.atk.phase === 'active') { mi.left = mi.right = false; }
     const cxm = px(b), cym = py(b);
-    const env = { water: this.waterAt(cxm, cym), currentX: 0, currentY: 0, g: this.g };
+    const env = { water: this.waterAt(cxm, cym), head: this.waterAt(cxm, b.y + 6), lip: !this.waterAt(cxm, b.y - 12), currentX: 0, currentY: 0, g: this.g };
     for (const c of rt.currents) if (cxm > c.x && cxm < c.x + c.w && cym > c.y && cym < c.y + c.h) { env.currentX += c.fx; env.currentY += c.fy; }
     const preVy = b.vy; const prevBottom = b.y + b.h;
     stepMovement(mv, mi, rt.grid, dt, env);
     this.landOnPlatforms(p, prevBottom, preVy);
+    this.updateAir(p, env.head, dt);
     if (mv.jumped) { this.sfx('jump'); }
     if (mv.landed) this.sfx('land');
     if (mv.landKind === 'stumble') { this.sfx('hit'); this.burst(px(b), b.y + b.h, '#c8b89a', 6, 60, 120); }
@@ -476,7 +506,7 @@ export class World {
   }
   private activateSwitch(s: SwitchEnt): void {
     s.on = true; this.sfx('switch'); this.say('toast.switchOn'); this.burst(s.x, s.y - 20, '#ffd23f', 8, 90, 0);
-    if (s.gate === 'crane') s.latch = 9; else if (s.gate === 'spot') s.latch = 7; else if (s.gate === 'gen') s.latch = 28;
+    if (s.gate === 'crane') s.latch = 9; else if (s.gate === 'spot') s.latch = 7; else if (s.gate === 'gen') s.latch = 28; else if (s.gate.startsWith('pool')) s.latch = 16;
   }
   private revealCable(c: { hidden: boolean; revealed: boolean; tx: number; ty: number; id: string }): void {
     if (c.revealed) return; c.revealed = true; this.sfx('crate'); this.say('toast.secret'); this.session.secrets.add(c.id);
@@ -693,7 +723,7 @@ export class World {
     this.respawnPlayer(p);
   }
   private respawnPlayer(p: PlayerEnt): void {
-    p.dead = false; p.downed = false; p.petrify = 0; p.invuln = 2; p.spawnProtect = 1.5; p.hp = MAX_HP;
+    p.dead = false; p.downed = false; p.petrify = 0; p.invuln = 2; p.spawnProtect = 1.5; p.hp = MAX_HP; p.air = AIR_MAX; p.drownT = 0;
     const rp = p.respawn; const nb = newMove(p.brother, rp.x + (p.idx ? 18 : 0), rp.y);
     p.mv = nb; p.safe = { x: rp.x, y: rp.y };
     if (this.rt.boss) { const bs = this.rt.boss; const fresh = makeBoss(bs.id, (bs.x0 + bs.x1) / 2 + (bs.x1 - bs.x0) * 0.3, bs.floorY, bs.x0, bs.x1); this.rt.boss = fresh; this.beams = []; this.projs = []; for (const s of this.rt.switches) s.on = false; for (const d of this.rt.decor) { d.state = 0; d.hits = 0; } this.opts.audio.music('w' + this.level.world); }

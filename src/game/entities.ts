@@ -25,6 +25,8 @@ export interface PlayerEnt {
   spawnProtect: number;
   /** punkty życia (v0.4: 3 + tarcza) i ostatnie bezpieczne miejsce (powrót po upadku w przepaść) */
   hp: number; safe: { x: number; y: number };
+  /** powietrze w płucach (s) i licznik utonięcia */
+  air: number; drownT: number;
 }
 
 export interface Enemy {
@@ -61,6 +63,10 @@ export interface RoomRT {
   checkpoints: { x: number; y: number; on: boolean }[]; exits: { x: number; y: number }[]; ecos: EcoEnt[]; lamps: Point[]; lanterns: LanternEnt[];
   hints: Hint[]; currents: Current[]; rains: { x0: number; x1: number; interval: number }[]; decor: Decor[]; signs: { x: number; y: number; symbol: number }[];
   crumble: Map<number, { t: number; gone: boolean }>;
+  water: Uint8Array;
+  /** mosty zwodzone / pomosty: kafle pojawiają się, gdy wszystkie przełączniki bramy `gate` są włączone */
+  spans: { gate: string; cells: [number, number][]; done: boolean }[];
+  floods: { x0: number; x1: number; y0: number; y1: number; from: number; to: number; speed: number; gate: string; cur: number; open?: boolean; applied?: boolean }[];
   boss: BossRT | null;
 }
 

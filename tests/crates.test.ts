@@ -48,7 +48,7 @@ describe('przedmioty wybite ze skrzynek', () => {
         }
       }
     }
-    expect(crates).toBeGreaterThan(100);
+    expect(crates).toBeGreaterThan(60);
     expect(bad).toEqual([]);
   }, 120000);
 });

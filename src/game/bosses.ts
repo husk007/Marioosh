@@ -44,7 +44,7 @@ function faceP(b: BossRT, c: BossCtx) { const p = px(c); if (p) b.dir = p.mv.bod
 /** Czy kontakt rani gracza? */
 export function bossHarmful(b: BossRT): boolean {
   if (b.dead || b.st === 'intro') return false;
-  if (['stuck', 'recover', 'landed', 'dazed'].includes(b.st)) return false;
+  if (['stuck', 'recover', 'landed', 'dazed', 'stranded', 'crouch'].includes(b.st)) return false;
   return true;
 }
 /** Czy można trafić bossa (kluczem/iskrą)? */
@@ -57,7 +57,8 @@ export function bossVulnerable(b: BossRT): boolean {
     case 'kaktogor': return b.data.roots >= 3 && b.armor === false;
     case 'krukorog': return b.st === 'landed';
     case 'rogodron': return b.st === 'exposed';
-    default: return false;     // rogopłetw / katoblepas — tylko mechanika luster / węzłów
+    case 'rogopletw': return b.st === 'stranded';
+    default: return false;     // katoblepas — tylko mechanika węzłów
   }
 }
 
@@ -69,6 +70,7 @@ export function hitBoss(b: BossRT, how: 'key' | 'spark' | 'stomp'): boolean {
   else if (b.st === 'stuck') { b.st = 'recover'; b.t = 1.0; b.cycle++; }
   else if (b.st === 'landed') { b.st = 'rise'; b.t = 1; b.cycle++; }
   else if (b.st === 'exposed') { b.st = 'cover'; b.t = 1.5; }
+  else if (b.st === 'stranded') { b.st = 'flee'; b.t = 3; b.cycle++; }
   return true;
 }
 
@@ -131,21 +133,48 @@ export function updateBoss(b: BossRT, dt: number, c: BossCtx): void {
       break;
     }
     case 'rogopletw': {
-      b.b.vy = 0; b.b.vx = 0;
-      const mirrors = c.decorOf('mirror');
-      if (b.st === 'intro') { if (b.t <= 0) { b.st = 'swim'; b.t = 2; } break; }
+      // v0.4: Rogopłetw Wielki brodzi po dnie basenów pod pomostem. Ochrania go woda — dopóki stoi w wodzie, jest nietykalny.
+      // Zawory na pomoście SPUSZCZAJĄ wodę z wybranego basenu (na ~16 s); osuszony boss zostaje unieruchomiony na dnie i można go uderzyć.
+      // Ataki: skok na pomost (zapowiedź: przykucnięcie 0,9 s) i szarża po dnie. Trafiony ucieka do basenu z wodą.
+      const secs = 3; const sw = (b.x1 - b.x0) / secs; const secC = (i: number) => b.x0 + sw * (i + 0.5);
+      const wetSec = (i: number) => c.water(secC(i), b.floorY - 20);
+      const here = (): number => Math.max(0, Math.min(secs - 1, Math.floor((bx(b) - b.x0) / sw)));
+      b.b.vx = 0;
+      if (b.st === 'intro') { if (b.t <= 0) { b.st = 'swim'; b.t = 2.5; b.data.sec = 1; } b.b.y = b.floorY - b.b.h; break; }
+      const grounded = b.st !== 'leap';
+      if (grounded) b.b.y = b.floorY - b.b.h;
+      const inWater = c.water(bx(b), b.floorY - 20);
       if (b.st === 'swim') {
-        b.data.sy = (b.data.sy ?? b.b.y); b.b.y = b.data.sy + Math.sin(b.f * 1.3) * 26; b.b.x += Math.sin(b.f * 0.7) * 30 * dt;
-        if (b.b.x + b.b.w > b.x1 - 20) b.b.x = b.x1 - 20 - b.b.w;
-        if (b.t <= 0) { b.data.m = Math.floor(Math.random() * 3); b.st = 'aim'; b.t = 3.0; c.say('toast.mirror'); c.sfx('warn'); }
-      } else if (b.st === 'aim') {
-        if (b.t <= 0) {
-          const m = mirrors[b.data.m]; b.st = 'fire'; b.t = 0.7; c.sfx('beam');
-          if (m && m.state === 1) { b.data.reflect = 0.7; b.hp -= 1; b.hurt = 1; m.state = 0; c.shake(6); c.sfx('bossHit'); if (b.hp <= 0) { b.dead = true; b.deadT = 2.4; } }
-          else { b.data.reflect = 0; if (m) c.beam({ x: bx(b) - 20, y: by(b), dir: -1, len: bx(b) - m.x, t: 0.7, warn: false, owner: -2 }); }
+        if (!inWater) { b.st = 'stranded'; b.t = 0; c.sfx('warn'); }
+        else {
+          // wędrówka po dnie ku wybranemu basenowi z wodą
+          const want = b.data.sec ?? 1; const tx = secC(want);
+          if (Math.abs(tx - bx(b)) > 8) { b.dir = tx > bx(b) ? 1 : -1; b.b.x += b.dir * 70 * dt; }
+          if (b.t <= 0) {
+            const p = px(c); const onWalk = !!p && p.mv.body.y + p.mv.body.h < b.floorY - 110; const dx = p ? Math.abs(p.mv.body.x - bx(b)) : 999;
+            if (p && onWalk && dx < 280) { b.st = 'crouch'; b.t = 0.9; faceP(b, c); c.sfx('warn'); }
+            else if (p && !onWalk && dx < 360) { b.st = 'dash'; b.t = 0.9; faceP(b, c); c.sfx('warn'); }
+            else { const opts = [0, 1, 2].filter((i) => wetSec(i)); if (opts.length) b.data.sec = opts[Math.floor(Math.random() * opts.length)]; b.t = 3.4; }
+          }
         }
-      } else if (b.st === 'fire') { if (b.t <= 0) { b.st = 'dash'; b.t = 0.9; faceP(b, c); const p = px(c); b.data.dy = p ? (p.mv.body.y - b.b.y) : 0; c.sfx('warn'); } }
-      else if (b.st === 'dash') { b.b.x += b.dir * 230 * dt; b.b.y += Math.sign(b.data.dy ?? 0) * 40 * dt; clampArena(b); if (b.t <= 0) { b.st = 'swim'; b.t = 2.2; } }
+      } else if (b.st === 'crouch') {
+        if (b.t <= 0) { const p = px(c); const tx = p ? p.mv.body.x + p.mv.body.w / 2 : bx(b); b.b.vy = -430; b.b.vx = Math.max(-190, Math.min(190, (tx - bx(b)) * 0.9)); b.st = 'leap'; b.t = 0; c.sfx('beam'); }
+      } else if (b.st === 'leap') {
+        b.b.vy += 620 * dt; b.b.x += b.b.vx * dt; b.b.y += b.b.vy * dt;
+        if (b.b.y >= b.floorY - b.b.h && b.b.vy > 0) { b.b.y = b.floorY - b.b.h; b.b.vy = 0; b.st = 'swim'; b.t = 3.0; c.shake(5); c.sfx('land'); }
+      } else if (b.st === 'dash') {
+        if (b.t > 0.35) { /* zapowiedź */ } else { b.b.x += b.dir * 230 * dt; }
+        if (b.t <= 0) { b.st = 'swim'; b.t = 2.4; }
+        if (!inWater) { b.st = 'stranded'; }
+      } else if (b.st === 'stranded') {
+        // unieruchomiony na suchym dnie; gdy woda wróci (zawór zamknięty), wstaje wściekły
+        if (inWater) { b.st = 'swim'; b.t = 1.5; }
+      } else if (b.st === 'flee') {
+        const opts = [0, 1, 2].filter((i) => wetSec(i)); const cur = here();
+        const tgt = opts.length ? opts.reduce((a, i) => Math.abs(secC(i) - bx(b)) < Math.abs(secC(a) - bx(b)) ? i : a, opts[0]) : cur;
+        const tx = secC(tgt); b.dir = tx > bx(b) ? 1 : -1; b.b.x += b.dir * 190 * dt;
+        if (Math.abs(tx - bx(b)) < 14 || (inWater && b.t <= 0)) { b.st = 'swim'; b.t = 3.0; b.data.sec = tgt; }
+      }
       break;
     }
     case 'krukorog': {

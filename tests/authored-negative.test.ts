@@ -46,3 +46,17 @@ it('W5-L1 (Skaltria 1,14 g): trasa główna z przerwą 3 kafli przejezdna dla ob
   const L = getLevel('W5-L1'); const exit = L.rooms[0].specs.find((s) => s.t === 'exit')!;
   for (const b of ['M', 'D'] as const) expect(analyze(L, b).reaches(0, exit.x, exit.y, 40, 10), b).toBe(true);
 }, 200000);
+
+/** Aqualis: każdy element mechaniki wody jest NIEZBĘDNY (bez niego wyjście jest nieosiągalne) */
+const exitOfLevel = (L: ReturnType<typeof getLevel>) => L.rooms[0].specs.find((s) => s.t === 'exit')!;
+const without = (id: string, pred: (s: Spec) => boolean) => { const L = structuredClone(getLevel(id)); L.rooms[0].specs = L.rooms[0].specs.filter((s) => !pred(s)); return L; };
+it('negatywny W4-L1: bez dźwigni mostu zwodzonego (l1) wyspa B i wyjście są nieosiągalne; bez drugiej dźwigni (l2) również; z obiema — osiągalne', () => {
+  for (const sw of ['l1', 'l2']) { const L = without('W4-L1', (s) => s.t === 'switch' && s.id.endsWith(':' + sw)); const e = exitOfLevel(L); expect(analyze(L, 'M').reaches(0, e.x, e.y, 40, 10), sw).toBe(false); }
+  const L = getLevel('W4-L1'); const e = exitOfLevel(L); expect(analyze(L, 'D').reaches(0, e.x, e.y, 40, 10)).toBe(true);
+}, 300000);
+it('negatywny W4-L2: bez któregokolwiek z trzech bezpieczników śluza zostaje zamknięta', () => {
+  for (const sw of ['b1', 'b3']) { const L = without('W4-L2', (s) => s.t === 'switch' && s.id.endsWith(':' + sw)); const e = exitOfLevel(L); expect(analyze(L, 'M').reaches(0, e.x, e.y, 40, 10), sw).toBe(false); }
+}, 300000);
+it('negatywny W4-L3: bez zaworu A (spust) dolny korytarz jest za długi na jeden oddech; bez zaworu B nie da się wypłynąć do wysokich drzwi', () => {
+  for (const sw of ['vA', 'vB']) { const L = without('W4-L3', (s) => s.t === 'switch' && s.id.endsWith(':' + sw)); const e = exitOfLevel(L); expect(analyze(L, 'M').reaches(0, e.x, e.y, 40, 10), sw).toBe(false); }
+}, 300000);

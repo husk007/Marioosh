@@ -24,18 +24,26 @@ Dokument opisuje, co z `08–11` jest w kodzie, jak to sprawdzono i gdzie implem
 ## 2. Jak sprawdzono przejezdność
 `tests/reach.ts` buduje graf stanów, w którym **krawędzie to makra symulowane prawdziwym `stepMovement`** (chód, bieg + skok z rozbiegu, zeskok przez platformę, drabina), a dodatkowo abstrakcyjne przejścia: drzwi, windy, przełączniki → bramy (iteracyjnie). Bez trybu „god”: kolce, wypadnięcie z poziomu i upadek ≥ 2,4 m kończą krawędź. `tests/authored.test.ts` wymaga, by **każdy brat osobno** dotarł do checkpointów, wyjścia, wszystkich przełączników, posągów i wszystkich opakowań oraz by budżet PET/puszek zgadzał się z `levels.json`. `tests/authored-negative.test.ts` dowodzi, że analizator nie jest zbyt łaskawy (bez drabiny/windy/przełącznika poziom przestaje być przejezdny).
 
+### 2a. Woda i powietrze (Aqualis)
+- **Model pływania** (`movement.ts`): prędkość 68/74 px/s (M/D), wypór 12 px/s ku powierzchni gdy głowa pod wodą, przy powierzchni zawisasz (`env.head`), po dnie brodzisz 0,6×; **wyskok z wody** (`env.lip`: głowa ≤ 12 px pod lustrem) wyrzuca stopy ≈ 0,25 m ponad lustro, więc pomost równy z wodą da się wejść, ale wyższy brzeg wymaga drabiny. Drabiny działają w wodzie.
+- **Powietrze** (`constants.ts`): `AIR_MAX` 20 s, `AIR_WARN` 6 s (miga HUD), `AIR_REFILL` 8× szybciej nad wodą, `DROWN_INTERVAL` 1,6 s (−1 HP; przy 0 HP powrót do checkpointu z pełnym powietrzem). Powietrze jest po stronie świata (`updateAir`), a „głowa w wodzie” to kafel wody 6 px pod czubkiem postaci.
+- **Specyfikacje**: `flood` (poziom wody w kolumnach [x0,x1] i opcjonalnie wierszach [y0,y1]: `from` → `to` w kaflach, `speed` wiersz/s; otwiera go komplet przełączników o danym `gate`) i `span` (kafle pomostu pojawiają się po włączeniu wszystkich przełączników bramy). Zawory bossa (`gate` zaczynające się od `pool`) mają samoczynny powrót po 16 s.
+- **Analizator**: węzły pływające (siatka 12 px), makra 8-kierunkowe po 0,4 s i wyskok z wody; każdy węzeł niesie rachunek powietrza identyczny jak w grze, a ścieżki dłuższe niż `AIR_MAX − AIR_TEST_MARGIN` (15 s) są odrzucane. Poziom wody zależy od otwartych zaworów (ostatni stan + suma punktów ze wszystkich stanów).
+- **Różnorodność świata 4**: L1 = most zwodzony i baseny odcięte od siebie (wyjście z wody tylko drabiną), L2 = labirynt komór z powietrzem i „dzwonami”, L3 = zbiorniki z zaworami (spust / napełnianie, sekret dostępny tylko przy napełnionym B), L4 = latarnia i boss Rogopłetw (woda go chroni, zawór osusza basen, skok na pomost zapowiadany przykucnięciem).
+
 ## 3. Odstępstwa od specyfikacji / uproszczenia prototypu
 - **Grafika kafli i tła** bez zmian (motyw lasu świata 1 także w „kablowni” i „przetwórni”) — oprawa podziemna/przemysłowa czeka na grafiki.
 - Wrogowie mają przeskalowany hitbox i sprite (×1,4), ale **ich prędkości, zasięgi widzenia i wszystkie telegrafy (0,4–1,0 s) nie zostały jeszcze przestrojone** — to Etap D.
 - Portal do skrytek to „drzwi pełnej wielkości” z interakcją (↑/E); bez animacji przejścia.
 - W1-L2: „górny skrót” z atlasu nie jest osobną trasą — rolę skrótu pełni szyb 1 (galeria zachodnia) i drabina 2.
 - Tryb „Nocna Zmiana” nie ma jeszcze sensu bez zegara (na poziomach ręcznych nie działa) — do decyzji projektowej.
-- 29 pozostałych poziomów jest oznaczonych WIP na mapie i nie da się ich uruchomić do czasu akceptacji prototypu (zgodnie z `10_ROADMAP`). Fragmenty W5-L1 i W6-L1 są prototypami grawitacji (poza główną ścieżką; uruchamiane przez `?debug=1` + `window.__play('W6-L1')`).
+- W Aqualis (W4) uproszczone względem atlasu: ryby nie wyskakują zza burty w L1 (pływają w basenach i grożą wpadającym), L2 nie ma „czterech przewodów” z przejściem na Vesperę (jest sekretna komora z 12 puszkami), prądów wodnych nie ma (L3 opiera się na poziomie wody), w L4 brak luster (zastąpione osuszaniem basenów).
+- 25 pozostałych poziomów jest oznaczonych WIP na mapie i nie da się ich uruchomić do czasu akceptacji prototypu (zgodnie z `10_ROADMAP`). Fragmenty W5-L1 i W6-L1 są prototypami grawitacji (poza główną ścieżką; uruchamiane przez `?debug=1` + `window.__play('W6-L1')`).
 
 ## 4. Następne kroki
 1. Ręczny playtest W1-L1/L2/L4 (czucie skoku, szarży Rogomira, 28 s okna generatorów) — wartości w `constants.ts` i `bosses.ts` to nastawy startowe.
 2. Strojenie wrogów: prędkości, zasięgi, telegrafy (Etap D).
-3. Po akceptacji: portowanie 29 pozostałych poziomów według atlasu.
+3. Po akceptacji: portowanie 25 pozostałych poziomów według atlasu (każdy świat z inną główną mechaniką: Złomaria — taśmociągi i dźwigi, Florion — światło i lustra, Skaltria — głazy na torach, Vespera — lampy i ptaki, Ferroks — burza i maszyny, Katoblis — sieć portali).
 
 ## 5. Wnioski z pomiarów fizyki (analizator z chwytem krawędzi)
 Maksymalna przerwa z rozbiegu (z chwytem krawędzi): 4 kafle wszędzie; 5 kafli — tylko Vespera (obaj) i Prądowo (tylko Darioosh); Skaltria — nigdy. Dlatego trasa główna używa przerw ≤ 3 kafle (2,4 m), a przerwy 5-kaflowe są wyłącznie opcjonalnym bonusem zależnym od planety.

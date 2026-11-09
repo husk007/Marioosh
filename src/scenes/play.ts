@@ -2,7 +2,7 @@
 import type { App, Scene } from '../app';
 import type { Gfx } from '../engine/gfx';
 import { t } from '../engine/i18n';
-import { MAX_HP, VH, VW } from '../game/constants';
+import { AIR_MAX, AIR_WARN, MAX_HP, VH, VW } from '../game/constants';
 import { getLevel, nextLevelId, parseId } from '../game/levels';
 import { World } from '../game/world';
 import { drawWorld } from '../game/worldDraw';
@@ -144,7 +144,15 @@ export class PlayScene implements Scene {
       for (const [k, v, max] of [['magnet', U.magnet, 20], ['extender', U.extender, 15], ['gloves', U.gloves, 12], ['star', U.star, 12]] as const) {
         if (v > 0) { ctx.drawImage(itemSprite(k), ix, 4, 14, 14); g.srect(ix, 20, 14 * (v / max), 2, '#ffd23f'); ix += 17; }
       }
-      if (p.petrify > 0) { g.text(t('hud.petrify'), x, 20, { size: 6, color: '#c8c8d8', shadow: null }); g.srect(x + 40, 21, 60, 5, '#2a2c3a'); g.srect(x + 40, 21, 60 * (p.petrify / 100), 5, p.petrify >= 65 ? '#e0443a' : '#c8c8d8'); }
+      if (p.air < AIR_MAX - 0.01) {
+        const n = 10, lit = Math.ceil((p.air / AIR_MAX) * n), warn = p.air <= AIR_WARN, blink = warn && Math.floor(p.anim * 4) % 2 === 0;
+        for (let k = 0; k < n; k++) {
+          const on = k < lit; ctx.beginPath(); ctx.arc(x + 4 + k * 9, 24, 3.4, 0, Math.PI * 2);
+          ctx.fillStyle = on ? (blink ? '#ff6a5a' : '#bfe9ff') : 'rgba(191,233,255,0.15)'; ctx.fill();
+          ctx.strokeStyle = on ? '#ffffff' : 'rgba(255,255,255,0.25)'; ctx.lineWidth = 1; ctx.stroke();
+        }
+      }
+      if (p.petrify > 0 && !(p.air < AIR_MAX - 0.01)) { g.text(t('hud.petrify'), x, 20, { size: 6, color: '#c8c8d8', shadow: null }); g.srect(x + 40, 21, 60, 5, '#2a2c3a'); g.srect(x + 40, 21, 60 * (p.petrify / 100), 5, p.petrify >= 65 ? '#e0443a' : '#c8c8d8'); }
     });
     // opakowania, kaucja, punkty
     const rx = VW - 8;

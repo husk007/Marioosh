@@ -94,3 +94,45 @@ describe('Rogomir v0.4 (bez skakania po głowie)', () => {
     expect(m.y + m.h).toBeCloseTo(15 * TILE, 0); expect(t).toBeLessThan(3.5);
   });
 });
+
+describe('Rogopłetw Wielki v0.4 (woda chroni, zawór osusza basen)', () => {
+  function pool(): World {
+    const s = new Session(newSave('solo', 'M'), 0);
+    const w = new World(getLevel('W4-L4'), s, { audio: stubAudio, settings: defaultSettings(), night: false });
+    w.readyT = 0; w.rt.enemies.length = 0;
+    const b = w.players[0].mv.body; b.x = 93 * TILE; b.y = 20 * TILE - b.h; b.vx = b.vy = 0; w.players[0].invuln = 999;   // widz na bloku wejściowym
+    w.rt.boss!.started = true; step(w, 3); return w;
+  }
+  const valve = (w: World, g: string) => w.rt.switches.find((s) => s.gate === g)!;
+  const inWater = (w: World) => { const b = w.rt.boss!; return w.waterAt(b.b.x + b.b.w / 2, b.floorY - 20); };
+
+  it('w wodzie jest nietykalny; po spuszczeniu wody z basenu, w którym stoi — unieruchomiony i podatny na cios', () => {
+    const w = pool(); const b = w.rt.boss!; step(w, 60 * 2);
+    expect(inWater(w)).toBe(true); expect(bossVulnerable(b)).toBe(false); expect(hitBoss(b, 'key')).toBe(false);
+    const sec = Math.floor((b.b.x + b.b.w / 2 - b.x0) / ((b.x1 - b.x0) / 3));
+    const g = ['poolA', 'poolB', 'poolC'][sec]; const v = valve(w, g); v.on = true; v.latch = 16;
+    step(w, 60 * 4);
+    expect(inWater(w)).toBe(false); expect(b.st).toBe('stranded'); expect(bossVulnerable(b)).toBe(true); expect(bossHarmful(b)).toBe(false);
+  });
+  it('trafiony ucieka do basenu z wodą i wraca do walki; po 3 trafieniach pada; woda wraca po zamknięciu zaworu (latch 16 s)', () => {
+    const w = pool(); const b = w.rt.boss!; step(w, 60 * 2);
+    for (let hit = 1; hit <= 3; hit++) {
+      const secW = (b.x1 - b.x0) / 3;
+      for (let i = 0; i < 60 * 10 && !(b.st === 'swim' && Math.abs(b.x0 + secW * ((b.data.sec ?? 1) + 0.5) - (b.b.x + b.b.w / 2)) < 10); i++) step(w, 1);   // czeka, aż boss dojdzie do celu
+      const sec = Math.floor((b.b.x + b.b.w / 2 - b.x0) / secW);
+      const v = valve(w, ['poolA', 'poolB', 'poolC'][sec]); v.on = true; v.latch = 16;
+      for (let i = 0; i < 60 * 8 && b.st !== 'stranded'; i++) step(w, 1);
+      expect(b.st, `hit ${hit}`).toBe('stranded');
+      b.hurt = 0; expect(hitBoss(b, 'key')).toBe(true); expect(b.hp).toBe(3 - hit);
+      if (hit < 3) { for (let i = 0; i < 60 * 8 && !(b.st === 'swim' || b.st === 'crouch' || b.st === 'dash'); i++) step(w, 1); expect(inWater(w), `after hit ${hit}`).toBe(true); step(w, 60 * 17); expect(w.waterAt((b.x0 + b.x1) / 2, b.floorY - 20)).toBe(true); }
+    }
+    expect(b.dead).toBe(true);
+  });
+  it('skok na pomost jest zapowiedziany (przykucnięcie, boss nieszkodliwy) i kończy się lądowaniem w basenie', () => {
+    const w = pool(); const b = w.rt.boss!; const p = w.players[0]; step(w, 60 * 2);
+    const bb = p.mv.body; bb.x = b.b.x + 10; bb.y = 20 * TILE - bb.h; bb.vx = bb.vy = 0;    // gracz na pomoście nad bossem
+    let crouched = false, leaped = false, landed = false;
+    for (let i = 0; i < 60 * 12 && !landed; i++) { step(w, 1); bb.x = b.b.x + 10; bb.y = 20 * TILE - bb.h; if (b.st === 'crouch') { crouched = true; expect(bossHarmful(b)).toBe(false); } if (b.st === 'leap') { leaped = true; expect(bossHarmful(b)).toBe(true); expect(b.b.y).toBeLessThan(b.floorY - b.b.h + 1); } if (leaped && b.st === 'swim') landed = true; }
+    expect(crouched && leaped && landed).toBe(true); expect(b.b.y + b.b.h).toBeCloseTo(b.floorY, 0);
+  });
+});

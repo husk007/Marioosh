@@ -36,9 +36,9 @@ export interface BrotherParams {
  * Żaden skok standardowy nie przekracza 0,9 m (36 px) na żadnej planecie.
  */
 export const BROTHERS: Record<Brother, BrotherParams> = {
-  M: { walk: 76, run: 168, accel: 520, decel: 620, airCtl: 120, jump: -140, jumpCut: 1.7, ladder: 48, crouch: 38, swim: 46, sink: 14,
+  M: { walk: 76, run: 168, accel: 520, decel: 620, airCtl: 120, jump: -140, jumpCut: 1.7, ladder: 48, crouch: 38, swim: 68, sink: -12,
        hitW: 26, hitH: 70, crouchH: 44, cushion: 0.13, keyRange: 40, keyCooldown: 0.55, keyDamage: 2, name: 'Marioosh' },
-  D: { walk: 84, run: 184, accel: 600, decel: 700, airCtl: 145, jump: -150, jumpCut: 1.9, ladder: 54, crouch: 42, swim: 52, sink: 12,
+  D: { walk: 84, run: 184, accel: 600, decel: 700, airCtl: 145, jump: -150, jumpCut: 1.9, ladder: 54, crouch: 42, swim: 74, sink: -12,
        hitW: 24, hitH: 68, crouchH: 43, cushion: 0.09, keyRange: 36, keyCooldown: 0.42, keyDamage: 1, name: 'Darioosh' },
 };
 
@@ -115,3 +115,11 @@ export const PICKUP_RADIUS = 24;
 export const BOSS_SCALE = 1.5;
 /** wrogowie w skali ludzkiej: hitbox i sprite ×1,4 względem v0.3 (Roguś ≈ 1,1 m) */
 export const ENEMY_SCALE = 1.4;
+
+/** powietrze (s): pod wodą (głowa pod powierzchnią) ubywa, w suchej komorze / nad wodą przybywa AIR_REFILL razy szybciej; po 0 — obrażenie co DROWN_INTERVAL */
+export const AIR_MAX = 20;
+export const AIR_WARN = 6;
+export const AIR_REFILL = 8;
+export const DROWN_INTERVAL = 1.6;
+/** margines bezpieczeństwa w testach osiągalności: odcinek pod wodą nie może trwać dłużej niż AIR_MAX − ten margines */
+export const AIR_TEST_MARGIN = 5;

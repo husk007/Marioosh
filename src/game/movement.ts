@@ -89,7 +89,7 @@ function ladderAt(g: Grid, b: Body, below: boolean): { ok: boolean; cx: number }
   return { ok: false, cx };
 }
 
-export interface MoveEnv { water?: boolean; currentX?: number; currentY?: number; g?: number }
+export interface MoveEnv { water?: boolean; head?: boolean; lip?: boolean; currentX?: number; currentY?: number; g?: number }
 
 /** Czy z miejsca przed ciałem da się przeskoczyć przeszkodę (0,3–1,0 m)? Zwraca cel (x1,y1) lub null. */
 function findVault(g: Grid, m: MoveState, side: 1 | -1): { x1: number; y1: number } | null {
@@ -144,7 +144,7 @@ export function stepMovement(m: MoveState, inp: MoveInput, g: Grid, dt: number, 
 
   // ---- drabina
   const lad = ladderAt(g, b, inp.down && b.onGround);
-  if (!m.climbing && m.regrab <= 0 && lad.ok && (inp.up || inp.down) && !m.swimming) {
+  if (!m.climbing && m.regrab <= 0 && lad.ok && (inp.up || inp.down)) {
     m.climbing = true; m.climbKind = 'ladder'; m.jumping = false; m.duck = false; applyDims(m); b.vx = 0; b.vy = 0; m.peakFeet = b.y + b.h;
   }
   if (m.climbing) {
@@ -168,17 +168,27 @@ export function stepMovement(m: MoveState, inp: MoveInput, g: Grid, dt: number, 
   }
   m.climbKind = '';
 
-  // ---- pływanie (8 kierunków, wolne, bez zrywu)
+  // ---- pływanie (8 kierunków, wyporność: bez ruchu unosisz się ku powierzchni, przy powierzchni zawisasz; po dnie brodzisz wolno)
   m.swimming = !!env.water;
   if (m.swimming) {
+    const head = env.head ?? true;
     m.duck = false; applyDims(m); m.peakFeet = b.y + b.h;
     let ix = dirRaw, iy = (inp.down ? 1 : 0) - (inp.up ? 1 : 0);
     const len = Math.hypot(ix, iy) || 1; ix /= len; iy /= len;
-    const sp = p.swim * slow; const a = (ix || iy ? 260 : 160) * dt;
-    b.vx = approach(b.vx, ix * sp, a); b.vy = approach(b.vy, iy ? iy * sp : p.sink, a * (iy ? 1 : 0.5));
-    if (m.jumpBuf > 0) { m.jumpBuf = 0; m.jumped = true; if (!iy) b.vy = -sp * 0.8; }
+    const wading = b.onGround && !iy;
+    const sp = p.swim * slow * (wading ? 0.6 : 1); const a = (ix || iy ? 260 : 160) * dt;
+    b.vx = approach(b.vx, ix * sp, a);
+    if (!head && !iy) {
+      // głowa nad wodą: grawitacja (łuk po wyskoku), opadając zwalniasz do lekkiego zanurzenia
+      if (b.vy < 0) b.vy += G * dt; else b.vy = approach(b.vy, 25, 220 * dt);
+    } else b.vy = approach(b.vy, iy ? iy * sp : p.sink, Math.abs(b.vy) > sp * 1.3 ? 700 * dt : a * (iy ? 1 : 0.5));
+    if (m.jumpBuf > 0) {
+      m.jumpBuf = 0; m.jumped = true;
+      if (!head || env.lip) { b.vy = p.jump * 1.7 * m.jumpMul; m.coyote = 0; }      // wyskok z wody: stopy ≈ 0,25 m ponad lustro wody → wejście na pomost równy z wodą
+      else if (!iy) b.vy = -sp * 0.9;
+    }
     b.vx += (env.currentX ?? 0) * dt; b.vy += (env.currentY ?? 0) * dt;
-    b.vx = clampN(b.vx, -160, 160); b.vy = clampN(b.vy, -160, 160);
+    b.vx = clampN(b.vx, -160, 160); b.vy = clampN(b.vy, -300, 160);
     if (ix) m.face = ix > 0 ? 1 : -1;
     moveBody(g, b, dt); m.wasGround = b.onGround; m.angle = 0; return;
   }

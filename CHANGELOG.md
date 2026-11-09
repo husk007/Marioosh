@@ -4,9 +4,11 @@
 - **Nowa skala i fizyka:** 40 px = 1 m, skok 0,6–0,9 m, auto-krok 0,3 m, przeskok i chwyt krawędzi, drabiny, upadki z progami (potknięcie / rana), kucanie. Usunięto szybowanie, odbicie od ściany, toczenie, uderzenie w ziemię i sprężyny.
 - **Grawitacja per planeta** (0,86–1,14 g, `PLANET_PHYSICS`).
 - **Zasady gry:** HP 3 + tarcza, **bez żyć, game over i zegara**, bez przeskoku na głowę wrogów; przepaść = −1 HP i powrót na ostatnie bezpieczne miejsce; kaucja tylko z opakowań. HUD z trzema sercami.
-- **Poziomy projektowane ręcznie** (ASCII + logika): drzwi i terminale pełnej wielkości, windy z postojem, schody 26°. Gotowe: **W1-L1, W1-L2, W1-L4**. Pozostałe 29 oznaczone WIP na mapie.
+- **Poziomy projektowane ręcznie** (ASCII + logika): drzwi i terminale pełnej wielkości, windy z postojem, schody 26°. Gotowe: **W1-L1, W1-L2, W1-L4** oraz cały świat **Aqualis (W4-L1…L4)**. Pozostałe 25 oznaczone WIP na mapie.
 - **Rogomir** przeprojektowany: trzy generatory zdejmują pancerz, szarża wolniejsza od biegu, ciągły pomost-schron (przejście nad bossem, drabiny przy ścianach, utknięcie 5,5 s), skala ×1,5.
-- **Testy:** nowy analizator przejezdności oparty na prawdziwym kontrolerze ruchu (bez trybu „god”) dla obu braci, testy negatywne, testy walki z Rogomirem; testy v0.3 przeniesione do `tests/legacy/`.
+- **Woda (Aqualis):** prawdziwe pływanie z wyporem (bez sterowania unosisz się ku powierzchni, po dnie się nie chodzi), **powietrze 20 s** z paskiem pęcherzyków w HUD (≤ 6 s miga na czerwono, po wyczerpaniu −1 HP co 1,6 s), wyskok z wody na pomost, drabiny w wodzie, „dzwony” i suche komory z powietrzem, zawory zmieniające poziom wody (`flood`) i opuszczane mosty (`span`).
+- **Aqualis — cztery różne poziomy:** W4-L1 archipelag z mostami zwodzonymi, W4-L2 zatopiony dworzec (komory powietrzne, trzy bezpieczniki), W4-L3 zakład pomp (zawory spuszczają/napełniają zbiorniki), W4-L4 latarnia i nowy boss **Rogopłetw Wielki** (woda go chroni; zawór osusza basen, w którym stoi).
+- **Testy:** analizator przejezdności z pływaniem i rachunkiem powietrza (limit 15 s pod wodą z rzędu), testy negatywne mechanik wody (bez zaworu/dźwigni/bezpiecznika wyjście niedostępne), testy walki z Rogopłetwem. Nowy analizator przejezdności oparty na prawdziwym kontrolerze ruchu (bez trybu „god”) dla obu braci, testy negatywne, testy walki z Rogomirem; testy v0.3 przeniesione do `tests/legacy/`.
 - Dokumentacja: `docs/design/08–12` (specyfikacja v0.4 i stan implementacji), `07` oznaczony jako historyczny.
 
 ## 0.3.0 — przebudowa pionowa („Sonic / Rayman”)

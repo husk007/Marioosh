@@ -215,10 +215,37 @@ describe('skok: coyote 0,08 s, bufor 0,10 s, zmienna wysokość, brak ruchów z 
   });
 });
 
-describe('ruch w wodzie', () => {
-  it('pływanie jest wolne (≈ 52 px/s) i nie ma zrywu', () => {
+describe('ruch w wodzie (v0.4: pływanie, wypór, wyjście z wody)', () => {
+  const wet = (surfaceY: number) => (m: ReturnType<typeof newMove>, g: number) => ({ water: m.body.y + m.body.h / 2 > surfaceY, head: m.body.y + 6 > surfaceY, lip: m.body.y - 12 < surfaceY, g });
+  it('prędkość pływania ≤ ~76 px/s', () => {
     const g = flatGrid(40, 16, 14); const m = newMove('D', 5 * 32, 10 * 32); let vmax = 0;
     for (let i = 0; i < 120; i++) { const inp = noInput(); inp.right = true; stepMovement(m, inp, g, DT, { water: true }); vmax = Math.max(vmax, Math.hypot(m.body.vx, m.body.vy)); }
-    expect(vmax).toBeLessThanOrEqual(55);
+    expect(vmax).toBeLessThanOrEqual(76);
+  });
+  it('bez sterowania unosisz się ku powierzchni (wypór), nie opadasz na dno', () => {
+    const g = flatGrid(40, 24, 22); const m = newMove('M', 5 * 32, 12 * 32); const y0 = m.body.y;
+    for (let i = 0; i < 120; i++) stepMovement(m, noInput(), g, DT, { water: true, head: true });
+    expect(m.body.y).toBeLessThan(y0 - 10);
+    expect(m.body.onGround).toBe(false);
+  });
+  it('przy powierzchni zawisasz (nie wypływasz w powietrze, nie toniesz)', () => {
+    const g = flatGrid(40, 24, 22); const m = newMove('M', 5 * 32, 12 * 32 + 70); const surf = 11 * 32; const env = wet(surf);
+    for (let i = 0; i < 360; i++) stepMovement(m, noInput(), g, DT, env(m, 392));
+    expect(m.body.y).toBeGreaterThan(surf - 25); expect(m.body.y).toBeLessThan(surf + 30);
+  });
+  it('skok przy powierzchni wynosi stopy ponad lustro wody (wejście na pomost równy z wodą)', () => {
+    const g = flatGrid(40, 24, 22); const surf = 11 * 32;
+    for (const br of ['M', 'D'] as const) {
+      const m = newMove(br, 5 * 32, surf - 6 + 70); const env = wet(surf); let minFeet = 1e9;
+      for (let i = 0; i < 40; i++) stepMovement(m, noInput(), g, DT, env(m, 392));   // zawiśnij
+      const inp = noInput(); inp.jumpPressed = true; inp.jumpHeld = true; stepMovement(m, inp, g, DT, env(m, 392));
+      for (let i = 0; i < 60; i++) { stepMovement(m, noInput(), g, DT, env(m, 392)); minFeet = Math.min(minFeet, m.body.y + m.body.h); }
+      expect(minFeet).toBeLessThan(surf - 4);
+    }
+  });
+  it('wynurzenie: na dnie można płynąć w górę, a pod wodą skok = kopnięcie w górę', () => {
+    const g = flatGrid(40, 24, 22); const m = newMove('M', 5 * 32, 20 * 32); const y0 = m.body.y;
+    for (let i = 0; i < 90; i++) { const inp = noInput(); inp.up = true; stepMovement(m, inp, g, DT, { water: true, head: true }); }
+    expect(m.body.y).toBeLessThan(y0 - 80);
   });
 });

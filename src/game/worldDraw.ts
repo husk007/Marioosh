@@ -137,15 +137,15 @@ export function drawWorld(w: World, g: Gfx): void {
 
   // woda (pod postaciami)
   let hasWater = false;
-  for (let ty = ty0; ty <= ty1 && !hasWater; ty++) for (let tx = tx0; tx <= tx1; tx++) if (room.water[ty * room.w + tx]) { hasWater = true; break; }
+  for (let ty = ty0; ty <= ty1 && !hasWater; ty++) for (let tx = tx0; tx <= tx1; tx++) if (rt.water[ty * room.w + tx]) { hasWater = true; break; }
   if (hasWater) {
     for (let ty = ty0; ty <= ty1; ty++) {
       let run = -1;
       for (let tx = tx0; tx <= tx1 + 1; tx++) {
-        const wet = tx <= tx1 && room.water[ty * room.w + tx] === 1;
+        const wet = tx <= tx1 && rt.water[ty * room.w + tx] === 1;
         if (wet && run < 0) run = tx; else if (!wet && run >= 0) {
           g.rect(run * TILE, ty * TILE, (tx - run) * TILE, TILE, '#2d80b4', 0.32);
-          if (ty === 0 || !room.water[(ty - 1) * room.w + run]) g.rect(run * TILE, ty * TILE, (tx - run) * TILE, 2, '#bfe6f6', 0.7);
+          if (ty === 0 || !rt.water[(ty - 1) * room.w + run]) g.rect(run * TILE, ty * TILE, (tx - run) * TILE, 2, '#bfe6f6', 0.7);
           run = -1;
         }
       }

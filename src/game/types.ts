@@ -62,6 +62,8 @@ export type Spec =
   | { t: 'lantern'; x: number; y: number; id: string }
   | { t: 'hint'; x: number; y: number; w: number; key: string }
   | { t: 'rain'; x0: number; x1: number; interval: number }
+  | { t: 'span'; gate: string; cells: [number, number][] }
+  | { t: 'flood'; x0: number; x1: number; /** opcjonalne ograniczenie wierszy [y0,y1] */ y0?: number; y1?: number; from: number; to: number; speed: number; gate: string }
   | { t: 'current'; x: number; y: number; w: number; h: number; fx: number; fy: number }
   | { t: 'boss'; k: BossId; x: number; y: number }
   | { t: 'decor'; k: string; x: number; y: number }

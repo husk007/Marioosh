@@ -20,7 +20,7 @@ const ENEMY_CHARS: Record<string, EnemyKind> = { r: 'rogus', z: 'zukorog', a: 'b
 const ITEM_CHARS: Record<string, ItemKind> = { p: 'pet', k: 'can', '*': 'golden', B: 'battery', x: 'xl' };
 
 export interface Mark { tx: number; ty: number }
-export interface RoomOpts { name?: string; world: number; dark?: boolean; bossArena?: { x0: number; x1: number }; wrapDeath?: boolean }
+export interface RoomOpts { name?: string; world: number; /** prostokąty wody [x0,y0,x1,y1] (kafle, włącznie): woda we wszystkich kaflach niebędących litą skałą, także w drabinach i pustce */ wet?: [number, number, number, number][]; dark?: boolean; bossArena?: { x0: number; x1: number }; wrapDeath?: boolean }
 
 /** środek kafla (px) */
 export const cx = (tx: number): number => tx * TILE + TILE / 2;
@@ -44,6 +44,7 @@ export class AuthoredRoom {
         else if (ch !== '.' && ch !== ' ') { const a = this.marks.get(ch) ?? []; a.push({ tx, ty }); this.marks.set(ch, a); }
       }
     });
+    for (const [x0, y0, x1, y1] of opts.wet ?? []) for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) { const t = this.tiles[y * this.w + x]; if (t === T.EMPTY || t === T.LADDER) this.water[y * this.w + x] = 1; }
   }
   /** i-te wystąpienie znacznika (błąd, jeśli brak) */
   at(ch: string, i = 0): Mark { const m = this.marks.get(ch)?.[i]; if (!m) throw new Error(`${this.id}: brak znacznika '${ch}'[${i}]`); return m; }
