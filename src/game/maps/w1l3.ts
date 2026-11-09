@@ -24,7 +24,8 @@ export function buildW1L3(): LevelData {
   c.ladder(91, 10, 19); c.rect(91, 20, 106, 20, '=');
   c.rect(92, 10, 104, 10, '='); c.rect(115, 10, 130, 10, '=');   // z dokami wagonika (x101–104 i x115–118)
   // wieża 2 i zejście drabiną na platformę 3 (półka ze złotą puszką)
-  c.ground(131, 142, 10); c.ladder(143, 10, 21); c.rect(145, 14, 147, 14, '=');
+  c.ground(131, 142, 10); c.rect(143, 16, 147, 16, '='); c.ladder(143, 10, 15); c.ladder(148, 16, 21);   // dwa odcinki drabiny z półką-odpoczynkiem
+  c.rect(145, 14, 147, 14, '=');
   c.ground(143, 159, 22);
   // słup wysokiego napięcia z rozdzielnicą (szczyt: wiersz 12, pod nim przejście na most), drabina x155
   c.rect(156, 12, 159, 17, '#'); c.ladder(155, 12, 21);   // pod rozdzielnicą wolne przejście (4 wiersze)

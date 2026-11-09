@@ -31,6 +31,14 @@ describe('poziomy v0.4: osiągalność bez trybu god (obaj bracia solo)', () => 
           expect(missing).toEqual([]);
         }, 120000);
       }
+      it('żaden ciągły odcinek drabiny nie przekracza 10 wierszy poza wodą (Marioosh wspina się ≈ 43 px/s: dłuższe wymagają półki-odpoczynku)', () => {
+        const LAD = 4; const long: string[] = [];
+        for (const r of L.rooms) for (let x = 0; x < r.w; x++) {
+          const floods = r.specs.filter((q) => q.t === 'flood' && x >= q.x0 && x <= q.x1) as { from: number; y0?: number; y1?: number }[];
+          const wet = (y: number): boolean => !!r.water[y * r.w + x] || floods.some((f) => y >= Math.ceil(f.from) && y >= (f.y0 ?? 0) && y <= (f.y1 ?? 9999));
+          let run = 0; for (let y = 0; y <= r.h; y++) { if (y < r.h && r.tiles[y * r.w + x] === LAD && !wet(y)) run++; else { if (run > 10) long.push(`${r.name}@${x},${y - run}..${y - 1} (${run})`); run = 0; } } }
+        expect(long).toEqual([]);
+      });
       it('budżet opakowań zgodny z levels.json (PET/puszki/złote)', () => {
         let pet = 0, can = 0, gold = 0;
         for (const r of L.rooms) for (const s of r.specs) if (s.t === 'item') { if (s.k === 'pet') pet++; else if (s.k === 'can') can++; else if (s.k === 'golden') gold++; }
