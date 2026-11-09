@@ -44,7 +44,7 @@ function faceP(b: BossRT, c: BossCtx) { const p = px(c); if (p) b.dir = p.mv.bod
 /** Czy kontakt rani gracza? */
 export function bossHarmful(b: BossRT): boolean {
   if (b.dead || b.st === 'intro') return false;
-  if (['stuck', 'recover', 'landed', 'dazed', 'stranded', 'crouch'].includes(b.st)) return false;
+  if (['stuck', 'recover', 'landed', 'dazed', 'stranded', 'crouch', 'exposed', 'cover'].includes(b.st)) return false;
   return true;
 }
 /** Czy można trafić bossa (kluczem/iskrą)? */
@@ -219,13 +219,13 @@ export function updateBoss(b: BossRT, dt: number, c: BossCtx): void {
       if (b.st === 'intro') { if (b.t <= 0) { b.st = 'fly'; b.t = 2; } break; }
       b.data.drone = (b.data.drone ?? 4) - dt;
       if (b.data.drone <= 0 && b.st === 'fly') { b.data.drone = 5; if (c.enemyCount('dron') < 3) c.spawnEnemy('dron', bx(b), by(b) + 30); }
-      b.data.plat = (b.data.plat ?? 6) - dt;
-      if (b.data.plat <= 0 && b.st === 'fly') { b.data.plat = 10; c.platsOff(3); c.say('boss.warn'); c.sfx('warn'); }
+      b.data.volley = (b.data.volley ?? 5) - dt;   // salwa złomu: dwa odłamki spadają w miejsce, gdzie stoi gracz (ok. 1 s lotu — da się zejść)
+      if (b.data.volley <= 0 && b.st === 'fly') { b.data.volley = 4.6; c.sfx('warn'); const p = px(c); if (p) for (const dx of [-26, 26]) c.proj({ kind: 'scrap', x: p.mv.body.x + p.mv.body.w / 2 + dx, y: b.floorY - 330, vx: 0, vy: 0, life: 4, grav: 700, r: 10 }); }
       const allOn = gens.length > 0 && gens.every((s) => s.on);
       if (b.st === 'fly') {
         const targetX = (b.x0 + b.x1) / 2 + Math.sin(b.f * 0.5) * (b.x1 - b.x0) * 0.3;
-        b.b.x += (targetX - bx(b)) * 1.1 * dt; b.b.y = b.floorY - b.b.h - 170 + Math.sin(b.f * 1.2) * 16;
-        if (allOn) { b.st = 'exposed'; b.t = 5.5; b.armor = false; c.say('toast.gen'); c.sfx('break'); }
+        b.b.x += (targetX - bx(b)) * 1.1 * dt; b.b.y = b.floorY - b.b.h - 280 + Math.sin(b.f * 1.2) * 16;
+        if (allOn) { b.st = 'exposed'; b.t = 7; b.armor = false; c.say('toast.gen'); c.sfx('break'); }
       } else if (b.st === 'exposed') {
         const ty = b.floorY - b.b.h - 20; b.b.y += (ty - b.b.y) * 2 * dt; if (b.t <= 0) { b.st = 'cover'; b.t = 1.5; }
       } else if (b.st === 'cover') { b.b.y -= 100 * dt; if (b.t <= 0) { b.st = 'fly'; b.t = 2; b.armor = true; for (const s of gens) s.on = false; } }

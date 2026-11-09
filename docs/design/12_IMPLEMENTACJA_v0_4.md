@@ -38,12 +38,12 @@ Dokument opisuje, co z `08–11` jest w kodzie, jak to sprawdzono i gdzie implem
 - W1-L2: „górny skrót” z atlasu nie jest osobną trasą — rolę skrótu pełni szyb 1 (galeria zachodnia) i drabina 2.
 - Tryb „Nocna Zmiana” nie ma jeszcze sensu bez zegara (na poziomach ręcznych nie działa) — do decyzji projektowej.
 - W Aqualis (W4) uproszczone względem atlasu: ryby nie wyskakują zza burty w L1 (pływają w basenach i grożą wpadającym), L2 nie ma „czterech przewodów” z przejściem na Vesperę (jest sekretna komora z 12 puszkami), prądów wodnych nie ma (L3 opiera się na poziomie wody), w L4 brak luster (zastąpione osuszaniem basenów).
-- 8 pozostałych poziomów (W7, W8) jest oznaczonych WIP na mapie i nie da się ich uruchomić (zgodnie z `10_ROADMAP`). Fragment grawitacji Vespery jest tylko w testach (`maps/proto.ts`).
+- 4 pozostałe poziomy (W8) są oznaczone WIP na mapie i nie da się ich uruchomić (zgodnie z `10_ROADMAP`). Fragment grawitacji Vespery jest tylko w testach (`maps/proto.ts`).
 
 ## 4. Następne kroki
 1. Ręczny playtest W1-L1/L2/L4 (czucie skoku, szarży Rogomira, 28 s okna generatorów) — wartości w `constants.ts` i `bosses.ts` to nastawy startowe.
 2. Strojenie wrogów: prędkości, zasięgi, telegrafy (Etap D).
-3. Po akceptacji: portowanie 8 pozostałych poziomów (W7, W8) według atlasu (każdy świat z inną główną mechaniką: Złomaria — taśmociągi i dźwigi, Florion — światło i lustra, Skaltria — głazy na torach, Vespera — lampy i ptaki, Ferroks — burza i maszyny, Katoblis — sieć portali).
+3. Po akceptacji: portowanie 4 pozostałych poziomów (W8) według atlasu (każdy świat z inną główną mechaniką: Złomaria — taśmociągi i dźwigi, Florion — światło i lustra, Skaltria — głazy na torach, Vespera — lampy i ptaki, Ferroks — burza i maszyny, Katoblis — sieć portali).
 
 ## 5. Wnioski z pomiarów fizyki (analizator z chwytem krawędzi)
 Maksymalna przerwa z rozbiegu (z chwytem krawędzi): 4 kafle wszędzie; 5 kafli — tylko Vespera (obaj) i Prądowo (tylko Darioosh); Skaltria — nigdy. Dlatego trasa główna używa przerw ≤ 3 kafle (2,4 m), a przerwy 5-kaflowe są wyłącznie opcjonalnym bonusem zależnym od planety.

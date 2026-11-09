@@ -270,3 +270,34 @@ describe('Krukoróg Królewski v0.4 (trzy reflektory, lądowanie, trafienia kluc
     expect(b.dead).toBe(true);
   });
 });
+
+describe('Rogodron v0.4 (trzy generatory, złom, drony, odsłonięty rdzeń)', () => {
+  const arenaR = (): World => {
+    const s = new Session(newSave('solo', 'M'), 0);
+    const w = new World(getLevel('W7-L4'), s, { audio: stubAudio, settings: defaultSettings(), night: false });
+    w.readyT = 0; w.rt.enemies.length = 0; step(w, 3); return w;
+  };
+  const gens = (w: World) => w.rt.switches.filter((s) => s.gate === 'gen');
+  const onAll = (w: World, n = 3) => gens(w).slice(0, n).forEach((s) => { s.on = true; s.latch = 28; });
+  const safe = (w: World) => { const p = w.players[0]; const m = p.mv.body; m.x = 127 * TILE - m.w / 2; m.y = 24 * TILE - m.h; m.vx = m.vy = 0; p.safe = { x: m.x + m.w / 2, y: 24 * TILE }; p.invuln = 5; };   // podest operatora, lewy kraniec
+  it('trzy generatory (lewy podest, środek, prawy podest); boss w pancerzu jest nietykalny', () => {
+    const w = arenaR(); const b = w.rt.boss!; b.started = true; step(w, 200);
+    expect(gens(w).length).toBe(3); expect(b.armor).toBe(true); expect(hitBoss(b, 'key')).toBe(false);
+  });
+  it('dwa generatory nie wystarczą; trzy → boss schodzi nisko, nie rani dotykiem i da się go trafić kluczem (nie skokiem); trzy trafienia go pokonują', () => {
+    const w = arenaR(); const b = w.rt.boss!; b.started = true; step(w, 60); let seen = false;
+    for (let i = 0; i < 60 * 12; i++) { onAll(w, 2); safe(w); step(w, 1); if (b.st === 'exposed') seen = true; }
+    expect(seen).toBe(false);
+    for (let hit = 0; hit < 3; hit++) {
+      let guard = 0; while (b.st !== 'exposed' && guard++ < 60 * 30) { onAll(w); safe(w); step(w, 1); }
+      expect(b.st).toBe('exposed'); expect(b.armor).toBe(false); expect(bossHarmful(b)).toBe(false); expect(hitBoss(b, 'stomp')).toBe(false);
+      b.hurt = 0; expect(hitBoss(b, 'key')).toBe(true); expect(b.hp).toBe(2 - hit); for (let i = 0; i < 240; i++) { safe(w); step(w, 1); }
+    }
+    expect(b.dead).toBe(true);
+  });
+  it('w locie boss nie sięga graczy na podestach i platformie środkowej (także w skoku), spada złom, a drony są ograniczone do 3', () => {
+    const w = arenaR(); const b = w.rt.boss!; b.started = true; let maxDrones = 0, scrap = 0, touched = false;
+    for (let i = 0; i < 60 * 25; i++) { safe(w); w.players[0].mv.body.x = (i % 600 < 300 ? 127 : 144) * TILE - w.players[0].mv.body.w / 2; step(w, 1); maxDrones = Math.max(maxDrones, w.rt.enemies.filter((e) => e.kind === 'dron' && !e.dead).length); scrap = Math.max(scrap, w.projs.filter((p) => p.kind === 'scrap').length); if (b.st === 'fly' && bossHarmful(b)) { const m = w.players[0].mv.body; if (m.x < b.b.x + b.b.w && m.x + m.w > b.b.x && m.y < b.b.y + b.b.h && m.y + m.h > b.b.y) touched = true; } }
+    expect(touched).toBe(false); expect(scrap).toBeGreaterThan(0); expect(maxDrones).toBeLessThanOrEqual(3);
+  });
+});

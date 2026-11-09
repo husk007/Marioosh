@@ -236,6 +236,21 @@ export function drawWorld(w: World, g: Gfx): void {
   for (const m of rt.decor) if (m.k === 'mirror' && m.state === 1) g.rect(m.x - 2, m.y - 60, 4, 4, '#fff', 0.8 + 0.2 * Math.sin(w.time * 10));
   for (const pt of w.parts) g.rect(pt.x, pt.y, pt.size, pt.size, pt.color, Math.min(1, pt.life / pt.max * 1.5));
 
+  // tłoki i wyładowania (cykliczne): ostrzeżenie = migające światło, aktywne = tłok / błyskawica
+  for (const a of rt.arcs) {
+    if (a.x1 < g.camX - 40 || a.x0 > g.camX + VW + 40) continue;
+    const w0 = a.x1 - a.x0, h0 = a.y1 - a.y0, cxm = (a.x0 + a.x1) / 2;
+    if (a.kind === 'bolt') {
+      if (a.live) { g.rect(a.x0, a.y0, w0, h0, '#bfe6ff', 0.25); let xx = cxm; for (let y = a.y0; y < a.y1; y += 12) { const nx = cxm + Math.sin(y * 0.7 + w.time * 60) * (w0 * 0.3); g.rect(Math.min(xx, nx) - 1, y, Math.abs(nx - xx) + 3, 13, '#fff', 0.95); xx = nx; } }
+      else if (a.warning) { if (Math.floor(w.time * 10) % 2 === 0) { g.rect(a.x0, a.y0, w0, 3, '#ffd24a', 0.9); g.rect(a.x0, a.y1 - 3, w0, 3, '#ffd24a', 0.9); } g.rect(a.x0, a.y0, w0, h0, '#ffd24a', 0.07); }
+      else if (!a.stopped) g.rect(a.x0 + 2, a.y0, w0 - 4, 2, '#7fd6ff', 0.35);
+    } else {
+      const top = a.y0;
+      if (a.live) { g.rect(a.x0, a.y0, w0, h0, '#8a929c', 1); g.rect(a.x0, a.y0, 4, h0, '#c6ccd4', 1); g.rect(a.x0 - 4, a.y1 - 10, w0 + 8, 10, '#5a616b', 1); for (let y = a.y0 + 8; y < a.y1 - 12; y += 14) g.rect(a.x0 + 4, y, w0 - 8, 2, '#5a616b', 1); }
+      else { const ext = a.warning ? 14 + Math.sin(w.time * 30) * 3 : 8; g.rect(a.x0 + 4, top, w0 - 8, ext, '#6b727c', 1); g.rect(a.x0 - 2, top + ext - 6, w0 + 4, 6, '#454b54', 1);
+        if (a.warning && Math.floor(w.time * 10) % 2 === 0) { g.rect(a.x0, a.y1 - 6, w0, 6, '#ff5a4a', 0.9); g.rect(a.x0, a.y0, w0, h0, '#ff5a4a', 0.08); } else if (a.stopped) g.rect(a.x0 + w0 / 2 - 2, a.y0 + ext, 4, 4, '#4be38a', 1); else g.rect(a.x0, a.y1 - 3, w0, 3, '#ffd24a', 0.45); }
+    }
+  }
   // deszcz
   for (const r of rt.rains) {
     const camMid = g.camX + VW / 2; if (camMid < r.x0 - VW / 2 || camMid > r.x1 + VW / 2) continue;

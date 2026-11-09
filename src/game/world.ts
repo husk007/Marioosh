@@ -74,7 +74,7 @@ export class World {
     const grid: Grid = { w: room.w, h: room.h, tiles };
     const rt: RoomRT = {
       room, tiles, grid, enemies: [], items: [], crates: [], cables: [], statues: [], switches: [], gates: [], plats: [], checkpoints: [], exits: [], ecos: [],
-      lamps: [], lanterns: [], hints: [], currents: [], rains: [], slides: [], boulders: [], decor: [], signs: [], crumble: new Map(), boss: null,
+      lamps: [], lanterns: [], hints: [], currents: [], rains: [], arcs: [], slides: [], boulders: [], decor: [], signs: [], crumble: new Map(), boss: null,
       water: room.water.slice(), floods: [], spans: [],
     };
     const S = this.session;
@@ -106,8 +106,9 @@ export class World {
         case 'hint': rt.hints.push({ x: s.x, w: s.w, key: s.key, shown: false }); break;
         case 'rain': rt.rains.push({ x0: s.x0, x1: s.x1, interval: s.interval }); break;
         case 'boulder': rt.boulders.push({ spec: s, t: s.every - (s.offset ?? 0), warned: false, roll: null }); break;
+        case 'arc': rt.arcs.push({ x0: s.x0, y0: s.y0, x1: s.x1, y1: s.y1, period: s.period, on: s.on, warn: s.warn ?? 1, offset: s.offset ?? 0, stop: s.stop, kind: s.kind ?? 'piston', live: false, warning: false, stopped: false }); break;
         case 'slide': rt.slides.push({ x0: s.x0, x1: s.x1, y: s.y, interval: s.interval, warn: s.warn ?? 1.8, t: s.interval - (s.offset ?? 0), warned: false }); break;
-        case 'span': rt.spans.push({ gate: s.gate, cells: s.cells, done: false }); break;
+        case 'span': rt.spans.push({ gate: s.gate, cells: s.cells, done: false, timed: s.timed }); break;
         case 'flood': rt.floods.push({ x0: s.x0, x1: s.x1, y0: s.y0 ?? 0, y1: s.y1 ?? 9999, from: s.from, to: s.to, speed: s.speed, gate: s.gate, cur: s.from }); break;
         case 'current': rt.currents.push({ x: s.x, y: s.y, w: s.w, h: s.h, fx: s.fx, fy: s.fy }); break;
         case 'decor': rt.decor.push({ k: s.k, x: s.x, y: s.y, hits: 0, state: 0 }); break;
@@ -156,7 +157,7 @@ export class World {
       lit: (x, y, range = 90) => this.rt.lamps.some((l) => Math.abs(l.x - x) < 120 && Math.abs(l.y - y) < range) || this.rt.lanterns.some((l) => l.lit && Math.abs(l.x - x) < 120 && Math.abs(l.y - y) < range),
       switchesFor: (g) => self.rt.switches.filter((s) => s.gate === g),
       decorOf: (k) => self.rt.decor.filter((d) => d.k === k),
-      spawnEnemy: (k, x, y) => { const e = makeEnemy(k, x, y); e.b.y = y - e.b.h / 2; e.hy = e.b.y; self.rt.enemies.push(e); },
+      spawnEnemy: (k, x, y) => { const e = makeEnemy(k, x, y); e.b.y = y - e.b.h / 2; e.hy = e.b.y; if (k === 'dron') e.st = 'chase'; self.rt.enemies.push(e); },
       enemyCount: (k) => self.rt.enemies.filter((e) => e.kind === k && !e.dead).length,
       shake: (a) => this.shake(a), platsOff: (s) => { this.platsOffT = s; }, say: (k, p) => this.say(k, p),
       breakPillar: (i) => { const d = self.rt.decor.filter((x) => x.k === 'pillar')[i]; if (d) this.burst(d.x, d.y - 40, '#8d93a0', 18, 160); },
@@ -175,7 +176,7 @@ export class World {
     this.session.run.time += dt;
     const rt = this.rt; const ctx = this.aiCtx();
     this.updatePlatforms(dt);
-    this.updateSwitchesGates(dt); this.updateFloods(dt); this.updateSlides(dt); this.updateBoulders(dt);
+    this.updateSwitchesGates(dt); this.updateFloods(dt); this.updateSlides(dt); this.updateArcs(dt); this.updateBoulders(dt);
     this.updateCrumble(dt);
     this.players.forEach((p, i) => this.updatePlayer(p, inputs[i] ?? inputs[0], dt));
     this.coopSafety();
@@ -251,7 +252,14 @@ export class World {
   private updateFloods(dt: number): void {
     const rt = this.rt;
     for (const sp of rt.spans) {
-      if (sp.done) continue; const sw = rt.switches.filter((s) => s.gate === sp.gate);
+      const sw = rt.switches.filter((s) => s.gate === sp.gate);
+      if (sp.timed && sp.done) {   // most na czas: ostrzeżenie na 2 s przed końcem, potem się chowa
+        const left = Math.max(...sw.map((s) => (s.on ? s.latch : 0)));
+        if (left > 0 && left <= 2 && !sp.warned) { sp.warned = true; this.sfx('warn'); this.say('toast.bridgeEnd'); }
+        if (left <= 0) { sp.done = false; sp.warned = false; for (const [x, y] of sp.cells) if (rt.tiles[y * rt.grid.w + x] === T.ONEWAY) rt.tiles[y * rt.grid.w + x] = T.EMPTY; this.sfx('break'); this.shake(3); }
+        continue;
+      }
+      if (sp.done) continue;
       if (sw.length && sw.every((s) => s.on)) { sp.done = true; for (const [x, y] of sp.cells) if (rt.tiles[y * rt.grid.w + x] === T.EMPTY) rt.tiles[y * rt.grid.w + x] = T.ONEWAY; this.say('toast.bridge'); this.sfx('switch'); this.shake(3); }
     }
     if (!rt.floods.length) return;
@@ -263,6 +271,22 @@ export class World {
       f.cur += Math.sign(d) * Math.min(Math.abs(d), f.speed * dt); f.applied = true;
       const top = Math.ceil(f.cur - 1e-6);
       for (let y = Math.max(0, f.y0); y <= Math.min(rt.grid.h - 1, f.y1); y++) for (let x = f.x0; x <= f.x1; x++) rt.water[y * rt.grid.w + x] = y >= top ? 1 : 0;
+    }
+  }
+  /** cykliczne zagrożenia (tłoki, wyładowania): aktywne `on` s z okresu `period`; przez ostatnie `warn` s przerwy świeci ostrzeżenie; odłącznik `stop` (otwarta brama) wyłącza je na stałe */
+  private updateArcs(dt: number): void {
+    const rt = this.rt;
+    for (const a of rt.arcs) {
+      a.stopped = !!a.stop && rt.gates.some((g) => g.id === a.stop && g.open);
+      const ph = (((this.time + a.offset) % a.period) + a.period) % a.period;
+      const wasLive = a.live;
+      a.live = !a.stopped && ph < a.on;
+      a.warning = !a.stopped && !a.live && ph >= a.period - a.warn;
+      const near = this.activePlayers.some((p) => p.mv.body.x > a.x0 - 360 && p.mv.body.x < a.x1 + 360);
+      if (a.live && !wasLive && near) { this.sfx(a.kind === 'bolt' ? 'hit' : 'rock'); this.shake(a.kind === 'bolt' ? 3 : 2); }
+      if (a.warning && near && Math.random() < dt * 8) this.parts.push({ x: a.x0 + Math.random() * (a.x1 - a.x0), y: a.y0 + Math.random() * (a.y1 - a.y0), vx: 0, vy: -20, life: 0.4, max: 0.4, color: '#ffd24a', size: 2, grav: 0 });
+      if (!a.live) continue;
+      for (const p of this.activePlayers) { const b = p.mv.body; if (p.invuln <= 0 && rectsOverlap(b.x, b.y, b.w, b.h, a.x0, a.y0, a.x1 - a.x0, a.y1 - a.y0)) this.hurtPlayer(p, (a.x0 + a.x1) / 2, true); }
     }
   }
   /** osuwy skalne: ostrzeżenie (dźwięk, kurz, drżenie) → po `warn` s spada rząd kamieni; osłania lity nawis */
@@ -324,7 +348,7 @@ export class World {
       const n = rt.switches.filter((s) => s.gate === g.id && s.on).length;
       if (n >= g.need) {
         g.open = true; for (const [cx, cy] of g.cells) { if (rt.tiles[cy * rt.grid.w + cx] === T.GATE) rt.tiles[cy * rt.grid.w + cx] = T.EMPTY; }
-        this.say(rt.plats.some((q) => q.power === g.id) ? 'toast.power' : 'toast.gateOpen'); this.sfx('switch'); this.shake(3);
+        this.say(rt.plats.some((q) => q.power === g.id) ? 'toast.power' : rt.arcs.some((q) => q.stop === g.id) ? 'toast.stop' : 'toast.gateOpen'); this.sfx('switch'); this.shake(3);
         if (g.id.endsWith(':warpgate')) for (const c of rt.cables) if (c.locked) c.locked = false;
       }
     }
@@ -563,7 +587,12 @@ export class World {
     for (const l of rt.lanterns) if (!l.lit && Math.abs(l.x - cx) < 50 && Math.abs(l.y - feet) < 70 && inp.pressed.interact) { l.lit = true; this.sfx('switch'); this.say('toast.light'); return; }
   }
   private activateSwitch(s: SwitchEnt): void {
+    if (s.gate.startsWith('ord')) {   // przekaźniki w kolejności: wszystkie o niższym symbolu muszą już działać, inaczej cały zestaw się zeruje
+      const grp = this.rt.switches.filter((q) => q.gate === s.gate);
+      if (!grp.filter((q) => q.symbol < s.symbol).every((q) => q.on)) { for (const q of grp) { q.on = false; q.latch = 0; } this.sfx('warn'); this.say('toast.order'); this.shake(2); return; }
+    }
     s.on = true; this.sfx('switch'); this.say('toast.switchOn'); this.burst(s.x, s.y - 20, '#ffd23f', 8, 90, 0);
+    if (s.gate.startsWith('tb')) s.latch = 8;
     if (s.gate === 'crane') s.latch = 14; else if (s.gate === 'spot') s.latch = 8; else if (s.gate === 'seal') s.latch = 16; else if (s.gate === 'gen') s.latch = 28; else if (s.gate.startsWith('pool')) s.latch = 16;
   }
   private revealCable(c: { hidden: boolean; revealed: boolean; tx: number; ty: number; id: string }): void {

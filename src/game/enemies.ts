@@ -42,6 +42,7 @@ export function makeEnemy(kind: EnemyKind, cx: number, groundY: number): Enemy {
   if (kind === 'rogoskoczek') { e.st = 'idle'; e.t = 0.6; }
   if (kind === 'kamienirog') { e.st = 'patrol'; e.t = 2.5; e.hornsUp = true; }
   if (kind === 'bazalisk') { e.hornsUp = true; }
+  if (kind === 'dron') { e.hornsUp = true; e.t = 1.5; }
   return e;
 }
 
@@ -167,6 +168,18 @@ export function updateEnemy(e: Enemy, dt: number, ctx: AICtx): void {
       break;
     }
     case 'dron': {
+      if (e.st === 'patrol' || e.st === 'alert' || e.st === 'dive' || e.st === 'land' || e.st === 'rise') {   // strażnik hali (W7): patroluje pod sufitem, na sygnał nurkuje w miejsce gracza
+        if (e.st === 'patrol') {
+          e.hornsUp = true; e.b.x += e.dir * S * 0.8 * dt; e.b.y = e.hy + Math.sin(e.f * 3) * 8; if (Math.abs(cx(e.b) - e.hx) > 150) e.dir = (e.dir * -1) as 1 | -1;
+          if (e.t <= 0 && p && Math.abs(cx(p.mv.body) - cx(e.b)) < 190 && p.mv.body.y > e.b.y + 20 && p.mv.body.y < e.b.y + 340) { e.st = 'alert'; e.t = 0.8; e.c = cx(p.mv.body); faceTo(e, p); ctx.sfx('warn'); }
+        } else if (e.st === 'alert') { e.b.y = e.hy + Math.sin(e.f * 40) * 3; if (e.t <= 0) { e.st = 'dive'; e.t = 1.3; e.dir = e.c >= cx(e.b) ? 1 : -1; } }   // cel zapamiętany na początku sygnału
+        else if (e.st === 'dive') {
+          const dx = e.c - cx(e.b); e.b.vx = Math.max(-170, Math.min(170, dx * 4)); e.b.vy = 220; moveBody(g, e.b, dt);
+          if (e.b.onGround || e.t <= 0) { e.st = 'land'; e.t = 1.6; e.hornsUp = false; e.b.vx = 0; }
+        } else if (e.st === 'land') { e.b.vx = 0; gravity(e, g, dt); if (e.t <= 0) e.st = 'rise'; }
+        else if (e.st === 'rise') { e.b.y -= 110 * dt; if (e.b.y <= e.hy) { e.b.y = e.hy; e.st = 'patrol'; e.t = 2.6; e.hornsUp = true; } }
+        break;
+      }
       e.hornsUp = false;
       if (p) { const dx = cx(p.mv.body) - cx(e.b), dy = cy(p.mv.body) - cy(e.b) - 30 + Math.sin(e.f * 3) * 20; const d = Math.hypot(dx, dy) || 1; e.b.x += (dx / d) * S * dt; e.b.y += (dy / d) * S * dt; e.dir = dx >= 0 ? 1 : -1; }
       break;
@@ -208,6 +221,7 @@ export function stompable(e: Enemy): boolean {
   switch (e.kind) {
     case 'pszczolrog': case 'rogopletw': case 'osmiorog': case 'rogopnacze': case 'rogoroza': case 'kakturozec': case 'kamienirog': case 'bykobieg': return false;
     case 'cmorog': case 'rogowrobel': case 'krukorog': return e.st === 'land';
+    case 'dron': return e.st === 'land' || e.st === 'chase';
     case 'baranitor': return e.st !== 'charge' && e.st !== 'alert';
     default: return true;
   }
@@ -222,6 +236,7 @@ export function hitEnemy(e: Enemy, how: HitKind, dmg: number, fromBehind: boolea
   if (how === 'key' || how === 'spark' || how === 'env') {
     switch (k) {
       case 'krukorog': ok = e.st === 'land'; break;
+      case 'dron': ok = e.st === 'land' || e.st === 'chase'; break;
       case 'baranitor': ok = e.st === 'stun' || fromBehind; break;
       case 'bykobieg': ok = e.st === 'stun'; break;
       case 'kamienirog': ok = e.st === 'shellOff'; break;

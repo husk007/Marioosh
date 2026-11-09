@@ -163,3 +163,45 @@ it('negatywny W6-L4: bez któregokolwiek z dwóch bezpieczników brama areny poz
   expect(sp.length).toBe(3);
   expect((Math.max(...xs) - Math.min(...xs)) / BROTHERS.M.run).toBeLessThan(6);
 }, 400000);
+
+it('W7-L1: bez przekaźnika 1 (brama g1) albo 2 (brama g2) wyjście jest nieosiągalne; bez pasm nad przepaścią prasy też; odłącznik nie jest wymagany', () => {
+  for (const sw of ['r1', 'r2']) { const L = without('W7-L1', (s) => s.t === 'switch' && s.id.endsWith(':' + sw)); const e = exitOfLevel(L); expect(analyze(L, 'M').reaches(0, e.x, e.y, 40, 10), sw).toBe(false); }
+  const P = structuredClone(getLevel('W7-L1')); const r = P.rooms[0];
+  for (let x = 58; x <= 99; x++) { r.tiles[21 * r.w + x] = T.EMPTY; r.tiles[12 * r.w + x] = T.EMPTY; }
+  const ep = exitOfLevel(P); expect(analyze(P, 'D').reaches(0, ep.x, ep.y, 40, 10), 'przepaść').toBe(false);
+  const NS = without('W7-L1', (s) => s.t === 'switch' && s.id.endsWith(':stop')); const en = exitOfLevel(NS);
+  for (const b of ['M', 'D'] as const) expect(analyze(NS, b).reaches(0, en.x, en.y, 40, 10), 'bez odłącznika ' + b).toBe(true);
+  const L = getLevel('W7-L1'); const e = exitOfLevel(L);
+  for (const b of ['M', 'D'] as const) expect(analyze(L, b).reaches(0, e.x, e.y, 40, 10), b).toBe(true);
+}, 600000);
+
+it('W7-L2: bez dźwigni mostu 1 albo mostu 2 wyjście jest nieosiągalne; dźwignia ciszy i trasa górna nie są wymagane', () => {
+  for (const sw of ['b1', 'b2']) { const L = without('W7-L2', (s) => s.t === 'switch' && s.id.endsWith(':' + sw)); const e = exitOfLevel(L); expect(analyze(L, 'M').reaches(0, e.x, e.y, 40, 10), sw).toBe(false); }
+  const NC = without('W7-L2', (s) => s.t === 'switch' && s.id.endsWith(':calm')); const en = exitOfLevel(NC);
+  expect(analyze(NC, 'D').reaches(0, en.x, en.y, 40, 10), 'bez ciszy').toBe(true);
+  const NP = without('W7-L2', (s) => s.t === 'platform'); const eP = exitOfLevel(NP);
+  expect(analyze(NP, 'M').reaches(0, eP.x, eP.y, 40, 10), 'trasa dolna bez pomostu').toBe(true);
+  const L = getLevel('W7-L2'); const e = exitOfLevel(L);
+  for (const b of ['M', 'D'] as const) expect(analyze(L, b).reaches(0, e.x, e.y, 40, 10), b).toBe(true);
+}, 600000);
+
+it('W7-L3: bez któregokolwiek z mostów na czas, stacji pomostów, trzech przekaźników rdzenia albo windy wyjście jest nieosiągalne; z kompletem — osiągalne dla obu braci', () => {
+  const ids = ['tb1', 'tb2', 'tb3', 'p1', 'p2', 'p3', 'o1', 'o2', 'o3'];
+  for (const id of ids) { const L = without('W7-L3', (s) => s.t === 'switch' && s.id.endsWith(':' + id)); const e = exitOfLevel(L); expect(analyze(L, 'M').reaches(0, e.x, e.y, 40, 10), id).toBe(false); }
+  const NL = without('W7-L3', (s) => s.t === 'platform' && s.mode === 'v'); const eN = exitOfLevel(NL); expect(analyze(NL, 'D').reaches(0, eN.x, eN.y, 40, 10), 'bez windy').toBe(false);
+  const L = getLevel('W7-L3'); const e = exitOfLevel(L);
+  for (const b of ['M', 'D'] as const) expect(analyze(L, b).reaches(0, e.x, e.y, 40, 10), b).toBe(true);
+}, 900000);
+
+it('negatywny W7-L4: bez dźwigni testu 1, 2 lub 3 arena Rogodrona jest nieosiągalna; trzy generatory da się włączyć solo w oknie 28 s (marsz ≤ 24 s); z kompletem arena osiągalna dla obu braci', () => {
+  for (const sw of ['t1', 't2', 't3']) {
+    const L = without('W7-L4', (s) => s.t === 'switch' && s.id.endsWith(':' + sw));
+    const boss = L.rooms[0].specs.find((s) => s.t === 'boss')!;
+    expect(analyze(L, 'M').reaches(0, boss.x, boss.y, 40, 10), sw).toBe(false);
+  }
+  const L0 = getLevel('W7-L4'); const boss = L0.rooms[0].specs.find((s) => s.t === 'boss')!;
+  for (const b of ['M', 'D'] as const) expect(analyze(L0, b).reaches(0, boss.x, boss.y, 40, 10), b).toBe(true);
+  const g = L0.rooms[0].specs.filter((s): s is Extract<Spec, { t: 'switch' }> => s.t === 'switch' && s.gate === 'gen').sort((a, b) => a.x - b.x); expect(g.length).toBe(3);
+  // droga: lewy podest → drabina (4 wiersze) → podłoga → środek (drabina) → podłoga → prawy podest; marsz ≈ dystans poziomy + 3 × 3 s na drabiny
+  const t = (g[2].x - g[0].x) / BROTHERS.M.run + 3 * 3; expect(t).toBeLessThan(24);
+}, 900000);

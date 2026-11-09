@@ -48,7 +48,7 @@ describe('przedmioty wybite ze skrzynek', () => {
         }
       }
     }
-    expect(crates).toBeGreaterThan(30);
+    expect(crates).toBeGreaterThan(10);   // poziomy autorskie (W7+) nie mają skrzynek — zostały tylko starsze mapy
     expect(bad).toEqual([]);
   }, 120000);
 });
