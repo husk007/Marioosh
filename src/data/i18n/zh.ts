@@ -60,7 +60,7 @@ const zh: Dict = {
   'hint.switch': '开关为大门供电。每个谜题单人也能解开。', 'hint.beam': '石化凝视！石化之前躲到障碍物后面。', 'hint.mirror': '放置镜子（互动），让光束反射到首领身上。', 'hint.dark': '灯笼照亮黑夜，请待在光亮里。', 'hint.valve': '阀门会改变水位：排空或注满水箱。水位会缓慢升降。', 'hint.air': '水下空气会耗尽：请浮出水面或寻找干燥舱室。在水面按跳跃可爬上岸。', 'hint.water': '水下按跳跃键会向上划水。', 'hint.crumble': '崩塌平台一会儿就会掉落，别耽搁。', 'hint.rock': '地面上的影子预示着落石。', 'hint.sequence': '符号顺序：闪电 → 月亮 → 树叶 → 星星。', 'hint.eco': '回收机（EcoPort）能把容器换成奖励。',
   'boss.rogomir': '罗戈米尔', 'boss.zlomotaur': '废铁牛怪', 'boss.kaktogor': '仙人掌角王', 'boss.rogopletw': '巨型角鳍鱼', 'boss.ceratopsor': '角龙兽', 'boss.krukorog': '角鸦王', 'boss.rogodron': '角无人机母体', 'boss.katoblepas': '卡托布勒帕斯',
   'bosshint.rogomir': '断开三台发电机（交互键）即可削弱罗戈米尔的装甲。它撞墙卡住时，用扳手攻击。冲锋前先躲到高架走道上。', 'bosshint.zlomotaur': "在14秒内启动两座塔上的起重机控制台，乘吊车往返。护甲裂开后，等废铁牛撞墙卡住，顺梯子下去攻击。", 'bosshint.kaktogor': '用钥匙砍断三条根（两条在地面，一条在平台上），再击打花心。每次命中后根会重新长出。小心尖刺。',
-  'bosshint.rogopletw': 'Rogopletw 在水中无敌。栈桥上的阀门能排空它所在的水池——顺梯子下去攻击。小心它的跳跃。', 'bosshint.ceratopsor': '引诱它撞向标记的墙，再攻击露出的侧面。', 'bosshint.krukorog': '角鸦王飞过时打开探照灯（互动）；它落地后攻击印记。',
+  'bosshint.rogopletw': 'Rogopletw 在水中无敌。栈桥上的阀门能排空它所在的水池——顺梯子下去攻击。小心它的跳跃。', 'bosshint.ceratopsor': '拉动走廊上的封印杠杆（16 秒）——这时装甲才会脱落。角龙冲向石柱；它被卡住时，爬下去攻击。石柱上方的走廊能躲避冲撞。', 'bosshint.krukorog': '角鸦王飞过时打开探照灯（互动）；它落地后攻击印记。',
   'bosshint.rogodron': '关闭三台发电机（互动），核心露出时将其摧毁。', 'bosshint.katoblepas': '第一阶段：击碎石柱。第二阶段：反射光束。第三阶段：启动八个能量节点。',
   'boss.phase': '第 {n} 阶段', 'boss.defeated': '已击败！', 'boss.warn': '小心！',
   'enemy.rogus': '小角怪', 'enemy.baranitor': '角羊冲锋兽', 'enemy.bykobieg': '奔牛', 'enemy.zukorog': '甲虫角怪', 'enemy.cmorog': '飞蛾角怪', 'enemy.pszczolrog': '蜂角怪', 'enemy.rogowrobel': '角雀', 'enemy.krukorog': '角鸦', 'enemy.gekorog': '壁虎角怪',

@@ -108,3 +108,10 @@ it('negatywny W5-L3: bez zwrotnicy (dźwigni na tarasie) rumowisko nie otwiera s
   expect(reach(without('W5-L3', (s) => s.t === 'switch'))).toBe(false);
   expect(reach(without('W5-L3', (s) => s.t === 'platform'))).toBe(false);
 }, 400000);
+it('negatywny W5-L4: bez dźwigni a (brama g1) lub b (brama g2) arena jest nieosiągalna', () => {
+  for (const sw of ['a', 'b']) {
+    const L = without('W5-L4', (s) => s.t === 'switch' && s.id.endsWith(':' + sw));
+    const can = L.rooms[0].specs.filter((s): s is Extract<Spec, { t: 'item' }> => s.t === 'item' && s.k === 'can').find((s) => s.x < 30 * 32 && s.y < 22 * 32)!;
+    expect(analyze(L, 'M').touches(0, can.x, can.y, 24), sw).toBe(false);
+  }
+}, 590000);

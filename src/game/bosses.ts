@@ -26,7 +26,7 @@ export function makeBoss(id: BossId, cx: number, groundY: number, x0: number, x1
   const b = newBody(cx - w / 2, flying ? groundY - h - 150 : groundY - h, w, h);
   return {
     id, b, hp: BOSS_HITS[id], maxHp: BOSS_HITS[id], st: 'intro', t: 1.2, dir: -1, phase: 1, hurt: 0, dead: false, deadT: 0, stun: 0, f: 0,
-    x0, x1, floorY: groundY, data: {}, armor: id === 'zlomotaur' || id === 'rogodron' || id === 'kaktogor' || id === 'rogomir', flying, cycle: 0, started: false, hint: '',
+    x0, x1, floorY: groundY, data: {}, armor: id === 'zlomotaur' || id === 'rogodron' || id === 'kaktogor' || id === 'rogomir' || id === 'ceratopsor', flying, cycle: 0, started: false, hint: '',
   };
 }
 
@@ -52,7 +52,7 @@ export function bossVulnerable(b: BossRT): boolean {
   if (b.dead || b.hurt > 0) return false;
   switch (b.id) {
     case 'rogomir': return b.st === 'stuck' && !b.armor;
-    case 'ceratopsor': return b.st === 'stuck';
+    case 'ceratopsor': return b.st === 'stuck' && !b.armor;
     case 'zlomotaur': return b.st === 'stuck' && !b.armor;
     case 'kaktogor': return b.data.roots >= 3 && b.armor === false;
     case 'krukorog': return b.st === 'landed';
@@ -102,13 +102,20 @@ export function updateBoss(b: BossRT, dt: number, c: BossCtx): void {
       break;
     }
     case 'ceratopsor': {
+      // v0.4: pancerz czołowy zdejmuje PIECZĘĆ (dźwignia na galerii, okno 16 s); bić można tylko wtedy, gdy boss utknie w kolumnie lub ścianie. Trafienie przywraca pancerz i pieczęć.
+      // Kolumny areny zatrzymują szarżę i dzielą salę na pasy; galeria nad nimi jest bezpieczna przed szarżą (spada tylko żwir po utknięciu, poniżej galerii).
+      const se = c.switchesFor('seal'); const live = se.filter((s) => s.on).length;
+      if (b.data.hp0 === undefined) b.data.hp0 = b.hp;
+      if (b.armor && se.length && live >= se.length) { b.armor = false; c.say('toast.armor'); c.sfx('break'); c.shake(6); }
+      else if (!b.armor && live < se.length && b.data.hp0 === b.hp) b.armor = true;
+      if (b.hp < b.data.hp0) { b.data.hp0 = b.hp; for (const s of se) { s.on = false; s.latch = 0; } b.armor = true; }
       if (b.st === 'idle' && b.t <= 0 && b.cycle % 2 === 1 && b.data.slam !== b.cycle) {
         b.data.slam = b.cycle; b.st = 'slam'; b.t = 0.9; c.sfx('warn');
       } else if (b.st === 'slam') {
         b.b.vx = 0; grav(b, c, dt);
         if (b.t <= 0.45 && b.data.slamDone !== b.cycle) { b.data.slamDone = b.cycle; b.b.vy = -300; }
         if (b.t <= 0 ) { b.st = 'idle'; b.t = 0.5; c.shake(7); c.sfx('rock'); for (const d of [-1, 1]) c.proj({ kind: 'wave', x: bx(b) + d * 30, y: b.floorY - 14, vx: d * 170, vy: 0, life: 3.2, r: 12 }); b.cycle++; }
-      } else chargeLike(b, c, dt, 230, 2.4, () => { for (let i = 0; i < 4; i++) c.proj({ kind: 'rock', x: b.x0 + Math.random() * (b.x1 - b.x0), y: b.floorY - 330, vx: 0, vy: 0, life: 4, grav: 600, r: 9 }); });
+      } else chargeLike(b, c, dt, 200, 5, () => { for (let i = 0; i < 3; i++) c.proj({ kind: 'rock', x: b.x0 + 30 + Math.random() * (b.x1 - b.x0 - 60), y: b.floorY - 190, vx: 0, vy: 0, life: 4, grav: 600, r: 9 }); }, 1.0, 5, 14);
       break;
     }
     case 'zlomotaur': {

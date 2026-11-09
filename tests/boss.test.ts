@@ -205,3 +205,32 @@ describe('Kaktogór v0.4 (korzenie odrastają po każdym trafieniu)', () => {
     expect(hitBoss(b, 'key')).toBe(false); expect(b.hp).toBe(2);
   });
 });
+
+describe('Ceratopsor v0.4 (pieczęć, kolumny, galeria)', () => {
+  const arenaC = (): World => {
+    const s = new Session(newSave('solo', 'M'), 0);
+    const w = new World(getLevel('W5-L4'), s, { audio: stubAudio, settings: defaultSettings(), night: false });
+    w.readyT = 0; w.rt.enemies.length = 0; step(w, 3); return w;
+  };
+  const seal = (w: World) => w.rt.switches.filter((s) => s.gate === 'seal');
+  const on = (w: World) => seal(w).forEach((s) => { s.on = true; s.latch = 16; });
+  it('pancerz na starcie; bez pieczęci utknięty boss jest nietykalny, z pieczęcią — podatny; trafienie przywraca pancerz i pieczęć', () => {
+    const w = arenaC(); const b = w.rt.boss!; b.started = true; b.st = 'stuck'; b.t = 5;
+    expect(b.armor).toBe(true); expect(seal(w).length).toBe(1); expect(hitBoss(b, 'key')).toBe(false);
+    on(w); step(w, 2); expect(b.armor).toBe(false); b.st = 'stuck'; b.t = 5; b.hurt = 0; expect(hitBoss(b, 'stomp')).toBe(false);
+    expect(hitBoss(b, 'key')).toBe(true); expect(b.hp).toBe(2); step(w, 2); expect(b.armor).toBe(true); expect(seal(w).every((s) => !s.on)).toBe(true);
+  });
+  it('trzy trafienia pokonują bossa; poza utknięciem pieczęć nie wystarcza', () => {
+    const w = arenaC(); const b = w.rt.boss!; b.started = true; on(w); step(w, 2); b.st = 'charge'; expect(hitBoss(b, 'key')).toBe(false);
+    for (let i = 0; i < 3; i++) { on(w); step(w, 2); b.st = 'stuck'; b.t = 5; b.hurt = 0; expect(hitBoss(b, 'key')).toBe(true); step(w, 2); }
+    expect(b.dead).toBe(true);
+  });
+  it('szarża zatrzymuje się na kolumnie: gracz w zachodnim pasie, boss we wschodnim — boss nie przechodzi kolumny, a gracz na galerii przez 25 s nie traci zdrowia', () => {
+    const w = arenaC(); const p = w.players[0]; const b = w.rt.boss!; const m = p.mv.body;
+    m.x = 18.5 * TILE - m.w / 2; m.y = 20 * TILE - m.h; m.vx = m.vy = 0; p.safe = { x: m.x + m.w / 2, y: 20 * TILE };
+    b.started = true; b.b.x = 27 * TILE; let stuck = false, xmin = 1e9;
+    for (let i = 0; i < 60 * 25; i++) { step(w, 1); m.x = 18.5 * TILE - m.w / 2; m.vx = 0; if (b.st === 'stuck') stuck = true; xmin = Math.min(xmin, b.b.x); }
+    expect(stuck).toBe(true); expect(p.hp).toBe(MAX_HP);
+    expect(xmin).toBeGreaterThanOrEqual(24 * TILE - 2);       // nie przeszedł przez kolumnę (22–23)
+  });
+});
