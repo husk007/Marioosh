@@ -23,6 +23,8 @@ export interface PlayerEnt {
   trail: { x: number; y: number }[];
   bounceHold: boolean;
   spawnProtect: number;
+  /** punkty życia (v0.4: 3 + tarcza) i ostatnie bezpieczne miejsce (powrót po upadku w przepaść) */
+  hp: number; safe: { x: number; y: number };
 }
 
 export interface Enemy {

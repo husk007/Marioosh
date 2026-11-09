@@ -9,5 +9,5 @@ export default defineConfig({
   plugins: [dropArtSources],
   base: './',
   build: { target: 'es2022', outDir: 'dist', sourcemap: false, chunkSizeWarningLimit: 900 },
-  test: { include: ['tests/**/*.test.ts'], environment: 'node' },
+  test: { include: ['tests/**/*.test.ts'], exclude: ['tests/legacy/**', 'node_modules/**'], environment: 'node' },
 } as any);

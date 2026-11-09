@@ -7,13 +7,10 @@ import { storage } from '../src/engine/storage';
 const mk = (mode: 'solo' | 'coop' = 'solo') => new Session(newSave(mode, 'M'), 0);
 
 describe('licznik opakowań (kryterium: 99 / 100 / 101)', () => {
-  it('99 opakowań nie daje życia, 100. daje dokładnie jedno, 101. nic', () => {
+  it('opakowania liczą się do kaucji, ale nie dają żyć (v0.4: brak żyć za 100 sztuk)', () => {
     const s = mk(); const start = s.lives[0]; let gained = 0;
-    for (let i = 1; i <= 99; i++) if (s.collectPackage(`pet${i}`, 'pet', 0).lifeGained) gained++;
-    expect(gained).toBe(0); expect(s.lives[0]).toBe(start);
-    expect(s.collectPackage('pet100', 'pet', 0).lifeGained).toBe(true); expect(s.lives[0]).toBe(start + 1);
-    expect(s.collectPackage('pet101', 'pet', 0).lifeGained).toBe(false); expect(s.lives[0]).toBe(start + 1);
-    expect(s.packages).toBe(101);
+    for (let i = 1; i <= 101; i++) if (s.collectPackage(`pet${i}`, 'pet', 0).lifeGained) gained++;
+    expect(gained).toBe(0); expect(s.lives[0]).toBe(start); expect(s.packages).toBe(101);
   });
   it('to samo opakowanie nie liczy się dwa razy (antyduplikacja po id)', () => {
     const s = mk(); expect(s.collectPackage('a', 'can', 0).counted).toBe(true);

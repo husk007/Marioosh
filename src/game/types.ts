@@ -85,6 +85,8 @@ export type LevelMode = 'run' | 'tower' | 'water' | 'boss';
 export interface LevelData {
   id: string;
   world: number; stage: number;
+  /** nadpisanie profilu fizyki (id planety 0–8); domyślnie = world */
+  planet?: number;
   titleKey: string;
   timeLimit: number;
   mode: LevelMode;

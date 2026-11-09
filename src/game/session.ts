@@ -1,5 +1,5 @@
 /** Stan rozgrywki: liczniki, życia, postęp. Czysta logika (testowalna bez przeglądarki). */
-import { MAX_LIVES, PACKAGES_PER_LIFE } from './constants';
+import { MAX_LIVES } from './constants';
 import { SaveData, writeSlot, type LevelRecord } from './save';
 
 export type PackageKind = 'pet' | 'can' | 'golden';
@@ -40,10 +40,8 @@ export class Session {
     this.data.score += score; this.data.depositGrosze += grosze; this.data.packageCount += 1;
     if (kind === 'pet') this.run.pets++; else if (kind === 'can') this.run.cans++; else this.run.golden++;
     this.run.carriedPackages++;
-    let lifeGained = false;
-    const milestones = Math.floor(this.data.packageCount / PACKAGES_PER_LIFE);
-    while (this.data.lifeMilestones < milestones) { this.data.lifeMilestones++; lifeGained = this.addLife(p) || lifeGained; }
-    return { counted: true, lifeGained, score };
+    void p;   // v0.4: opakowania to wartość kaucji, nie dają żyć
+    return { counted: true, lifeGained: false, score };
   }
 
   /** Jednorazowy unikat (bateria, kryształ, zapiski…) — zwraca true, jeśli nowy. */

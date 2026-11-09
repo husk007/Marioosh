@@ -198,7 +198,7 @@ export function drawWorld(w: World, g: Gfx): void {
 
   // gracze
   const solo = !w.session.coop;
-  if (solo) { const p = w.players[0]; const other = p.brother === 'M' ? 'D' : 'M'; const tr = p.trail[Math.max(0, p.trail.length - 28)]; if (tr && !p.dead) g.spr(heroSprite(other, 'idle', false, false), tr.x - HERO_W / 2, tr.y - HERO_H, { alpha: 0.55, flip: p.face < 0 }); const cmp = tr ? tr : null; if (cmp) g.spr(companionSprite(Math.floor(w.time * 8)), cmp.x - 8, cmp.y - 66 + Math.sin(w.time * 5) * 3); }
+  if (solo) { const p = w.players[0]; const other = p.brother === 'M' ? 'D' : 'M'; const tr = p.trail[Math.max(0, p.trail.length - 28)]; if (tr && !p.dead) g.spr(heroSprite(other, 'idle', false, false), tr.x - HERO_W * HERO_SCALE / 2, tr.y - HERO_H * HERO_SCALE, { w: HERO_W * HERO_SCALE, h: HERO_H * HERO_SCALE, alpha: 0.55, flip: p.face < 0 }); const cmp = tr ? tr : null; if (cmp) g.spr(companionSprite(Math.floor(w.time * 8)), cmp.x - 8, cmp.y - 100 + Math.sin(w.time * 5) * 3); }
   for (const p of w.players) drawPlayer(g, p, w);
 
   // pociski, wiązki
@@ -267,6 +267,9 @@ function drawEnemy(g: Gfx, e: Enemy, w: World): void {
   void L;
 }
 
+/** skala sprite’a bohatera względem v0.3 (hitbox 26×70 ≈ 1,75 m) */
+export const HERO_SCALE = 1.55;
+
 export function heroFrameFor(p: PlayerEnt): HeroFrame {
   const mv = p.mv, b = mv.body;
   if (p.dead || p.hurtT > 0) return 'hurt';
@@ -274,10 +277,9 @@ export function heroFrameFor(p: PlayerEnt): HeroFrame {
   if (mv.hang || mv.ledge) return 'hang';
   if (mv.climbing) return Math.abs(b.vy) < 5 && Math.abs(b.vx) < 5 ? 'climb0' : Math.floor(p.anim * 7) % 2 ? 'climb1' : 'climb0';
   if (mv.swimming) return 'swim';
-  if (!b.onGround) { if (mv.pounding) return 'pound'; if (mv.wallSlide) return 'wall'; if (mv.gliding) return 'glide'; return b.vy > 90 ? 'fall' : 'jump'; }
-  if (mv.rolling) return (['roll0', 'roll1', 'roll2', 'roll3'] as const)[Math.floor(p.anim * 14) & 3];
+  if (!b.onGround) return b.vy > 90 ? 'fall' : 'jump';
   if (mv.duck) return 'crouch';
-  if (Math.abs(b.vx) > 12) return Math.floor(p.anim * (Math.abs(b.vx) > 200 ? 12 : 8)) % 2 ? 'walk1' : 'walk0';
+  if (Math.abs(b.vx) > 12) return Math.floor(p.anim * (Math.abs(b.vx) > 120 ? 9 : 6)) % 2 ? 'walk1' : 'walk0';
   return 'idle';
 }
 
@@ -289,12 +291,13 @@ function drawPlayer(g: Gfx, p: PlayerEnt, w: World): void {
   else if (p.petrify >= 35) img = tint(img, '#9a9aa6', Math.min(0.75, (p.petrify - 20) / 100));
   if (p.tele) img = tint(img, '#fff', 0.8);
   const blink = p.invuln > 0 && !p.tele && Math.floor(w.time * 20) % 2 === 0;
-  const x = b.x + b.w / 2 - HERO_W / 2, y = b.y + b.h - HERO_H;
+  const HW = HERO_W * HERO_SCALE, HH = HERO_H * HERO_SCALE;
+  const x = b.x + b.w / 2 - HW / 2, y = b.y + b.h - HH;
   if (U.star > 0) { g.ctx.globalAlpha = 0.6; g.spr(glowImage(), x - 64 + 16, y - 56 + 24, { w: 160, h: 160, alpha: 0.5 + 0.3 * Math.sin(w.time * 14) }); g.ctx.globalAlpha = 1; }
-  if (p.dead) g.spr(img, x, y, { rot: Math.min(1.6, (1.4 - p.deadT) * 3) * (p.face), alpha: 1 });
-  else g.spr(img, x, y, { flip: p.face < 0, alpha: blink ? 0.35 : 1 });
-  if (U.shield && !p.dead) g.spr(shieldSprite(), b.x + b.w / 2 - 20, b.y + b.h / 2 - 26, { alpha: 0.35 + 0.15 * Math.sin(w.time * 6) });
-  if (U.coil && !p.dead) g.rect(b.x + b.w / 2 - 2, b.y - 6, 4, 4, '#7fd6ff');
+  if (p.dead) g.spr(img, x, y, { w: HW, h: HH, rot: Math.min(1.6, (1.2 - p.deadT) * 3) * (p.face), alpha: 1 });
+  else g.spr(img, x, y, { w: HW, h: HH, flip: p.face < 0, alpha: blink ? 0.35 : 1 });
+  if (U.shield && !p.dead) g.spr(shieldSprite(), b.x + b.w / 2 - 34, b.y + b.h / 2 - 44, { w: 68, h: 88, alpha: 0.3 + 0.12 * Math.sin(w.time * 6) });
+  if (U.coil && !p.dead) g.rect(b.x + b.w / 2 - 2, b.y - 8, 4, 4, '#7fd6ff');
   if (U.magnet > 0 && !p.dead) g.rect(b.x + b.w / 2 - 14, b.y - 12, 28, 2, '#d6403a', 0.8);
   if (w.session.coop) g.text(p.idx === 0 ? '1P' : '2P', b.x + b.w / 2 - g.camX, b.y - 16 - g.camY, { size: 6, align: 'center', color: p.idx === 0 ? '#ff8a7a' : '#8aff9a' });
 }

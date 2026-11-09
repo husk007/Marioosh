@@ -59,6 +59,8 @@ export function floorAt(g: Grid, x: number, yRef: number, up: number, down: numb
     if (sy < yRef - up - 0.001 || sy > yRef + down + 0.001) continue;
     if (isSolidTile(t)) return { y: sy, tile: t, angle: 0 };
     if (t === T.ONEWAY && oneWay && sy >= yRef - 0.5) return { y: sy, tile: t, angle: 0 };
+    // szczyt drabiny to powierzchnia, na której można stanąć (v0.4)
+    if (t === T.LADDER && oneWay && tileAt(g, tx, ty - 1) !== T.LADDER && sy >= yRef - 0.5) return { y: sy, tile: T.ONEWAY, angle: 0 };
   }
   return null;
 }
@@ -68,11 +70,11 @@ export function floorAt(g: Grid, x: number, yRef: number, up: number, down: numb
  * „przykleja się” do powierzchni (w górę i w dół stoku), a w powietrzu ląduje na powierzchni pochyłej.
  * one-way: tylko z góry.
  */
-export function moveBody(g: Grid, b: Body, dt: number, opt: { dropThrough?: boolean } = {}): void {
+export function moveBody(g: Grid, b: Body, dt: number, opt: { dropThrough?: boolean; step?: number } = {}): void {
   const wasGround = b.onGround;
   b.hitWall = 0; b.hitCeil = false; b.onGround = false; b.groundTile = 0;
   const adx = Math.abs(b.vx * dt);
-  const stepUp = (wasGround ? 4 : 1) + adx * 1.15;     // tyle „schodka” (lub stoku) pokonujemy bez zatrzymania
+  const stepUp = (wasGround ? (opt.step ?? 4) : 1) + adx * 1.15;     // tyle „schodka” (lub stoku) pokonujemy bez zatrzymania
   // ---- oś X
   let nx = b.x + b.vx * dt;
   if (b.vx !== 0) {

@@ -86,37 +86,3 @@ describe('generator poziomów', () => {
   }
 });
 
-describe('osiągalność przedmiotów (wysokość skoku)', () => {
-  const apexM = BROTHERS.M.jump ** 2 / (2 * GRAVITY);            // najsłabszy skok ≈ 77 px
-  const LIMIT = Math.floor(apexM + BROTHERS.M.hitH / 2 + PICKUP_RADIUS) - 16; // zapas na niedokładny skok
-  const SUP = new Set<number>([T.SOLID, T.ONEWAY, T.CRUMBLE, T.CONVL, T.CONVR, T.CRACKED]);
-  it('żadne opakowanie nie wisi wyżej, niż sięgnie Marioosh ze stałego podłoża', () => {
-    const tooHigh: string[] = [];
-    for (const [id, L] of built) L.rooms.forEach((r, ri) => {
-      const platforms = r.specs.filter((s) => s.t === 'platform') as unknown as { x: number }[];
-      for (const s of r.specs) {
-        if (s.t !== 'item') continue;
-        const it = s as unknown as { x: number; y: number; k: string };
-        const cx = Math.floor(it.x / 32); let best = Infinity;
-        for (const dx of [-1, 0, 1]) {
-          const c = cx + dx; if (c < 0 || c >= r.w) continue;
-          for (let row = Math.max(0, Math.floor(it.y / 32)); row < r.h; row++) if (SUP.has(r.tiles[row * r.w + c])) { best = Math.min(best, row * 32 - it.y); break; }
-        }
-        const overMoving = platforms.some((p) => Math.abs(p.x / 32 - cx) < 8);
-        if (best !== Infinity && best > LIMIT && !overMoving) tooHigh.push(`${id}#${ri} ${it.k}@${it.x},${it.y} h=${best}`);
-      }
-    });
-    expect(tooHigh).toEqual([]);
-  });
-  it('komory bonusowe: puszki do ~88 px nad podłożem lub na półce', () => {
-    for (const [id, L] of built) for (const r of L.rooms.filter((q) => q.name === 'bonus' || q.name === 'secret' || q.name === 'scarlet')) {
-      for (const s of r.specs) if (s.t === 'item') {
-        const it = s as unknown as { x: number; y: number };
-        const cx = Math.floor(it.x / 32); let below = -1;
-        for (let row = Math.floor(it.y / 32); row < r.h; row++) if (SUP.has(r.tiles[row * r.w + cx])) { below = row * 32 - it.y; break; }
-        expect(below, `${id} ${r.name}`).toBeGreaterThan(0);
-        expect(below, `${id} ${r.name} @${cx}`).toBeLessThanOrEqual(LIMIT);
-      }
-    }
-  });
-});

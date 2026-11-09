@@ -7,7 +7,7 @@ import { BOSS_BY_WORLD } from '../data/worlds';
 import { BossCtx, bossHarmful, hitBoss, makeBoss, updateBoss } from './bosses';
 import {
   BROTHERS, INVULN_AFTER_HIT, KEY_ACTIVE, KEY_WINDUP, PETRIFY_DECAY, PETRIFY_DELAY, PETRIFY_MAX, PETRIFY_RATE, PETRIFY_TIER1, PETRIFY_TIER2,
-  PICKUP_RADIUS, SPARK_BOUNCES, SPARK_LIFE, SPARK_MAX, SPARK_SPEED, STATUE_TIME_COOP, STOMP_MIN_VY, TELEPORT_TIME, TILE, TIME_EXTENDER, TIME_GLOVES,
+  PICKUP_RADIUS, SPARK_BOUNCES, SPARK_LIFE, SPARK_MAX, SPARK_SPEED, STATUE_TIME_COOP, TELEPORT_TIME, MAX_HP, effectiveGravity, TILE, TIME_EXTENDER, TIME_GLOVES,
   TIME_MAGNET, TIME_STAR, VH, VW, type Brother,
 } from './constants';
 import {
@@ -15,7 +15,7 @@ import {
 } from './entities';
 import { AICtx, harmful, hitEnemy, makeEnemy, stompable, updateEnemy, STATS } from './enemies';
 import { hitsSolid, moveBody, touchesTile, tileAt, type Grid } from './physics';
-import { newMove, setBig, stepMovement, type MoveInput } from './movement';
+import { newMove, stepMovement, type MoveInput } from './movement';
 import type { Session } from './session';
 import { T, rectsOverlap, type Dest, type EnemyKind, type LevelData, type Room } from './types';
 
@@ -45,12 +45,15 @@ export class World {
   time = 0; timeLeft: number; state: 'play' | 'clear' | 'over' = 'play';
   cam = { x: 0, y: 0 }; shakeT = 0; shakeA = 0; flash = 0;
   platsOffT = 0; endT = 0; bossDeadHandled = false; fixedStart = 0;
+  /** grawitacja planety (px/s²) — patrz PLANET_PHYSICS */
+  g: number;
   rng: Rng; speedMul: number; lightsOn = true; deathCount = 0; bossIntroShown = false; bossFails = 0;
   readyT = 1.4;
 
   constructor(level: LevelData, session: Session, opts: WorldOpts) {
     this.level = level; this.session = session; this.opts = opts; this.rng = new Rng('w:' + level.id);
-    this.timeLeft = level.timeLimit * (opts.night ? 0.9 : 1);
+    this.timeLeft = 0;   // v0.4: brak globalnego licznika czasu
+    this.g = effectiveGravity(level.planet ?? level.world);
     this.speedMul = opts.night ? 1.12 : 1;
     this.rooms = level.rooms.map((r) => this.buildRoom(r));
     session.beginLevel();
@@ -119,7 +122,7 @@ export class World {
     return {
       idx, brother, mv, upg: { M: noUpgrades(), D: noUpgrades() }, invuln: 0, dead: false, deadT: 0, downed: false,
       atk: { phase: 'none', t: 0, cd: 0, swing: 0, hitList: new Set() }, sparks: 0, petrify: 0, petDelay: 0, statue: 0, tele: null, anim: 0, hurtT: 0, face: 1,
-      respawn: { x, y }, trail: [], bounceHold: false, spawnProtect: 1.0,
+      respawn: { x, y }, trail: [], bounceHold: false, spawnProtect: 1.0, hp: MAX_HP, safe: { x, y },
     };
   }
 
@@ -163,11 +166,6 @@ export class World {
     if (this.state !== 'play') { if (this.state === 'clear') this.endT += dt; return; }
     if (this.readyT > 0) { this.readyT -= dt; this.updateCamera(dt); if (this.readyT > 0.2) return; }
     this.session.run.time += dt;
-    this.timeLeft -= dt;
-    if (this.timeLeft <= 0) {
-      this.timeLeft = 90; this.say('toast.stone');
-      for (const p of this.activePlayers) this.killPlayer(p);
-    }
     const rt = this.rt; const ctx = this.aiCtx();
     this.updatePlatforms(dt);
     this.updateSwitchesGates(dt);
@@ -277,21 +275,21 @@ export class World {
     // skamienienie
     this.updatePetrify(p, dt);
     mv.slow = p.petrify >= PETRIFY_TIER2 ? 0.75 : 1; mv.jumpMul = p.petrify >= PETRIFY_TIER2 ? 0.8 : 1; mv.speedMul = this.speedMul;
-    setBig(mv, U.shield);
     // jazda na platformie
     this.carryOnPlatforms(p);
     const mi = this.inputFor(p, inp);
     if (p.atk.phase === 'wind' || p.atk.phase === 'active') { mi.left = mi.right = false; }
     const cxm = px(b), cym = py(b);
-    const env = { water: this.waterAt(cxm, cym), currentX: 0, currentY: 0 };
+    const env = { water: this.waterAt(cxm, cym), currentX: 0, currentY: 0, g: this.g };
     for (const c of rt.currents) if (cxm > c.x && cxm < c.x + c.w && cym > c.y && cym < c.y + c.h) { env.currentX += c.fx; env.currentY += c.fy; }
     const preVy = b.vy; const prevBottom = b.y + b.h;
     stepMovement(mv, mi, rt.grid, dt, env);
     this.landOnPlatforms(p, prevBottom, preVy);
     if (mv.jumped) { this.sfx('jump'); }
     if (mv.landed) this.sfx('land');
-    if (mv.sprung) { this.sfx('powerup'); this.shake(2); this.burst(px(b), b.y + b.h, '#ffd23f', 8, 160, 200); }
-    if (mv.pounded) this.groundPound(p);
+    if (mv.landKind === 'stumble') { this.sfx('hit'); this.burst(px(b), b.y + b.h, '#c8b89a', 6, 60, 120); }
+    else if (mv.landKind === 'damage') { this.sfx('hit'); this.shake(3); this.burst(px(b), b.y + b.h, '#c8b89a', 10, 80, 160); this.hurtPlayer(p, px(b), true); }
+    if (b.onGround && !mv.hang && !mv.ledge && !mv.climbing && (b.groundTile === T.SOLID || b.groundTile === T.ONEWAY) && !this.waterAt(cxm, cym)) p.safe = { x: px(b), y: b.y + b.h };
     p.face = mv.face; p.bounceHold = inp.held.jump;
     // crumble tiles
     if (b.onGround && b.groundTile === T.CRUMBLE) {
@@ -308,7 +306,7 @@ export class World {
     // zagrożenia kafelkowe
     if (touchesTile(rt.grid, b.x + 3, b.y + 3, b.w - 6, b.h - 4, T.HAZARD) && U.star <= 0 && U.gloves <= 0) this.hurtPlayer(p, px(b) + (this.rng.chance(0.5) ? 1 : -1), true);
     // przepaść
-    if (b.y > rt.grid.h * TILE + 90) { this.killPlayer(p); return; }
+    if (b.y > rt.grid.h * TILE + 90) { this.fallIntoPit(p); return; }
     // strefy, checkpointy, wyjście, lampy
     this.zones(p);
     // ślad dla towarzysza
@@ -316,23 +314,9 @@ export class World {
     // przedmioty (zbieranie w updateItems)
   }
 
-  /** uderzenie w ziemię (Marioosh): rozbija pęknięte podłoża pod stopami, ogłusza wrogów obok, trzęsie ekranem */
-  private groundPound(p: PlayerEnt): void {
-    const rt = this.rt; const b = p.mv.body; const ty = Math.floor((b.y + b.h + 1) / TILE);
-    this.sfx('rock'); this.shake(7); this.burst(px(b), b.y + b.h, '#c8b89a', 14, 190, 300);
-    for (let tx = Math.floor((b.x - 4) / TILE); tx <= Math.floor((b.x + b.w + 4) / TILE); tx++) {
-      const i = ty * rt.grid.w + tx; const t = rt.tiles[i];
-      if (t === T.CRACKED || t === T.PLATFORM_BREAK) { rt.tiles[i] = T.EMPTY; this.sfx('break'); this.burst(tx * TILE + 16, ty * TILE + 16, '#a89878', 10, 160, 400); }
-    }
-    for (const e of rt.enemies) {
-      if (e.dead || Math.abs(px(e.b) - px(b)) > 64 || Math.abs(e.b.y + e.b.h - (b.y + b.h)) > 28) continue;
-      const r = hitEnemy(e, 'stomp', 2, false); this.afterEnemyHit(e, r, p); if (!e.dead) { e.stun = Math.max(e.stun, 1.4); e.b.vy = -160; }
-    }
-  }
-
   private switchBrother(p: PlayerEnt): void {
     const nb: Brother = p.brother === 'M' ? 'D' : 'M';
-    const old = p.mv.body; const next = newMove(nb, px(old), old.y + old.h, p.upg[nb].shield);
+    const old = p.mv.body; const next = newMove(nb, px(old), old.y + old.h);
     next.body.vx = old.vx; next.body.vy = old.vy; next.face = p.mv.face;
     p.brother = nb; p.mv = next; this.session.data.brother = nb; this.sfx('select'); this.burst(px(old), old.y + old.h / 2, '#fff', 8, 90, 0);
     p.invuln = Math.max(p.invuln, 0.3);
@@ -587,11 +571,10 @@ export class World {
       case 'pet': case 'can': case 'golden': {
         const r = S.collectPackage(it.id, it.kind, p.idx);
         if (r.counted) this.sfx(it.kind === 'golden' ? 'golden' : it.kind === 'pet' ? 'pet' : 'can');
-        if (r.lifeGained) { this.sfx('oneup'); this.say('toast.1up'); this.events.push({ t: 'caption', key: 'caption.oneup' }); }
         this.events.push({ t: 'caption', key: it.kind === 'pet' ? 'caption.pet' : 'caption.can' });
         break;
       }
-      case 'battery': if (S.collectUnique(it.id)) { const ok = S.addLife(p.idx); this.say(ok ? 'toast.life' : 'toast.lifeMax'); this.sfx('oneup'); } break;
+      case 'battery': if (S.collectUnique(it.id)) { if (p.hp < MAX_HP) p.hp++; else S.addScore(500); this.say('toast.life'); this.sfx('oneup'); } break;
       case 'crystal': if (S.collectUnique(it.id)) { S.addScore(1000); this.sfx('powerup'); } break;
       case 'shard': if (S.collectUnique(it.id)) { S.shards.add(it.id); this.say('toast.shard', { n: S.shards.size }); this.sfx('powerup'); S.addScore(2000); this.session.persist(); } break;
       case 'note': if (S.collectUnique(it.id)) { S.notes.add(it.id); this.say('toast.note', { n: S.notes.size }); this.sfx('powerup'); S.addScore(500); } break;
@@ -610,7 +593,7 @@ export class World {
     const rt = this.rt; const b = p.mv.body; const cx = px(b);
     for (const h of rt.hints) if (!h.shown && cx > h.x && cx < h.x + h.w) { h.shown = true; this.say(h.key); }
     for (const c of rt.checkpoints) if (!c.on && Math.abs(c.x - cx) < 36 && Math.abs(c.y - (b.y + b.h)) < 70) {
-      c.on = true; for (const q of this.players) q.respawn = { x: c.x, y: c.y };
+      c.on = true; for (const q of this.players) { q.respawn = { x: c.x, y: c.y }; q.hp = MAX_HP; }
       for (const o of rt.checkpoints) if (o !== c) o.on = false;
       this.say('toast.checkpoint'); this.sfx('checkpoint'); this.events.push({ t: 'checkpoint' }); this.events.push({ t: 'caption', key: 'caption.checkpoint' });
       this.session.persist(this.session.run.time); this.burst(c.x, c.y - 40, '#8aff9a', 14, 120, 0);
@@ -636,20 +619,13 @@ export class World {
   // ------------------------------------------------------------------ kontakty z wrogami / pociskami
   private enemyContacts(p: PlayerEnt): void {
     if (p.dead || p.downed || p.tele || p.statue > 0) return;
-    const b = p.mv.body; const U = p.upg[p.brother]; const prm = BROTHERS[p.brother];
+    const b = p.mv.body; const U = p.upg[p.brother];
     for (const e of this.rt.enemies) {
       if (e.dead) continue;
       if (!rectsOverlap(b.x, b.y, b.w, b.h, e.b.x + 2, e.b.y + 2, e.b.w - 4, e.b.h - 3)) continue;
       if (U.star > 0) { e.dead = true; e.deadT = 0.8; e.b.vy = -200; this.session.addScore(STATS[e.kind].score); this.sfx('stomp'); this.burst(px(e.b), py(e.b), '#ffd23f', 12, 150); continue; }
-      // toczenie (Sonic): szybka kula rozbija wrogów, których da się uderzyć z góry
-      if (p.mv.rolling && Math.abs(b.vx) > 160 && stompable(e)) { const r = hitEnemy(e, 'stomp', 1, false); this.afterEnemyHit(e, r, p); b.vx *= 0.9; continue; }
-      const feet = b.y + b.h; const above = feet - Math.max(0, b.vy) * 0.02 <= e.b.y + Math.min(14, e.b.h * 0.5);
-      if (b.vy >= STOMP_MIN_VY && above && stompable(e)) {
-        const r = hitEnemy(e, 'stomp', 1, false); this.afterEnemyHit(e, r, p);
-        b.vy = p.bounceHold ? prm.stompBounce * 1.25 : prm.stompBounce; p.mv.jumping = true; b.y = e.b.y - b.h; continue;
-      }
+      // v0.4: żadnego skakania po głowach — dotknięcie groźnego wroga rani, wróg w fazie „ostrzeżenia/odpoczynku” nie atakuje (harmful)
       if (harmful(e) && p.invuln <= 0) this.hurtPlayer(p, px(e.b));
-      else if (b.vy >= STOMP_MIN_VY && above && e.hornsUp && p.invuln <= 0 && harmful(e)) this.hurtPlayer(p, px(e.b));
     }
   }
   private bossContacts(): void {
@@ -657,8 +633,6 @@ export class World {
     for (const p of this.players) {
       if (p.dead || p.downed || p.tele || p.statue > 0) continue; const b = p.mv.body;
       if (!rectsOverlap(b.x, b.y, b.w, b.h, bs.b.x + 4, bs.b.y + 4, bs.b.w - 8, bs.b.h - 6)) continue;
-      const feet = b.y + b.h;
-      if (b.vy >= STOMP_MIN_VY && feet <= bs.b.y + 18 && bs.id === 'krukorog' && hitBoss(bs, 'stomp')) { b.vy = BROTHERS[p.brother].stompBounce; this.sfx('bossHit'); this.shake(7); this.burst(px(bs.b), bs.b.y, '#fff3a0', 16, 180); continue; }
       if (bossHarmful(bs) && p.invuln <= 0 && p.upg[p.brother].star <= 0) this.hurtPlayer(p, px(bs.b));
     }
   }
@@ -669,48 +643,49 @@ export class World {
     if (p.dead || p.invuln > 0 || p.tele || (this.god && !env)) return;
     const U = p.upg[p.brother]; const b = p.mv.body;
     if (U.star > 0) return;
-    if (U.shield) {
-      U.shield = false; U.coil = false; p.invuln = INVULN_AFTER_HIT; p.hurtT = 0.4;
-      b.vx = (px(b) < fromX ? -1 : 1) * 170; b.vy = -230; this.sfx('hit'); this.say('toast.shieldLost'); this.events.push({ t: 'caption', key: 'caption.hit' });
-      this.burst(px(b), py(b), '#7fd6ff', 12, 140); this.flashHit(); setBig(p.mv, false); return;
+    const away = px(b) < fromX ? -1 : 1;
+    p.invuln = INVULN_AFTER_HIT; p.hurtT = 0.4; p.mv.lock = 0.25; b.vx = away * 70; b.vy = -90;
+    this.flashHit(); this.burst(px(b), py(b), U.shield ? '#7fd6ff' : '#ff6a5a', 10, 110);
+    if (U.shield) {   // tarcza (XL) pochłania jedno trafienie i nie jest już formą „big”
+      U.shield = false; U.coil = false; this.sfx('hit'); this.say('toast.shieldLost'); this.events.push({ t: 'caption', key: 'caption.hit' }); return;
     }
-    this.killPlayer(p);
+    p.hp = Math.max(0, p.hp - 1);
+    this.sfx('hit'); this.events.push({ t: 'caption', key: 'caption.hit' });
+    if (p.hp <= 0) this.killPlayer(p);
   }
   private flashHit(): void { if (!this.opts.settings.reduceFlashes) this.flash = 0.15; }
 
+  /** upadek w przepaść: −1 HP i powrót na ostatnie bezpieczne miejsce; przy 0 HP — od checkpointu */
+  private fallIntoPit(p: PlayerEnt): void {
+    if (p.dead) return;
+    p.hp = Math.max(0, p.hp - 1); this.sfx('hit'); this.events.push({ t: 'caption', key: 'caption.hit' });
+    if (p.hp <= 0) { this.killPlayer(p); return; }
+    const m = p.mv; const b = m.body;
+    b.x = p.safe.x - b.w / 2; b.y = p.safe.y - b.h; b.vx = b.vy = 0; m.climbing = false; m.hang = null; m.ledge = null; m.lock = 0.3;
+    p.invuln = 1.5; this.snapCamera();
+  }
+
+  /** utrata wszystkich HP: powrót do ostatniego checkpointu (bez żyć, bez game over) */
   killPlayer(p: PlayerEnt): void {
     if (p.dead) return;
-    p.dead = true; p.deadT = 1.4; p.atk.phase = 'none'; p.tele = null; p.statue = 0;
-    p.mv.body.vy = -330; p.mv.body.vx = 0; this.sfx('die'); this.burst(px(p.mv.body), py(p.mv.body), '#ff6a5a', 14, 150);
+    p.dead = true; p.deadT = 1.2; p.atk.phase = 'none'; p.tele = null; p.statue = 0; p.hp = 0;
+    p.mv.body.vy = -160; p.mv.body.vx = 0; this.sfx('die'); this.burst(px(p.mv.body), py(p.mv.body), '#ff6a5a', 14, 150);
     this.deathCount++; this.session.data.deaths++;
     p.upg[p.brother].shield = false; p.upg[p.brother].coil = false;
     if (this.rt.boss?.started) this.bossFails++;
-    const S = this.session; const li = this.session.coop ? p.idx : 0;
-    S.data.lives[li] = Math.max(0, S.data.lives[li] - 1);
   }
   private updateDead(p: PlayerEnt, dt: number): void {
     const b = p.mv.body;
-    if (p.downed) { b.x = px(this.players.find((q) => !q.downed && !q.dead)?.mv.body ?? b) - b.w / 2; return; }
-    p.deadT -= dt; b.vy += 1150 * dt; b.y += b.vy * dt; b.x += b.vx * dt;
+    if (p.downed) { p.downed = false; }
+    p.deadT -= dt; b.vy += 600 * dt; b.y += b.vy * dt; b.x += b.vx * dt;
     if (p.deadT > 0) return;
-    const S = this.session; const li = this.session.coop ? p.idx : 0;
-    if (S.data.lives[li] <= 0) {
-      // co-op: partner może „opłacić” ożywienie jednym życiem
-      const partner = this.players.find((q) => q !== p && !q.downed);
-      if (this.session.coop && partner && S.data.lives[partner.idx] > 1) { S.data.lives[partner.idx]--; S.data.lives[li] = 1; this.say('toast.partner'); }
-      else if (this.session.coop && partner && !partner.dead) { p.downed = true; return; }
-      else { this.state = 'over'; this.events.push({ t: 'gameover' }); return; }
-    }
     this.respawnPlayer(p);
   }
   private respawnPlayer(p: PlayerEnt): void {
-    p.dead = false; p.downed = false; p.petrify = 0; p.invuln = 2; p.spawnProtect = 1.5;
-    const lead = this.players.find((q) => q !== p && !q.dead && !q.downed);
+    p.dead = false; p.downed = false; p.petrify = 0; p.invuln = 2; p.spawnProtect = 1.5; p.hp = MAX_HP;
     const rp = p.respawn; const nb = newMove(p.brother, rp.x + (p.idx ? 18 : 0), rp.y);
-    p.mv = nb;
-    if (lead && this.session.coop && Math.abs(px(lead.mv.body) - rp.x) < 400) { /* wraca do checkpointu */ }
+    p.mv = nb; p.safe = { x: rp.x, y: rp.y };
     if (this.rt.boss) { const bs = this.rt.boss; const fresh = makeBoss(bs.id, (bs.x0 + bs.x1) / 2 + (bs.x1 - bs.x0) * 0.3, bs.floorY, bs.x0, bs.x1); this.rt.boss = fresh; this.beams = []; this.projs = []; for (const s of this.rt.switches) s.on = false; for (const d of this.rt.decor) { d.state = 0; d.hits = 0; } this.opts.audio.music('w' + this.level.world); }
-    if (this.ri !== 0 && this.rooms[0] && this.level.stage !== 4 && !this.rooms[this.ri].room.bossArena) { /* zostaje w pokoju bonusowym */ }
     this.snapCamera();
   }
   private coopSafety(): void {
@@ -764,56 +739,55 @@ export class World {
 
   // ------------------------------------------------------------------ kamera
   snapCamera(): void { this.updateCamera(1, true); }
-  private camLook = 0; private camLa = 0; private camFocus = 200;
+  private camLook = 0; private camLa = 0; private camFocus = 230;
+  /**
+   * Kamera v0.4 (docs/design/08): martwa strefa ≈25% szerokości i 20% wysokości, wyprzedzenie 60–100 px wg prędkości,
+   * łagodne podążanie; w powietrzu kamera stoi, dopóki postać nie wyjdzie poza okno.
+   */
   private updateCamera(dt: number, snap = false): void {
     const r = this.rt.room; const alive = this.players.filter((p) => !p.dead || p.deadT > 0.6);
     const list = alive.length ? alive : this.players;
     const maxX = Math.max(0, r.w * TILE - VW), maxY = Math.max(0, r.h * TILE - VH);
-    // ---- poziomo: okno przy postaci + wyprzedzenie proporcjonalne do prędkości
-    let cx = 0, fy = 0, cyc = 0, air = false, speedLook = 0, grounded = true, fast = false, climbing = false, falling = 0;
+    let cx = 0, fy = 0, cyc = 0, grounded = true, speedLook = 0, climbing = false, falling = 0;
     for (const p of list) {
       const b = p.mv.body; cx += px(b); fy += b.y + b.h; cyc += py(b);
-      speedLook += clamp(b.vx / 420, -1, 1);
-      if (!b.onGround) { air = true; grounded = false; }
+      speedLook += clamp(b.vx / 170, -1, 1);
+      if (!b.onGround) grounded = false;
       if (b.vy > falling) falling = b.vy;
       if (p.mv.climbing || p.mv.hang || p.mv.ledge) climbing = true;
-      if (p.mv.sprung || b.vy < -700) fast = true;
     }
     const n = list.length; cx /= n; fy /= n; cyc /= n; speedLook /= n;
     const hold = list[0];
-    // ---- ręczne rozglądanie: ↑/↓ na stojąco po 0,5 s
+    // ręczne rozglądanie: ↑/↓ na stojąco po 0,5 s
     const inp = this.lastInputs?.[0]; const still = !!hold && hold.mv.body.onGround && Math.abs(hold.mv.body.vx) < 8;
-    if (inp && still && (inp.held.up || inp.held.down) && !hold.mv.duck) this.camLook += dt; else this.camLook = Math.max(0, this.camLook - dt * 3);
-    const look = this.camLook > 0.5 && inp ? (inp.held.up ? -120 : 120) : 0;
-    this.camLa += (speedLook * 112 - this.camLa) * (snap ? 1 : 1 - Math.exp(-5 * dt));
-    let tx = cx + this.camLa - VW / 2;
-    // ---- pionowo: stopy na wysokości focus (z przyciąganiem do platformy), w powietrzu okno 60..300 px od góry ekranu
-    const wantFocus = climbing ? 240 : falling > 600 ? 120 : 200;
-    this.camFocus += (wantFocus - this.camFocus) * (snap ? 1 : 1 - Math.exp(-6 * dt));
+    if (inp && still && (inp.held.up || inp.held.down) && !hold.mv.duck && !hold.mv.climbing) this.camLook += dt; else this.camLook = Math.max(0, this.camLook - dt * 3);
+    const look = this.camLook > 0.5 && inp ? (inp.held.up ? -90 : 90) : 0;
+    this.camLa += (speedLook * 80 - this.camLa) * (snap ? 1 : 1 - Math.exp(-4 * dt));
+    // ---- poziomo: martwa strefa ±80 px wokół punktu (postać + wyprzedzenie)
+    const wantX = cx + this.camLa - VW / 2;
+    let tx = snap ? wantX : clamp(this.cam.x, wantX - 80, wantX + 80);
+    // ---- pionowo: stopy na wysokości focus; martwa strefa ±36 px; w powietrzu okno
+    const wantFocus = climbing ? 250 : falling > 300 ? 130 : 230;
+    this.camFocus += (wantFocus - this.camFocus) * (snap ? 1 : 1 - Math.exp(-5 * dt));
     let ty: number;
-    const tyGround = fy - this.camFocus + look;
-    if (grounded || climbing) ty = tyGround;
-    else {
-      // w powietrzu kamera stoi, dopóki postać nie wyjdzie poza okno
-      const winTop = cyc - 300, winBot = cyc - 60; ty = clamp(this.cam.y, winTop, winBot);
-      if (falling > 600) ty = Math.max(ty, cyc - 150);
-    }
+    const wantY = fy - this.camFocus + look;
+    if (snap) ty = wantY;
+    else if (grounded || climbing) ty = clamp(this.cam.y, wantY - 36, wantY + 36);
+    else { const winTop = cyc - 250, winBot = cyc - 90; ty = clamp(this.cam.y, winTop, winBot); if (falling > 300) ty = Math.max(ty, cyc - 170); }
     tx = clamp(tx, 0, maxX); ty = clamp(ty, 0, maxY);
     if (this.rt.boss?.started && this.rt.room.bossArena) { tx = clamp(tx, Math.max(0, this.rt.boss.x0 - 40), Math.min(maxX, this.rt.boss.x1 - VW + 40)); }
-    void air;
     if (snap) { this.cam.x = tx; this.cam.y = ty; return; }
-    const kx = 1 - Math.exp(-9 * dt), ky = 1 - Math.exp(-(grounded ? 7 : 12) * dt);
-    this.cam.x += clamp((tx - this.cam.x) * kx, -1100 * dt, 1100 * dt);
-    const maxVy = (fast ? 1900 : 960) * dt;
-    this.cam.y += clamp((ty - this.cam.y) * ky, -maxVy, maxVy);
-    // zasada bezpieczeństwa: postać zawsze w [48, 312] px od góry ekranu
-    const sy = cyc - this.cam.y; if (sy < 48) this.cam.y = clamp(cyc - 48, 0, maxY); else if (sy > 312) this.cam.y = clamp(cyc - 312, 0, maxY);
+    const kx = 1 - Math.exp(-7 * dt), ky = 1 - Math.exp(-(grounded ? 6 : 10) * dt);
+    this.cam.x += clamp((tx - this.cam.x) * kx, -700 * dt, 700 * dt);
+    this.cam.y += clamp((ty - this.cam.y) * ky, -600 * dt, 600 * dt);
+    // zasada bezpieczeństwa: postać zawsze w [60, 300] px od góry ekranu
+    const sy = cyc - this.cam.y; if (sy < 60) this.cam.y = clamp(cyc - 60, 0, maxY); else if (sy > 300) this.cam.y = clamp(cyc - 300, 0, maxY);
   }
 
   // ------------------------------------------------------------------ API dla scen
   /** poziom ukończony — przekazuje wyniki do sesji */
   result(): { time: number; bonus: number; pets: number; cans: number; golden: number; freed: number; noDeath: boolean; allResidents: boolean } {
-    const bonus = Math.max(0, Math.floor(this.timeLeft)) * 10;
+    const bonus = 0;   // v0.4: brak premii za czas
     const freedHere = [1, 2, 3].filter((n) => this.session.freed.has(`${this.level.id}-S${n}`)).length;
     return { time: this.session.run.time, bonus, pets: this.session.run.pets, cans: this.session.run.cans, golden: this.session.run.golden, freed: freedHere, noDeath: this.deathCount === 0, allResidents: freedHere === 3 };
   }
