@@ -9,6 +9,7 @@ import { buildW2L2 } from './w2l2';
 import { buildW2L3 } from './w2l3';
 import { buildW2L4 } from './w2l4';
 import { buildW3L1 } from './w3l1';
+import { buildW3L2 } from './w3l2';
 import { buildW4L1 } from './w4l1';
 import { buildW4L2 } from './w4l2';
 import { buildW4L3 } from './w4l3';
@@ -25,6 +26,7 @@ export const AUTHORED: Record<string, () => LevelData> = {
   'W2-L3': buildW2L3,
   'W2-L4': buildW2L4,
   'W3-L1': buildW3L1,
+  'W3-L2': buildW3L2,
   'W4-L1': buildW4L1,
   'W4-L2': buildW4L2,
   'W4-L3': buildW4L3,

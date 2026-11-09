@@ -82,3 +82,6 @@ it('negatywny W2-L4: bez żaluzji (w), bez wyłącznika A albo B arena jest nieo
   for (const sw of ['w', 'a', 'b']) { const L = without('W2-L4', (s) => s.t === 'switch' && s.id.endsWith(':' + sw)); expect(analyze(L, 'M').reaches(0, 122 * 32 + 16, 22 * 32, 40, 10), sw).toBe(false); }
   const a = analyze(getLevel('W2-L4'), 'D'); expect(a.switchesOn.has('0:W2-L4:c1')).toBe(true); expect(a.switchesOn.has('0:W2-L4:c2')).toBe(true);
 }, 590000);
+it('negatywny W3-L2: bez dźwigni l1 (taras 2) i bez dźwigni l2 (taras 4) wyjście jest nieosiągalne', () => {
+  for (const sw of ['l1', 'l2']) { const L = without('W3-L2', (s) => s.t === 'switch' && s.id.endsWith(':' + sw)); const e = exitOfLevel(L); expect(analyze(L, 'M').reaches(0, e.x, e.y, 40, 10), sw).toBe(false); }
+}, 400000);
