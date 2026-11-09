@@ -5,6 +5,8 @@
 **Zastępuje kierunek mechaniczny opisany w:** 07_PRZEBUDOWA_PIONOWA_v0_3.md.
 **Zachowuje:** historię, nazwy i wygląd zatwierdzonych postaci, braci-elektryków, księżniczkę Scarlet, Katoblepasa, 8 planet, 32 etapy, mieszkańców, kolekcjonowanie PET/puszek, przewody i 8 bossów.
 
+**Obowiązuje równolegle:** [11_PLANETY_GRAWITACJA_I_ROZNORODNOSC_v0_4.md](11_PLANETY_GRAWITACJA_I_ROZNORODNOSC_v0_4.md) — planetarna grawitacja, odrębny charakter ośmiu światów, 32 odmienne topologie i testy balansu. W razie różnicy z wcześniejszymi szablonami poziomów pierwszeństwo mają reguły nowego dokumentu.
+
 ## 0. Decyzja projektowa
 Marioosh i Darioosh są ludźmi, dobrymi elektrykami, nie superbohaterami. Nie toczą się jak kule; nie szybują w powietrzu; nie odbijają od pionowych ścian; nie wykonują „ground pound”; nie skaczą przez kilkanaście metrów po trampolinie. Poruszają się naturalnie i sprawnie: chodzą, biegną, skaczą, przyklękają, podciągają się na krawędziach, przechodzą po kładkach i wspinają po drabinach. Świat jest fantastyczny, a urządzenia nie, więc może zawierać teleportację, żywe rośliny i energię odklęcia — ale ciało elektryka podlega rozsądnej fizyce.
 
@@ -21,7 +23,7 @@ Gra nie jest symulatorem BHP i nie powinna być powolna. To **płynna, precyzyjn
 - Współczynnik paralaksy: daleki plan 0,1–0,2, środkowy 0,35–0,6, elementy rozgrywki 1,0. Dekoracja nie może wyglądać jak aktywna platforma, jeśli nie ma kolizji.
 
 ## 2. Docelowa fizyka gracza (60 Hz)
-**Wszystkie wartości są pierwszym zestawem do strojenia w grywalnym prototypie.** Nie są docelowymi pomiarami laboratoryjnymi, lecz spójną skalą gry.
+**Wszystkie wartości są pierwszym zestawem do strojenia w grywalnym prototypie.** Grawitacja 392 px/s² jest punktem odniesienia odpowiadającym Ziemi. W rozgrywce należy stosować mnożnik właściwy dla każdej planety z dokumentu 11. Nie są docelowymi pomiarami laboratoryjnymi, lecz spójną skalą gry.
 
 | Parametr | Marioosh (M) | Darioosh (D) | Uzasadnienie |
 |---|---:|---:|---|
@@ -96,7 +98,7 @@ Bohaterowie to elektrycy, nie wojownicy. Standardowy przeciwnik ma czytelne trzy
 Plan każdej planszy musi zawierać:
 1. **Motyw miejsca** — dlaczego w środku jest fabryka, most, kopalnia lub oranżeria? Jak wygląda jej konstrukcja?
 2. **Cel** — co elektrycy mają naprawić/odłączyć, aby otworzyć dalszą drogę?
-3. **3 wysokości do eksploracji**, nie 3 absurdalnie odległe półki. Dolna: tunele/technika; środkowa: droga główna; górna: pomosty i serwis.
+3. **Różne, uzasadnione architektonicznie topologie zamiast obowiązkowych trzech pasm**. Niektóre etapy mają antresole, inne pierścień wokół rdzenia, spiralę latarni, układ otwartych wysp, jaskiniowe odnogi lub siatkę dachów. Kondygnacje powinny wynikać z budowli i zróżnicować się między 32 etapami.
 4. **Pętlę i rozgałęzienie** — przynajmniej jeden opcjonalny skrót lub sekret prowadzący z powrotem do głównej drogi, nie bezsensowny ślepy korytarz.
 5. **Jedną nową zasadę** — zademonstrowaną bez ryzyka, potem używaną w wyzwaniu i zremiksowaną w końcówce.
 6. **Realistyczne źródło wysokości** — schody, drzewa, klatki, platformy, windy, kotwy, przewody.
@@ -146,7 +148,7 @@ Areny mają szerokość 18–30 m, przynajmniej jedną osłonę, jedną czyteln�
 | 8 Katoblis | Katoblepas | Osłony przeciw spojrzeniu, zwierciadła i aktywacja 8 Węzłów Energii |
 
 ## 11. Kryteria akceptacji nowego stylu rozgrywki
-- Żaden brat nie wykonuje skoku > 0,9 m od ziemi bez urządzenia, a urządzenie nie zastępuje fizyki ludzkiej samym przyspieszeniem balistycznym.
+- Żaden brat na żadnej planecie nie wykonuje skoku > 0,9 m od ziemi bez urządzenia, a urządzenie nie zastępuje fizyki ludzkiej samym przyspieszeniem balistycznym.
 - Nie ma rolling, gliding, wall-jump, ground-pound ani super-szybkich pętli.
 - Główna trasa każdego etapu jest osiągalna bez ręcznego wybierania idealnego momentu na maksymalny skok.
 - Każda obowiązkowa zmiana wysokości o > 1,7 m ma uzasadniony element dostępu.

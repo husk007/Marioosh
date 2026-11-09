@@ -3,8 +3,10 @@
 **Data:** 2026-11-09 · **Status:** kierunek autorski do opracowania map gry.
 Wymóg wspólny: 2–3 połączone kondygnacje, główna ścieżka dostępna solo dla obu braci, skrót i pętla, rozdzielnia/checkpoint, bez absurdalnych skoków i ramp rozpędowych. Każdy etap ma zachować fabularny cel, opakowania, trzech mieszkańców (o ile poziom fabularnie to dopuszcza) i nazwy z pliku levels.json; zmienia się *architektura*, nie tożsamość świata.
 
+**Obowiązuje równolegle:** [11_PLANETY_GRAWITACJA_I_ROZNORODNOSC_v0_4.md](11_PLANETY_GRAWITACJA_I_ROZNORODNOSC_v0_4.md) — planetarna grawitacja, odrębny charakter ośmiu światów, 32 odmienne topologie i testy balansu. W razie różnicy z wcześniejszymi szablonami poziomów pierwszeństwo mają reguły nowego dokumentu.
+
 ## Przestrzenny schemat przejścia
-W każdej mapie identyfikować trzy pasma:
+Przykładowe pasma dla wybranych map (nie narzucać ich w identycznej liczbie każdej planszy — dokument 11 określa 32 odrębne typy geometrii):
 - **Dolne** — konserwacja, skrytki, magazyny, tunele, zagadki;
 - **Środkowe** — główne bezpieczne przejście, odcinki walki, checkpoint;
 - **Górne** — antresole, rusztowania, balkony, czasem skróty;
@@ -109,7 +111,7 @@ Twierdza z dziedzińcem, podziemną rozdzielnią, galerią luster i areną na so
 
 ## Reguły wykonania atlasu
 1. Każda plansza zaczyna od szkicu architektury w widoku przekrojowym, a dopiero potem dodaje przeciwników i bonusy.
-2. Każda droga obowiązkowa ma test przejścia człowiekiem 70 px wysokim ze skokiem 25–29 px, a nie „god mode”.
+2. Każda droga obowiązkowa ma test przejścia człowiekiem 70 px wysokim ze skokiem wynikającym z lokalnej grawitacji planety; nigdy wyłącznie „god mode”.
 3. Główna trasa nie wymaga przedmiotów opcjonalnych, obu graczy ani specjalnych umiejętności drugiego brata.
 4. Nie generować obowiązkowo w każdym poziomie „wzgórza, sprężyny, wall jump, loft, vaultD, vaultM”. Sekrety wynikają z miejsc.
 5. Wynik losowania może zmienić wygląd skrzynek, kolejność znajdziek i dekorację, ale nie może losować samego krytycznego układu pomieszczeń.

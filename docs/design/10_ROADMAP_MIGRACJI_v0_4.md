@@ -1,6 +1,8 @@
 
 # Plan wdrożenia nowej koncepcji v0.4 — instrukcja dla Claude / Codex
-**Data:** 2026-11-09. Ten dokument i GDD v0.4 są *specyfikacją zmian*, nie informacją o zaimplementowaniu. Nie wykonywać automatycznego merge zmian mechaniki, zanim nie przejdzie grywalny prototyp.
+**Data:** 2026-11-09.
+**Obowiązuje równolegle:** [11_PLANETY_GRAWITACJA_I_ROZNORODNOSC_v0_4.md](11_PLANETY_GRAWITACJA_I_ROZNORODNOSC_v0_4.md) — planetarna grawitacja, odrębny charakter ośmiu światów, 32 odmienne topologie i testy balansu. W razie różnicy z wcześniejszymi szablonami poziomów pierwszeństwo mają reguły nowego dokumentu.
+ Ten dokument i GDD v0.4 są *specyfikacją zmian*, nie informacją o zaimplementowaniu. Nie wykonywać automatycznego merge zmian mechaniki, zanim nie przejdzie grywalny prototyp.
 
 ## 1. Co jest nie tak w obecnym kodzie
 - docs/design/07_PRZEBUDOWA_PIONOWA_v0_3.md zawiera kierunek Sonic/Rayman; należy go uznać za historyczny i nie rozwijać.
@@ -15,7 +17,7 @@
 **Gałąź robocza:** osobna feature branch dla zmian w silniku. Main pozostaje z wersją v0.3 do chwili testów.
 
 ### Etap A — ruch człowieka (oddzielny PR)
-- Przerobić BrotherParams według tabeli GDD v0.4; skala = 40px/m, g=392.
+- Przerobić BrotherParams według tabeli GDD v0.4; skala = 40px/m, bazowe g0=392, rzeczywiste g = g0 × PLANET_PHYSICS[level.world].gravityMultiplier (dokument 11).
 - Wyłączyć rolling, gliding, wallJump, wallSlide jako sposób zejścia po ścianie, pounding, super-sprężyny i dash w wodzie.
 - Wprowadzić idle/walk/run, crouch, jump z variable height, controlled air correction, vault, ledge grab/pull-up, ladder, hop down i bezpieczne lądowanie.
 - Animacje mogą początkowo być stand-in, ale muszą odpowiadać działaniu człowieka, bez komicznych salt.
@@ -24,6 +26,7 @@
 - Test jednostkowy obu braci na płaskiej powierzchni; wszystkie wyniki i tolerancje jawnie policzone.
 
 ### Etap B — autorski generator/edytor map (oddzielny PR)
+- Osiem planet musi mieć inne sylwetki konstrukcji, materiały, oświetlenie, efekty dźwiękowe i mechaniki. Każdy z 32 poziomów ma niepowtarzalny archetyp topologiczny według dokumentu 11; nie narzucać tego samego układu trzech pasm każdemu etapowi.
 - Zbudować model pokoju/kompleksu jako grafu połączonych pomieszczeń, a nie linii elementów losowanych wagą. Każdy pokój ma floor polygons / tile collision, wejścia, wyjścia, węzły zasilania, trasę główną, punkt kontrolny, sekret.
 - Stworzyć bibliotekę ręcznie złożonych prefabów: hallway, yard, mezzanine, switchboard, shaft, staircase, ladder, cargoLift, bridge, serviceTunnel, door, portal, rooftop, cave, floodedRoom.
 - Zostawić deterministyczny RNG tylko dla dekoracji, rozstawienia nieobowiązkowych opakowań i miękkich wariantów spotkań.
@@ -32,6 +35,7 @@
 - Projektant każdej mapy podaje checklistę: 3 pasma, co najmniej jedna pętla, zasadne połączenia pionowe, jeden zrozumiały motyw urządzenia, min. 2 checkpointy.
 
 ### Etap C — pionowy wycinek gry (grywalna wersja do oceny)
+- Przed implementacją wszystkich światów przetestować także skrajne wartości grawitacji: krótki fragment Vespery (0,86g) i Skaltrii (1,14g), dla obu braci i bez ulepszeń.
 - W1-L1: leśna stacja, pierwsza naprawa, ruch, schody, vault, ukryty tunel.
 - W1-L2: podziemia i platformy serwisowe, winda, przewody teleportacyjne i rozdzielnice.
 - W1-L4: boss Rogomir i system osłon/odłączników.
@@ -51,7 +55,7 @@
 - Na końcu testy wydajności przeglądarka/PWA/Android/Windows/Linux/iOS, bez zmian technologii TypeScript + Canvas 2D.
 
 ## 3. Testy i warunki ukończenia
-- Testy dla wartości: g=392, M.jump=-140, D.jump=-150, dopuszczalna wysokość stóp < 0,9m; opadanie po czasie; zachowanie po puszczeniu skoku.
+- Testy dla wartości: bazowe g0=392, M.jump=-140, D.jump=-150, wszystkie mnożniki planet 0–8 zgodnie z dokumentem 11, dopuszczalna wysokość stóp <0,9m na każdej planecie; opadanie po czasie; zachowanie po puszczeniu skoku.
 - Testy kolizji z drabiną, windą, krawędzią, wąskim przejściem, ruchomym mostem, poślizgiem i swobodnym spadaniem.
 - Testy prowadzenia kamery, czy cel przy wspinaniu jest widoczny, ostrzeżenie zagrożenia >=0,8s.
 - Deterministyczny test osiągalności W1-L1/W1-L2/W1-L4 z M i D, bez supermocy i bez narzędzi opcjonalnych.
