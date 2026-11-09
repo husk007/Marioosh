@@ -2,7 +2,7 @@
 import type { App, Scene } from '../app';
 import type { Gfx } from '../engine/gfx';
 import { t } from '../engine/i18n';
-import { VH, VW } from '../game/constants';
+import { MAX_HP, VH, VW } from '../game/constants';
 import { getLevel, nextLevelId, parseId } from '../game/levels';
 import { World } from '../game/world';
 import { drawWorld } from '../game/worldDraw';
@@ -28,8 +28,6 @@ export class PlayScene implements Scene {
 
   enter(app: App): void {
     const s = app.session!;
-    if (s.data.lives[0] <= 0) s.data.lives[0] = 3;
-    if (s.coop && s.data.lives[1] <= 0) s.data.lives[1] = 3;
     const night = s.data.night;
     this.world = new World(getLevel(this.levelId, night), s, { audio: app.audio, settings: app.settings, night });
     app.input.coop = s.coop;
@@ -107,7 +105,7 @@ export class PlayScene implements Scene {
     s.persist(r.time);
     const zl = (s.data.depositGrosze / 100).toFixed(2);
     const lines: [string, string][] = [
-      [t('result.time'), '+' + r.bonus],
+      [t('result.time'), `${Math.floor(r.time / 60)}:${String(Math.floor(r.time % 60)).padStart(2, '0')}`],
       [t('result.packages'), `PET ${r.pets} · ${t('item.can')} ${r.cans}${r.golden ? ' · ★' + r.golden : ''}`],
       [t('result.deposit'), `${zl} ${t('hud.zl')}`],
       [t('result.residents'), `${r.freed}/3`],
@@ -136,11 +134,10 @@ export class PlayScene implements Scene {
   private drawHud(app: App, g: Gfx): void {
     const w = this.world; const s = app.session!; const ctx = g.ctx;
     { const hg = ctx.createLinearGradient(0, 0, 0, 30); hg.addColorStop(0, 'rgba(10,8,24,0.78)'); hg.addColorStop(1, 'rgba(10,8,24,0.42)'); ctx.fillStyle = hg; ctx.fillRect(0, 0, VW, 30); g.srect(0, 30, VW, 1, '#ffffff', 0.18); g.srect(0, 31, VW, 1, '#000000', 0.25); }
-    // życia
+    // zdrowie: 3 serca (bez żyć w v0.4)
     w.players.forEach((p, i) => {
-      const li = s.coop ? i : 0; const x = i === 0 ? 8 : 8 + 120;
-      g.spr(heartIcon('life', p.brother), x, 4, { screen: true });
-      g.text('×' + s.data.lives[li], x + 20, 7, { size: 8, color: p.dead ? '#ff6a5a' : '#fff' });
+      const x = i === 0 ? 8 : 8 + 120;
+      for (let h = 0; h < MAX_HP; h++) g.spr(heartIcon('life', p.brother), x + h * 17, 4, { screen: true, alpha: h < p.hp ? 1 : 0.22 });
       const U = p.upg[p.brother]; let ix = x + 58;
       if (U.shield) { g.spr(heartIcon('shield'), ix, 4, { screen: true }); ix += 17; }
       if (U.coil) { g.spr(heartIcon('coil'), ix, 4, { screen: true }); ix += 17; }
@@ -149,10 +146,6 @@ export class PlayScene implements Scene {
       }
       if (p.petrify > 0) { g.text(t('hud.petrify'), x, 20, { size: 6, color: '#c8c8d8', shadow: null }); g.srect(x + 40, 21, 60, 5, '#2a2c3a'); g.srect(x + 40, 21, 60 * (p.petrify / 100), 5, p.petrify >= 65 ? '#e0443a' : '#c8c8d8'); }
     });
-    // czas
-    const tl = Math.max(0, Math.ceil(w.timeLeft));
-    g.text(t('hud.time'), VW / 2, 3, { size: 6, align: 'center', color: '#c8c8d8', shadow: null });
-    g.text(String(tl), VW / 2, 12, { size: 10, align: 'center', color: tl < 30 && Math.floor(w.time * 4) % 2 === 0 ? '#ff6a5a' : '#fff' });
     // opakowania, kaucja, punkty
     const rx = VW - 8;
     g.spr(heartIcon('pet'), rx - 236, 3, { screen: true }); g.text(String(s.run.pets), rx - 218, 7, { size: 8 });

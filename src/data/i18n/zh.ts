@@ -44,7 +44,7 @@ const zh: Dict = {
   'settings.keys': '玩家 {n} 按键', 'settings.outfit': '兄弟服装', 'settings.outfitClassic': '经典', 'settings.outfitNight': '夜班服（通关后解锁）',
   'settings.on': '开', 'settings.off': '关', 'settings.auto': '自动', 'settings.remap': '请按下按键…', 'settings.reset': '恢复默认', 'settings.locked': '未解锁',
   'act.left': '向左', 'act.right': '向右', 'act.up': '向上 / 攀爬', 'act.down': '向下 / 进入电缆', 'act.jump': '跳跃', 'act.run': '奔跑', 'act.attack': '攻击', 'act.interact': '互动', 'act.switch': '切换兄弟',
-  'result.title': '关卡完成！', 'result.time': '时间奖励', 'result.packages': '容器', 'result.deposit': '押金', 'result.residents': '获救居民', 'result.noDeath': '未损失生命', 'result.allResidents': '全部获救', 'result.score': '得分', 'result.next': '继续', 'result.flash': '能量闪光',
+  'result.title': '关卡完成！', 'result.time': '通关用时', 'result.packages': '容器', 'result.deposit': '押金', 'result.residents': '获救居民', 'result.noDeath': '未损失生命', 'result.allResidents': '全部获救', 'result.score': '得分', 'result.next': '继续', 'result.flash': '能量闪光',
   'gameover.title': '严重故障', 'gameover.sub': '交班时间到', 'gameover.continue': '从本星球开头继续', 'gameover.menu': '主菜单',
   'item.pet': 'PET 塑料瓶', 'item.can': '易拉罐', 'item.golden': '金色易拉罐', 'item.battery': '绿色生命电池', 'item.crystal': '能量水晶', 'item.shard': '生命水晶碎片', 'item.signet': '斯嘉丽的印戒', 'item.note': '斯嘉丽的笔记',
   'item.xl': '超大保险丝', 'item.coil': '火花线圈', 'item.magnet': '磁力插头', 'item.extender': '战斗延长线', 'item.gloves': '绝缘手套', 'item.star': '电压之星', 'item.lamp': '解咒灯',
