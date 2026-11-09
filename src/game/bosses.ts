@@ -112,10 +112,15 @@ export function updateBoss(b: BossRT, dt: number, c: BossCtx): void {
       break;
     }
     case 'zlomotaur': {
+      // v0.4: dwa pulpity suwnicy (po jednym na wieżach) włączone w jednym oknie zdejmują pancerz; trafienie przywraca pancerz i wyłącza pulpity.
       const cr = c.switchesFor('crane'); const live = cr.filter((s) => s.on).length;
-      if (b.armor && live >= cr.length && cr.length) { b.armor = false; c.say('toast.armor'); c.sfx('break'); c.shake(8); }
-      b.data.scrap = (b.data.scrap ?? 2) - dt; if (b.data.scrap <= 0 && b.st !== 'intro') { b.data.scrap = 3.2; c.proj({ kind: 'scrap', x: b.x0 + 40 + Math.random() * (b.x1 - b.x0 - 80), y: b.floorY - 340, vx: 0, vy: 0, life: 4, grav: 700, r: 10 }); c.sfx('warn'); }
-      chargeLike(b, c, dt, 200, 2.4);
+      if (b.data.hp0 === undefined) b.data.hp0 = b.hp;
+      if (b.armor && cr.length && live >= cr.length) { b.armor = false; c.say('toast.armor'); c.sfx('break'); c.shake(8); }
+      else if (!b.armor && live < cr.length && b.data.hp0 === b.hp) b.armor = true;       // okno się skończyło — pancerz wraca
+      if (b.hp < b.data.hp0) { b.data.hp0 = b.hp; for (const s of cr) { s.on = false; s.latch = 0; } b.armor = true; }
+      b.data.scrap = (b.data.scrap ?? 2.5) - dt;
+      if (b.data.scrap <= 0 && b.st !== 'intro') { b.data.scrap = 3.6; c.proj({ kind: 'scrap', x: b.x0 + 40 + Math.random() * (b.x1 - b.x0 - 80), y: b.floorY - 340, vx: 0, vy: 0, life: 4, grav: 700, r: 10 }); c.sfx('warn'); }
+      chargeLike(b, c, dt, 150, 5.5, undefined, 0.95, 14, 8);   // szarża kończy się na ścianie areny (przy drabinie wieży); utknięcie 5,5 s
       break;
     }
     case 'kaktogor': {

@@ -136,3 +136,43 @@ describe('Rogopłetw Wielki v0.4 (woda chroni, zawór osusza basen)', () => {
     expect(crouched && leaped && landed).toBe(true); expect(b.b.y + b.b.h).toBeCloseTo(b.floorY, 0);
   });
 });
+
+describe('Złomotaur v0.4 (dwie suwnice, okno 14 s)', () => {
+  const arenaZ = (): World => {
+    const s = new Session(newSave('solo', 'M'), 0);
+    const w = new World(getLevel('W2-L4'), s, { audio: stubAudio, settings: defaultSettings(), night: false });
+    w.readyT = 0; w.rt.enemies.length = 0; step(w, 3); return w;
+  };
+  const cr = (w: World) => w.rt.switches.filter((s) => s.gate === 'crane');
+  const on = (w: World) => cr(w).forEach((s) => { s.on = true; s.latch = 14; });
+  it('pancerz na starcie, dwa pulpity; jeden pulpit nie wystarcza, oba zdejmują pancerz, a trafienie go przywraca i wyłącza pulpity', () => {
+    const w = arenaZ(); const b = w.rt.boss!; b.started = true; b.st = 'stuck'; b.t = 5;
+    expect(b.armor).toBe(true); expect(cr(w).length).toBe(2);
+    cr(w)[0].on = true; cr(w)[0].latch = 14; step(w, 2); expect(b.armor).toBe(true); expect(hitBoss(b, 'key')).toBe(false);
+    on(w); step(w, 2); expect(b.armor).toBe(false); b.st = 'stuck'; b.t = 5; b.hurt = 0;
+    expect(hitBoss(b, 'key')).toBe(true); expect(b.hp).toBe(2); step(w, 2); expect(b.armor).toBe(true); expect(cr(w).every((s) => !s.on)).toBe(true);
+  });
+  it('trzy trafienia pokonują bossa; skok na głowę nie rani', () => {
+    const w = arenaZ(); const b = w.rt.boss!; b.started = true;
+    on(w); step(w, 2); b.st = 'stuck'; expect(hitBoss(b, 'stomp')).toBe(false);
+    for (let i = 0; i < 3; i++) { on(w); step(w, 2); b.st = 'stuck'; b.t = 5; b.hurt = 0; expect(hitBoss(b, 'key')).toBe(true); step(w, 2); }
+    expect(b.dead).toBe(true);
+  });
+  it('okno 14 s: po zatrzasku pulpity gasną, a pancerz wraca', () => {
+    const w = arenaZ(); const b = w.rt.boss!; b.started = true; on(w); step(w, 2); expect(b.armor).toBe(false);
+    for (const s of cr(w)) s.latch = 0.05; step(w, 10); expect(cr(w).every((s) => !s.on)).toBe(true); expect(b.armor).toBe(true);
+  });
+  it('gracz na płycie wieży jest bezpieczny przez 25 s szarż; szarża kończy się przy ścianie areny (obok drabiny), a utknięcie trwa ≥ 5,5 s', () => {
+    const w = arenaZ(); const p = w.players[0]; const b = w.rt.boss!; const m = p.mv.body;
+    m.x = 108.5 * TILE - m.w / 2; m.y = 14 * TILE - m.h; m.vx = m.vy = 0; p.safe = { x: m.x + m.w / 2, y: 14 * TILE };
+    b.started = true; b.b.x = 125 * TILE; let stuck = 0, maxStuck = 0, xmin = 1e9, xmax = -1e9;
+    for (let i = 0; i < 60 * 25; i++) { step(w, 1); if (b.st === 'stuck') { stuck += DT; maxStuck = Math.max(maxStuck, stuck); } else stuck = 0; xmin = Math.min(xmin, b.b.x); xmax = Math.max(xmax, b.b.x + b.b.w); }
+    expect(p.hp).toBe(MAX_HP); expect(b.cycle).toBeGreaterThan(0);
+    expect(xmin).toBeGreaterThanOrEqual(113 * TILE - 1); expect(xmax).toBeLessThanOrEqual(133 * TILE + 1);
+    expect(maxStuck).toBeGreaterThan(5.4);
+  });
+  it('czas przejazdu wagonika między wieżami mieści się w oknie 14 s z zapasem', () => {
+    const w = arenaZ(); const pl = w.rt.plats.find((q) => q.mode === 'h')!;
+    expect(pl.range / pl.speed + 2 * (pl.dwell ?? 0)).toBeLessThan(11);
+  });
+});

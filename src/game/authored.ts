@@ -134,6 +134,15 @@ export class Canvas {
     }
     return x - 2 * rise;
   }
+  /** profil terenu: lista odcinków płaskich [długość, wiersz powierzchni]; między nimi automatycznie rampy 26° (2 kolumny na kafel różnicy wysokości). Zwraca odcinki płaskie. */
+  profile(x0: number, parts: [number, number][]): { x0: number; x1: number; row: number }[] {
+    const out: { x0: number; x1: number; row: number }[] = []; let x = x0, prev = parts[0][1];
+    parts.forEach(([len, row], i) => {
+      if (i > 0) { const d = row - prev; if (d < 0) { this.rampUp(x, prev, -d); x += -2 * d; } else if (d > 0) { this.rampDown(x, prev, d); x += 2 * d; } }
+      this.ground(x, x + len - 1, row); out.push({ x0: x, x1: x + len - 1, row }); x += len; prev = row;
+    });
+    return out;
+  }
   ladder(x: number, y0: number, y1: number): this { return this.rect(x, y0, x, y1, 'H'); }
   rows(): string[] { return this.cells.map((r) => r.join('')); }
 }

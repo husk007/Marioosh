@@ -64,3 +64,21 @@ it('negatywny W1-L3: bez wciągarki mostu 1 (w1), bez wagonika nad kanionem 2 i 
   for (const sw of ['w1', 'w3']) { const L = without('W1-L3', (s) => s.t === 'switch' && s.id.endsWith(':' + sw)); const e = exitOfLevel(L); expect(analyze(L, 'M').reaches(0, e.x, e.y, 40, 10), sw).toBe(false); }
   const L = without('W1-L3', (s) => s.t === 'platform'); const e = exitOfLevel(L); expect(analyze(L, 'D').reaches(0, e.x, e.y, 40, 10), 'wagonik').toBe(false);
 }, 400000);
+it('negatywny W2-L1: bez żurawia (pomostu nad fosą) wyjście jest nieosiągalne', () => {
+  const L = without('W2-L1', (s) => s.t === 'platform'); const e = exitOfLevel(L);
+  for (const b of ['M', 'D'] as const) expect(analyze(L, b).reaches(0, e.x, e.y, 40, 10), b).toBe(false);
+}, 300000);
+it('negatywny W2-L2: bez dźwigni blokady prasy albo bez pomostu inspekcyjnego wyjście jest nieosiągalne; bez zwrotnicy skarbiec zostaje zamknięty', () => {
+  for (const pred of [(s: Spec) => s.t === 'switch' && s.id.endsWith(':lock'), (s: Spec) => s.t === 'platform']) { const L = without('W2-L2', pred); const e = exitOfLevel(L); expect(analyze(L, 'M').reaches(0, e.x, e.y, 40, 10)).toBe(false); }
+  const L = without('W2-L2', (s) => s.t === 'switch' && s.id.endsWith(':t2'));
+  const vault = L.rooms[0].specs.find((s): s is Extract<Spec, { t: 'item' }> => s.t === 'item' && s.k === 'can' && s.y > 34 * 32)!;
+  expect(analyze(L, 'D').touches(0, vault.x, vault.y, 24)).toBe(false);
+}, 400000);
+it('negatywny W2-L3: bez panelu belki 1 lub 2 oraz bez belki 3 kolejny most nie powstaje i wyjście jest nieosiągalne', () => {
+  for (const sw of ['p1', 'p2']) { const L = without('W2-L3', (s) => s.t === 'switch' && s.id.endsWith(':' + sw)); const e = exitOfLevel(L); expect(analyze(L, 'M').reaches(0, e.x, e.y, 40, 10), sw).toBe(false); }
+  const L = without('W2-L3', (s) => s.t === 'span' && s.gate === 'm3'); const e = exitOfLevel(L); expect(analyze(L, 'D').reaches(0, e.x, e.y, 40, 10), 'm3').toBe(false);
+}, 590000);
+it('negatywny W2-L4: bez żaluzji (w), bez wyłącznika A albo B arena jest nieosiągalna, a oba pulpity suwnicy są osiągalne', () => {
+  for (const sw of ['w', 'a', 'b']) { const L = without('W2-L4', (s) => s.t === 'switch' && s.id.endsWith(':' + sw)); expect(analyze(L, 'M').reaches(0, 122 * 32 + 16, 22 * 32, 40, 10), sw).toBe(false); }
+  const a = analyze(getLevel('W2-L4'), 'D'); expect(a.switchesOn.has('0:W2-L4:c1')).toBe(true); expect(a.switchesOn.has('0:W2-L4:c2')).toBe(true);
+}, 590000);
