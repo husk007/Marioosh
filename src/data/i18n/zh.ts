@@ -59,7 +59,7 @@ const zh: Dict = {
   'hint.slope': '顺着斜坡向下冲刺积累速度——坡顶会把你弹向空中。', 'hint.climb': '按上键抓住攀爬网。马里奥什约3秒后会累，达里奥什永远不会。', 'hint.spring': '弹簧能把你弹到平台上方很高的地方。', 'hint.pound': '马里奥什：在空中按下键可以砸地，击碎裂开的地面。', 'hint.walljump': '达里奥什：贴墙下滑时按跳跃可蹬墙起跳。马里奥什只能下滑。', 'hint.glide': '在空中再按一次跳跃即可滑翔。达里奥什滑翔更久。', 'hint.ice': '冰面很滑——提前刹车。', 'hint.sand': '沙地会减速——跳得更高才能脱身。', 'hint.oil': '油面比冰还滑。',
   'hint.switch': '开关为大门供电。每个谜题单人也能解开。', 'hint.beam': '石化凝视！石化之前躲到障碍物后面。', 'hint.mirror': '放置镜子（互动），让光束反射到首领身上。', 'hint.dark': '灯笼照亮黑夜，请待在光亮里。', 'hint.water': '水下按跳跃键会向上划水。', 'hint.crumble': '崩塌平台一会儿就会掉落，别耽搁。', 'hint.rock': '地面上的影子预示着落石。', 'hint.sequence': '符号顺序：闪电 → 月亮 → 树叶 → 星星。', 'hint.eco': '回收机（EcoPort）能把容器换成奖励。',
   'boss.rogomir': '罗戈米尔', 'boss.zlomotaur': '废铁牛怪', 'boss.kaktogor': '仙人掌角王', 'boss.rogopletw': '巨型角鳍鱼', 'boss.ceratopsor': '角龙兽', 'boss.krukorog': '角鸦王', 'boss.rogodron': '角无人机母体', 'boss.katoblepas': '卡托布勒帕斯',
-  'bosshint.rogomir': '躲开冲锋。它的角卡住时，攻击露出的肚子。', 'bosshint.zlomotaur': '当废铁牛怪从起重机下冲过时启动起重机，然后攻击封印。', 'bosshint.kaktogor': '用扳手切断三条根须，再攻击花的心脏。',
+  'bosshint.rogomir': '断开三台发电机（交互键）即可削弱罗戈米尔的装甲。它撞墙卡住时，用扳手攻击。冲锋前先躲到高架走道上。', 'bosshint.zlomotaur': '当废铁牛怪从起重机下冲过时启动起重机，然后攻击封印。', 'bosshint.kaktogor': '用扳手切断三条根须，再攻击花的心脏。',
   'bosshint.rogopletw': '在你和首领之间放置镜子（互动），光束会反射到它的眼睛。', 'bosshint.ceratopsor': '引诱它撞向标记的墙，再攻击露出的侧面。', 'bosshint.krukorog': '角鸦王飞过时打开探照灯（互动）；它落地后攻击印记。',
   'bosshint.rogodron': '关闭三台发电机（互动），核心露出时将其摧毁。', 'bosshint.katoblepas': '第一阶段：击碎石柱。第二阶段：反射光束。第三阶段：启动八个能量节点。',
   'boss.phase': '第 {n} 阶段', 'boss.defeated': '已击败！', 'boss.warn': '小心！',

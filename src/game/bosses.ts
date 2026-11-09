@@ -1,6 +1,6 @@
 /** Ośmiu bossów wg tabeli H z GDD — każdy ma czytelne fazy, sygnał przed atakiem i warunek pokonania. */
 import { BOSS_SIZE } from '../sprites/art';
-import { GRAVITY, TILE } from './constants';
+import { BOSS_SCALE, GRAVITY, TILE } from './constants';
 import { moveBody, newBody } from './physics';
 import type { BossId } from '../data/worlds';
 import type { BossRT, Decor, SwitchEnt } from './entities';
@@ -21,12 +21,12 @@ export interface BossCtx extends AICtx {
 export const BOSS_HITS: Record<BossId, number> = { '': 0, rogomir: 3, zlomotaur: 3, kaktogor: 6, rogopletw: 3, ceratopsor: 3, krukorog: 3, rogodron: 3, katoblepas: 14 };
 
 export function makeBoss(id: BossId, cx: number, groundY: number, x0: number, x1: number): BossRT {
-  const s = BOSS_SIZE[id]; const w = Math.round(s.w * 0.78), h = Math.round(s.h * 0.86);
+  const s = BOSS_SIZE[id]; const w = Math.round(s.w * 0.78 * BOSS_SCALE), h = Math.round(s.h * 0.86 * BOSS_SCALE);
   const flying = id === 'krukorog' || id === 'rogodron';
   const b = newBody(cx - w / 2, flying ? groundY - h - 150 : groundY - h, w, h);
   return {
     id, b, hp: BOSS_HITS[id], maxHp: BOSS_HITS[id], st: 'intro', t: 1.2, dir: -1, phase: 1, hurt: 0, dead: false, deadT: 0, stun: 0, f: 0,
-    x0, x1, floorY: groundY, data: {}, armor: id === 'zlomotaur' || id === 'rogodron' || id === 'kaktogor', flying, cycle: 0, started: false, hint: '',
+    x0, x1, floorY: groundY, data: {}, armor: id === 'zlomotaur' || id === 'rogodron' || id === 'kaktogor' || id === 'rogomir', flying, cycle: 0, started: false, hint: '',
   };
 }
 
@@ -51,7 +51,8 @@ export function bossHarmful(b: BossRT): boolean {
 export function bossVulnerable(b: BossRT): boolean {
   if (b.dead || b.hurt > 0) return false;
   switch (b.id) {
-    case 'rogomir': case 'ceratopsor': return b.st === 'stuck';
+    case 'rogomir': return b.st === 'stuck' && !b.armor;
+    case 'ceratopsor': return b.st === 'stuck';
     case 'zlomotaur': return b.st === 'stuck' && !b.armor;
     case 'kaktogor': return b.data.roots >= 3 && b.armor === false;
     case 'krukorog': return b.st === 'landed';
@@ -71,10 +72,10 @@ export function hitBoss(b: BossRT, how: 'key' | 'spark' | 'stomp'): boolean {
   return true;
 }
 
-function chargeLike(b: BossRT, c: BossCtx, dt: number, base: number, stuckT: number, onStuck?: () => void) {
+function chargeLike(b: BossRT, c: BossCtx, dt: number, base: number, stuckT: number, onStuck?: () => void, windupT = 0.75) {
   switch (b.st) {
     case 'intro': grav(b, c, dt); if (b.t <= 0) { b.st = 'idle'; b.t = 1.2; } break;
-    case 'idle': b.b.vx = 0; grav(b, c, dt); faceP(b, c); if (b.t <= 0) { b.st = 'windup'; b.t = 0.75; c.sfx('warn'); } break;
+    case 'idle': b.b.vx = 0; grav(b, c, dt); faceP(b, c); if (b.t <= 0) { b.st = 'windup'; b.t = windupT; c.sfx('warn'); } break;
     case 'windup': b.b.vx = 0; grav(b, c, dt); if (b.t <= 0) { b.st = 'charge'; b.t = 3; } break;
     case 'charge': b.b.vx = b.dir * (base + b.cycle * 35); grav(b, c, dt); clampArena(b);
       if (b.b.hitWall || b.t <= 0) { b.st = 'stuck'; b.t = stuckT; b.b.vx = 0; c.shake(5); c.sfx('rock'); onStuck?.(); } break;
@@ -89,7 +90,13 @@ export function updateBoss(b: BossRT, dt: number, c: BossCtx): void {
   const g = c.grid;
   switch (b.id) {
     case 'rogomir': {
-      chargeLike(b, c, dt, 210, 2.6);
+      // v0.4: trzy generatory zasilają pancerz. Odłączone naraz (okno czasowe) zdejmują go; trafienie kluczem podłącza je z powrotem.
+      const gens = c.switchesFor('gen'); const live = gens.filter((s) => s.on).length;
+      if (b.armor && gens.length && live >= gens.length) { b.armor = false; c.say('toast.armor'); c.sfx('break'); c.shake(6); }
+      else if (!b.armor && live < gens.length && b.data.hp0 === b.hp) { b.armor = true; }   // okno się skończyło — pancerz wraca
+      if (b.data.hp0 === undefined) b.data.hp0 = b.hp;
+      if (b.hp < b.data.hp0) { b.data.hp0 = b.hp; for (const s of gens) { s.on = false; s.latch = 0; } b.armor = true; }
+      chargeLike(b, c, dt, 150, 2.8, undefined, 0.95);
       break;
     }
     case 'ceratopsor': {

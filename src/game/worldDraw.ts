@@ -7,7 +7,7 @@ import {
   freedSprite, glowImage, heroSprite, itemSprite, lampSprite, lanternSprite, parallaxLayer, pulseSprite, rockSprite, shieldSprite, signSprite, skyImage, sparkSprite,
   statueSprite, switchSprite, tileset, type HeroFrame,
 } from '../sprites/art';
-import { TILE, VH, VW } from './constants';
+import { BOSS_SCALE, TILE, VH, VW } from './constants';
 import type { Enemy, PlayerEnt } from './entities';
 import { T } from './types';
 import type { World } from './world';
@@ -193,7 +193,7 @@ export function drawWorld(w: World, g: Gfx): void {
   if (rt.boss) {
     const b = rt.boss; const S = BOSS_SIZE[b.id];
     const mode = b.hurt > 0 && Math.floor(w.time * 20) % 2 === 0 ? 1 : (b.st === 'stuck' || b.st === 'landed' || b.st === 'exposed' ? 2 : 0);
-    if (!(b.dead && Math.floor(w.time * 18) % 2 === 0)) g.spr(bossSprite(b.id, Math.floor(b.f * 5), mode), b.b.x + b.b.w / 2 - S.w / 2, b.b.y + b.b.h - S.h, { flip: b.dir < 0, alpha: b.dead ? Math.max(0.2, b.deadT / 2.4) : 1 });
+    if (!(b.dead && Math.floor(w.time * 18) % 2 === 0)) g.spr(bossSprite(b.id, Math.floor(b.f * 5), mode), b.b.x + b.b.w / 2 - S.w * BOSS_SCALE / 2, b.b.y + b.b.h - S.h * BOSS_SCALE, { w: S.w * BOSS_SCALE, h: S.h * BOSS_SCALE, flip: b.dir < 0, alpha: b.dead ? Math.max(0.2, b.deadT / 2.4) : 1 });
     if (b.st === 'windup' || b.st === 'aim') { g.rect(b.b.x - 4, b.b.y - 22, b.b.w + 8, 5, '#ff4a3a', 0.6 + 0.4 * Math.sin(w.time * 30)); }
   }
 

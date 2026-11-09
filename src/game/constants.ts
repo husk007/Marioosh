@@ -110,3 +110,6 @@ export const MAX_FALL = 700;
 
 export const TELEPORT_TIME = 0.55;
 export const PICKUP_RADIUS = 24;
+
+/** boss w skali ludzkiej: hitbox i sprite ×1,5 względem v0.3 (Rogomir ≈ 2,1 m wysokości) */
+export const BOSS_SCALE = 1.5;

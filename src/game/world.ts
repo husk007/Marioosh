@@ -476,7 +476,7 @@ export class World {
   }
   private activateSwitch(s: SwitchEnt): void {
     s.on = true; this.sfx('switch'); this.say('toast.switchOn'); this.burst(s.x, s.y - 20, '#ffd23f', 8, 90, 0);
-    if (s.gate === 'crane') s.latch = 9; else if (s.gate === 'spot') s.latch = 7;
+    if (s.gate === 'crane') s.latch = 9; else if (s.gate === 'spot') s.latch = 7; else if (s.gate === 'gen') s.latch = 28;
   }
   private revealCable(c: { hidden: boolean; revealed: boolean; tx: number; ty: number; id: string }): void {
     if (c.revealed) return; c.revealed = true; this.sfx('crate'); this.say('toast.secret'); this.session.secrets.add(c.id);
