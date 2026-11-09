@@ -345,7 +345,7 @@ export class World {
     for (const s of rt.switches) if (s.on && s.latch > 0) { s.latch -= dt; if (s.latch <= 0) s.on = false; }
     for (const g of rt.gates) {
       if (g.open) continue;
-      const n = rt.switches.filter((s) => s.gate === g.id && s.on).length;
+      const n = g.id.startsWith('free') ? rt.statues.filter((s) => s.freed).length : rt.switches.filter((s) => s.gate === g.id && s.on).length;   // brama „free…”: otwierają ją uwolnieni mieszkańcy (W8-L3)
       if (n >= g.need) {
         g.open = true; for (const [cx, cy] of g.cells) { if (rt.tiles[cy * rt.grid.w + cx] === T.GATE) rt.tiles[cy * rt.grid.w + cx] = T.EMPTY; }
         this.say(rt.plats.some((q) => q.power === g.id) ? 'toast.power' : rt.arcs.some((q) => q.stop === g.id) ? 'toast.stop' : 'toast.gateOpen'); this.sfx('switch'); this.shake(3);

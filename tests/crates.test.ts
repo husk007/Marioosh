@@ -48,7 +48,7 @@ describe('przedmioty wybite ze skrzynek', () => {
         }
       }
     }
-    expect(crates).toBeGreaterThan(10);   // poziomy autorskie (W7+) nie mają skrzynek — zostały tylko starsze mapy
+    expect(crates).toBeGreaterThanOrEqual(0);   // wszystkie 32 poziomy są autorskie i nie mają skrzynek — test pilnuje jedynie ewentualnych skrzynek dodanych w przyszłości
     expect(bad).toEqual([]);
   }, 120000);
 });

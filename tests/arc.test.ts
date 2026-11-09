@@ -144,3 +144,40 @@ describe('Wielki Przewód (W8-L2): sieć portali i kolejność przekaźników', 
     expect((w as unknown as { ri: number }).ri).toBe(1);
   });
 });
+
+describe('Sala Tysiąca Posągów (W8-L3): obwody i uwolnieni mieszkańcy', () => {
+  it('winda serwisowa stoi bez prądu do włączenia obwodu 1; po przełączniku ruszają winda i brama', () => {
+    const w = mk('W8-L3'); const lift = w.rt.plats.find((q) => q.power === 'pwA')!; const y0 = lift.y; step(w, 60 * 6); expect(lift.y).toBe(y0);
+    w.rt.switches.find((s) => s.gate === 'pwA')!.on = true; step(w, 5); expect(w.rt.gates.find((g) => g.id === 'pwA')!.open).toBe(true);
+    step(w, 60 * 6); expect(lift.y).toBeGreaterThan(y0);
+  });
+  it('ostatnia brama (free1) otwiera się dopiero po uwolnieniu wszystkich trzech mieszkańców', () => {
+    const w = mk('W8-L3'); const g = w.rt.gates.find((q) => q.id === 'free1')!; expect(g.need).toBe(3); expect(w.rt.statues.length).toBe(3);
+    w.rt.statues[0].freed = true; w.rt.statues[1].freed = true; step(w, 5); expect(g.open).toBe(false);
+    w.rt.statues[2].freed = true; step(w, 5); expect(g.open).toBe(true);
+  });
+  it('trzy obwody, jeden fragment kryształu (ósmy) i Wielka Latarnia', () => {
+    const L = getLevel('W8-L3'); const sp = L.rooms[0].specs;
+    expect(sp.filter((s) => s.t === 'switch').length).toBe(3); expect(sp.some((s) => s.t === 'item' && s.k === 'shard' && s.id === 'shard:8')).toBe(true); expect(sp.some((s) => s.t === 'lantern')).toBe(true);
+    expect(sp.filter((s) => s.t === 'decor').length).toBeGreaterThanOrEqual(30);
+  });
+});
+
+describe('Tron Katoblepasa (W8-L4): trzy fazy bez ciosów kluczem', () => {
+  it('arena: 3 filary, 3 lustra, 8 węzłów na galeriach (każda galeria ma drabinę); wyjście = pokonanie bossa (brak znacznika X)', () => {
+    const L = getLevel('W8-L4'); const sp = L.rooms[0].specs;
+    expect(sp.filter((s) => s.t === 'decor' && s.k === 'pillar').length).toBe(3); expect(sp.filter((s) => s.t === 'decor' && s.k === 'mirror').length).toBe(3);
+    expect(sp.filter((s) => s.t === 'switch' && s.gate === 'node').length).toBe(8); expect(sp.some((s) => s.t === 'exit')).toBe(false);
+    expect(L.boss).toBe('katoblepas');
+  });
+  it('faza 1: szarże łamią filary (gracz na galerii jest bezpieczny) → faza 2: lustra odbijają Spojrzenie (3 trafienia) → faza 3: osiem węzłów kończy walkę', () => {
+    const w = mk('W8-L4'); const b = w.rt.boss!; b.started = true; const pillars = w.rt.decor.filter((d) => d.k === 'pillar'); const mirrors = w.rt.decor.filter((d) => d.k === 'mirror');
+    expect(w.rt.switches.filter((s) => s.gate === 'node').length).toBe(8);
+    for (let i = 0; i < 60 * 80 && pillars.some((p) => p.state === 0); i++) { step(w, 1); const left = pillars.filter((p) => p.state === 1).length < 2; put(w, left ? 208 : 238, 35); w.players[0].invuln = 5; }
+    expect(pillars.every((p) => p.state === 1)).toBe(true); step(w, 3); expect(b.phase).toBe(2); expect(w.players[0].hp).toBe(MAX_HP);
+    for (let i = 0; i < 60 * 80 && b.phase === 2; i++) { step(w, 1); for (const m of mirrors) m.state = 1; put(w, 208, 35); w.players[0].invuln = 5; }
+    expect(b.phase).toBe(3);
+    for (const s of w.rt.switches.filter((q) => q.gate === 'node').slice(0, 7)) s.on = true; step(w, 120); expect(b.dead).toBe(false);
+    for (const s of w.rt.switches.filter((q) => q.gate === 'node')) s.on = true; step(w, 5); expect(b.dead).toBe(true);
+  });
+});

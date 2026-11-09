@@ -219,3 +219,22 @@ it('W8-L2: bez przekaźników rozdzielni grodź (zamknięte drzwi do hali wyjśc
   const L0 = getLevel('W8-L2'); const e0 = exitOfLevel(L0);
   for (const b of ['M', 'D'] as const) expect(analyze(L0, b).reaches(0, e0.x, e0.y, 40, 10), b).toBe(true);
 }, 400000);
+
+it('W8-L3: bez obwodu 1 (winda), obwodu 2 (brama sali) lub uwolnionych posągów wyjście jest nieosiągalne; z wszystkim osiągalne dla obu braci', () => {
+  const strip = (pred: (s: Spec) => boolean) => { const L = structuredClone(getLevel('W8-L3')); L.rooms[0].specs = L.rooms[0].specs.filter((s) => !pred(s)); return L; };
+  for (const pred of [(s: Spec) => s.t === 'switch' && s.id.endsWith(':c1'), (s: Spec) => s.t === 'switch' && s.id.endsWith(':c2'), (s: Spec) => s.t === 'statue']) {
+    const L = strip(pred); const e = exitOfLevel(L); expect(analyze(L, 'M').reaches(0, e.x, e.y, 40, 10)).toBe(false);
+  }
+  const L0 = getLevel('W8-L3'); const e0 = exitOfLevel(L0);
+  for (const b of ['M', 'D'] as const) expect(analyze(L0, b).reaches(0, e0.x, e0.y, 40, 10), b).toBe(true);
+}, 900000);
+
+it('W8-L4: bez przekaźnika rozdzielni (r1/r2) lub przekaźnika portalu (r3) arena jest nieosiągalna; z wszystkimi — osiągalna dla obu braci, razem z ośmioma węzłami', () => {
+  const arenaPt = (L: ReturnType<typeof getLevel>) => L.rooms[0].specs.find((s) => s.t === 'boss')!;
+  for (const id of ['r1', 'r2', 'r3']) {
+    const L = structuredClone(getLevel('W8-L4')); L.rooms[0].specs = L.rooms[0].specs.filter((s) => !(s.t === 'switch' && s.id.endsWith(':' + id)));
+    const b = arenaPt(L); expect(analyze(L, 'M').reaches(0, b.x, b.y, 40, 10), id).toBe(false);
+  }
+  const L0 = getLevel('W8-L4'); const b0 = arenaPt(L0);
+  for (const br of ['M', 'D'] as const) { const a = analyze(L0, br); expect(a.reaches(0, b0.x, b0.y, 40, 10), br).toBe(true); for (const s of L0.rooms[0].specs) if (s.t === 'switch' && s.gate === 'node') expect(a.switchesOn.has(`0:${s.id}`), s.id).toBe(true); }
+}, 900000);

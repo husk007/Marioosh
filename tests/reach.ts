@@ -249,7 +249,9 @@ export function analyze(level: LevelData, brother: Brother, opt: { maxNodes?: nu
         if (points.some((p) => p.ri === ri && Math.abs(p.x - s.x) < 34 && Math.abs(p.fy - s.y) < 44)) { switchesOn.add(`${ri}:${s.id}`); changed = true; }
       }
       for (const s of r.specs) if (s.t === 'gate' && !openGates.has(`${ri}:${s.id}`)) {
-        const n = r.specs.filter((q) => q.t === 'switch' && q.gate === s.id && switchesOn.has(`${ri}:${q.id}`)).length;
+        const n = s.id.startsWith('free')   // brama otwierana uwolnionymi mieszkańcami: liczą się posągi osiągalne w tym pokoju
+          ? r.specs.filter((q) => q.t === 'statue' && points.some((p) => p.ri === ri && Math.abs(p.x - q.x) < 44 && Math.abs(p.fy - q.y) < 12)).length
+          : r.specs.filter((q) => q.t === 'switch' && q.gate === s.id && switchesOn.has(`${ri}:${q.id}`)).length;
         if (n >= s.need) { openGates.add(`${ri}:${s.id}`); changed = true; }
       }
       for (const s of r.specs) if (s.t === 'boulder' && s.fork && s.hit && !openGates.has(`${ri}:${s.hit}`)) {
