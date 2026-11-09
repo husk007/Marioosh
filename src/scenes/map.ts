@@ -3,7 +3,7 @@ import type { Gfx } from '../engine/gfx';
 import { t } from '../engine/i18n';
 import { WORLDS } from '../data/worlds';
 import { VH, VW } from '../game/constants';
-import { LEVEL_JSON, levelId, parseId } from '../game/levels';
+import { LEVEL_JSON, isPorted, levelId, parseId } from '../game/levels';
 import { PlayScene } from './play';
 import { JournalScene } from './menus';
 import { TitleScene } from './title';
@@ -45,8 +45,8 @@ export class MapScene implements Scene {
   }
   private unlocked(app: App): boolean {
     const s = app.session!;
-    if (this.world === 0) return s.data.pradowoUnlocked;
-    return s.isLevelUnlocked(this.world, this.stage);
+    if (this.world === 0) return false;       // Prądowo (bonus) wróci razem z mapami W0
+    return isPorted(levelId(this.world, this.stage)) && s.isLevelUnlocked(this.world, this.stage);
   }
   private enterLevel(app: App): void {
     if (!this.unlocked(app)) { app.audio.sfx('warn'); return; }
@@ -88,9 +88,11 @@ export class MapScene implements Scene {
     const id = this.world === 0 ? 'W0' : levelId(this.world, this.stage); const rec = s.data.levels[id];
     panel(g, VW / 2 - 230, 262, 460, 84);
     const open = this.unlocked(app);
-    g.text(open ? t('lvl.' + id) : t('map.locked'), VW / 2, 270, { size: 10, align: 'center', color: open ? '#ffd23f' : '#8a8a9a' });
+    const wip = !isPorted(id);
+    g.text(open ? t('lvl.' + id) : wip ? t('lvl.' + id) : t('map.locked'), VW / 2, 270, { size: 10, align: 'center', color: open ? '#ffd23f' : '#8a8a9a' });
     const j = LEVEL_JSON.find((l) => l.level_id === id);
-    if (j && open) g.text(`PET ${j.collectibles.pet} · ${t('item.can')} ${j.collectibles.cans} · ${t('hud.time')} ${j.time_limit_seconds}`, VW / 2, 290, { size: 7, align: 'center', color: '#c8c8d8' });
+    if (wip) g.text(t('map.wip'), VW / 2, 290, { size: 8, align: 'center', color: '#ffb36a' });
+    else if (j && open) g.text(`PET ${j.collectibles.pet} · ${t('item.can')} ${j.collectibles.cans}`, VW / 2, 290, { size: 7, align: 'center', color: '#c8c8d8' });
     if (rec?.done) g.text(`${t('map.best')}: ${rec.bestScore} · ${rec.freed}/3`, VW / 2, 306, { size: 7, align: 'center', color: '#8aff9a' });
     g.text(t('map.hint'), VW / 2, 326, { size: 6, align: 'center', color: '#c8c8d8', shadow: null });
     g.text(`${completion(s.data)}%`, VW - 10, VH - 14, { size: 7, align: 'right', color: '#c8c8d8' });

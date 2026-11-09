@@ -50,11 +50,11 @@ export type Spec =
   | { t: 'enemy'; k: EnemyKind; x: number; y: number }
   | { t: 'item'; k: ItemKind; x: number; y: number; id: string }
   | { t: 'crate'; k: ItemKind; x: number; y: number; hidden: boolean; id: string }
-  | { t: 'cable'; id: string; color: CableColor; x: number; y: number; face: 'up' | 'down'; dest?: Dest; warp?: string; locked?: boolean; hidden?: boolean; symbol?: number }
+  | { t: 'cable'; id: string; color: CableColor; x: number; y: number; face: 'up' | 'down' | 'door'; dest?: Dest; warp?: string; locked?: boolean; hidden?: boolean; symbol?: number }
   | { t: 'statue'; idx: number; x: number; y: number; id: string }
   | { t: 'switch'; id: string; x: number; y: number; gate: string; style: SwitchStyle; symbol: number }
   | { t: 'gate'; id: string; cells: [number, number][]; need: number }
-  | { t: 'platform'; x: number; y: number; w: number; mode: 'h' | 'v' | 'phase' | 'crumble'; range: number; speed: number; offset: number }
+  | { t: 'platform'; x: number; y: number; w: number; mode: 'h' | 'v' | 'phase' | 'crumble'; range: number; speed: number; offset: number; /** winda: postój na każdym końcu (s); ruch ze stałą prędkością `speed` px/s */ dwell?: number }
   | { t: 'checkpoint'; x: number; y: number }
   | { t: 'exit'; x: number; y: number }
   | { t: 'ecoport'; x: number; y: number; broken: boolean; id: string; fuses: string[] }

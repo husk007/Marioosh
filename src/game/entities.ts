@@ -36,11 +36,11 @@ export interface Enemy {
 
 export interface Item { id: string; kind: ItemKind; x: number; y: number; vy: number; taken: boolean; ghost: boolean; t: number; popT: number; fixed: boolean; vx?: number; home?: { x: number; y: number } }
 export interface Crate { id: string; k: ItemKind; tx: number; ty: number; hidden: boolean; revealed: boolean; used: boolean; bump: number }
-export interface CableEnt { id: string; color: CableColor; tx: number; ty: number; face: 'up' | 'down'; dest?: Dest; warp?: string; locked: boolean; gate?: string; hidden: boolean; revealed: boolean; symbol?: number }
+export interface CableEnt { id: string; color: CableColor; tx: number; ty: number; face: 'up' | 'down' | 'door'; dest?: Dest; warp?: string; locked: boolean; gate?: string; hidden: boolean; revealed: boolean; symbol?: number }
 export interface StatueEnt { id: string; idx: number; x: number; y: number; freed: boolean; t: number; ghost: boolean }
 export interface SwitchEnt { id: string; x: number; y: number; gate: string; style: SwitchStyle; symbol: number; on: boolean; latch: number }
 export interface GateEnt { id: string; cells: [number, number][]; need: number; open: boolean; openT: number }
-export interface Plat { x: number; y: number; w: number; mode: 'h' | 'v' | 'phase' | 'crumble'; range: number; speed: number; offset: number; x0: number; y0: number; dx: number; dy: number; solid: boolean; t: number; fall: number; warn: boolean }
+export interface Plat { x: number; y: number; w: number; mode: 'h' | 'v' | 'phase' | 'crumble'; range: number; speed: number; offset: number; dwell?: number; x0: number; y0: number; dx: number; dy: number; solid: boolean; t: number; fall: number; warn: boolean }
 export interface Point { x: number; y: number }
 export interface EcoEnt { id: string; x: number; y: number; broken: boolean; fuses: string[]; used: boolean; flash: number }
 export interface Hint { x: number; w: number; key: string; shown: boolean }

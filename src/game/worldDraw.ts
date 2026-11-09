@@ -157,15 +157,16 @@ export function drawWorld(w: World, g: Gfx): void {
   for (const s of rt.signs) g.spr(signSprite(s.symbol), s.x - 12, s.y - 32);
   for (const l of rt.lamps) g.spr(lampSprite(fr), l.x - 8, l.y - 40);
   for (const l of rt.lanterns) g.spr(lanternSprite(l.lit), l.x - 10, l.y - 28);
-  for (const c of rt.checkpoints) g.spr(checkpointSprite(c.on, fr), c.x - 12, c.y - 56);
-  for (const e of rt.exits) if (!rt.boss || rt.boss.dead) g.spr(exitSprite(true, fr), e.x - 32, e.y - 84);
-  for (const e of rt.ecos) g.spr(ecoportSprite(e.broken, fr), e.x - 24, e.y - 64);
+  for (const c of rt.checkpoints) g.spr(checkpointSprite(c.on, fr), c.x - 17, c.y - 80, { w: 34, h: 78 });
+  for (const e of rt.exits) if (!rt.boss || rt.boss.dead) g.spr(exitSprite(true, fr), e.x - 40, e.y - 104, { w: 80, h: 104 });
+  for (const e of rt.ecos) g.spr(ecoportSprite(e.broken, fr), e.x - 30, e.y - 80, { w: 60, h: 80 });
   for (const s of rt.statues) {
-    if (s.freed) { if (s.t < 2.5) { s.t += 1 / 60; g.spr(freedSprite(), s.x - 16 + s.t * 40, s.y - 44, { alpha: Math.max(0, 1 - s.t / 2.5) }); } }
-    else g.spr(statueSprite(false, s.idx), s.x - 16, s.y - 44);
+    if (s.freed) { if (s.t < 2.5) { s.t += 1 / 60; g.spr(freedSprite(), s.x - 24 + s.t * 40, s.y - 70, { w: 48, h: 70, alpha: Math.max(0, 1 - s.t / 2.5) }); } }
+    else g.spr(statueSprite(false, s.idx), s.x - 24, s.y - 70, { w: 48, h: 70 });
   }
-  for (const s of rt.switches) g.spr(switchSprite(s.style, s.on), s.x - 14, s.y - 36);
+  for (const s of rt.switches) g.spr(switchSprite(s.style, s.on), s.x - 19, s.y - 48, { w: 38, h: 48 });
   for (const c of rt.cables) if (c.revealed) {
+    if (c.face === 'door') { drawDoor(g, c.tx * TILE + 16, (c.ty + 1) * TILE, c.color, c.locked, w.time); continue; }
     g.spr(cableSprite(c.color, c.face, fr), c.tx * TILE, c.ty * TILE - (c.face === 'up' ? 6 : 0));
     if (c.symbol !== undefined) g.spr(signSprite(c.symbol), c.tx * TILE + 4, c.ty * TILE - 42, { w: 24, h: 32 });
     if (c.locked || c.color === 'black') { g.rect(c.tx * TILE + 12, c.ty * TILE - 14, 8, 8, '#e0443a'); }
@@ -300,4 +301,18 @@ function drawPlayer(g: Gfx, p: PlayerEnt, w: World): void {
   if (U.coil && !p.dead) g.rect(b.x + b.w / 2 - 2, b.y - 8, 4, 4, '#7fd6ff');
   if (U.magnet > 0 && !p.dead) g.rect(b.x + b.w / 2 - 14, b.y - 12, 28, 2, '#d6403a', 0.8);
   if (w.session.coop) g.text(p.idx === 0 ? '1P' : '2P', b.x + b.w / 2 - g.camX, b.y - 16 - g.camY, { size: 6, align: 'center', color: p.idx === 0 ? '#ff8a7a' : '#8aff9a' });
+}
+
+const DOOR_COL: Record<string, string> = { blue: '#4aa3ff', green: '#5fe08a', yellow: '#ffd23f', red: '#e0443a', purple: '#b070ff', black: '#555a66' };
+/** drzwi / terminal przewodowy pełnej wielkości (v0.4: ≥ 90 px wysokości, można w nie wejść) */
+function drawDoor(g: Gfx, cx: number, feetY: number, color: string, locked: boolean, time: number): void {
+  const col = DOOR_COL[color] ?? '#4aa3ff'; const x = cx - 26, y = feetY - 100;
+  g.rect(x - 4, y - 4, 60, 104, '#20232e'); g.rect(x, y, 52, 100, '#343a4a');
+  g.rect(x + 6, y + 6, 40, 88, '#10131c');
+  const pulse = 0.55 + 0.25 * Math.sin(time * 3);
+  g.rect(x + 8, y + 8, 36, 84, col, locked ? 0.18 : pulse * 0.55);
+  g.rect(x + 8, y + 8, 4, 84, col, 0.9); g.rect(x + 40, y + 8, 4, 84, col, 0.9);
+  g.rect(x + 10, y + 46, 32, 2, '#ffffff', 0.35);
+  g.rect(x + 20, y - 10, 12, 6, col, 0.95);
+  if (locked) { g.rect(x + 22, y + 40, 8, 8, '#e0443a'); }
 }

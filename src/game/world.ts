@@ -88,14 +88,14 @@ export class World {
           break;
         }
         case 'cable': {
-          const tx = Math.floor(s.x / TILE), ty = Math.floor(s.y / TILE); tiles[ty * room.w + tx] = T.CABLE;
+          const tx = Math.floor(s.x / TILE), ty = Math.floor((s.face === 'door' ? s.y - 1 : s.y) / TILE); if (s.face !== 'door') tiles[ty * room.w + tx] = T.CABLE;
           rt.cables.push({ id: s.id, color: s.color, tx, ty, face: s.face, dest: s.dest, warp: s.warp, locked: !!s.locked, hidden: !!s.hidden, revealed: !s.hidden, symbol: s.symbol });
           break;
         }
         case 'statue': rt.statues.push({ id: s.id, idx: s.idx, x: s.x, y: s.y, freed: S.freed.has(s.id), t: 0, ghost: S.freed.has(s.id) }); break;
         case 'switch': rt.switches.push({ id: s.id, x: s.x, y: s.y, gate: s.gate, style: s.style, symbol: s.symbol, on: false, latch: 0 }); break;
         case 'gate': rt.gates.push({ id: s.id, cells: s.cells, need: s.need, open: false, openT: 0 }); break;
-        case 'platform': rt.plats.push({ x: s.x, y: s.y, w: s.w * TILE, mode: s.mode, range: s.range, speed: s.speed, offset: s.offset, x0: s.x, y0: s.y, dx: 0, dy: 0, solid: true, t: 0, fall: 0, warn: false }); break;
+        case 'platform': rt.plats.push({ x: s.x, y: s.y, w: s.w * TILE, mode: s.mode, range: s.range, speed: s.speed, offset: s.offset, dwell: s.dwell, x0: s.x, y0: s.y, dx: 0, dy: 0, solid: true, t: 0, fall: 0, warn: false }); break;
         case 'checkpoint': rt.checkpoints.push({ x: s.x, y: s.y, on: false }); break;
         case 'exit': rt.exits.push({ x: s.x, y: s.y }); break;
         case 'ecoport': rt.ecos.push({ id: s.id, x: s.x, y: s.y, broken: s.broken, fuses: s.fuses, used: false, flash: 0 }); break;
@@ -202,7 +202,13 @@ export class World {
   private updatePlatforms(dt: number): void {
     for (const pl of this.rt.plats) {
       const ox = pl.x, oy = pl.y; pl.t += dt;
-      if (pl.mode === 'h') { pl.x = pl.x0 + pl.range * (0.5 + 0.5 * Math.sin((pl.t * pl.speed) / pl.range * Math.PI + pl.offset * Math.PI * 2)); }
+      if (pl.dwell !== undefined && (pl.mode === 'h' || pl.mode === 'v')) {
+        // winda / ruchomy pomost: ruch ze stałą prędkością, postój na obu końcach
+        const mv = pl.range / pl.speed, cyc = 2 * (mv + pl.dwell); const u = ((pl.t + pl.offset * cyc) % cyc + cyc) % cyc;
+        const k = u < pl.dwell ? 0 : u < pl.dwell + mv ? (u - pl.dwell) / mv : u < 2 * pl.dwell + mv ? 1 : 1 - (u - 2 * pl.dwell - mv) / mv;
+        if (pl.mode === 'v') pl.y = pl.y0 + pl.range * k; else pl.x = pl.x0 + pl.range * k;
+      }
+      else if (pl.mode === 'h') { pl.x = pl.x0 + pl.range * (0.5 + 0.5 * Math.sin((pl.t * pl.speed) / pl.range * Math.PI + pl.offset * Math.PI * 2)); }
       else if (pl.mode === 'v') { pl.y = pl.y0 + pl.range * (0.5 + 0.5 * Math.sin((pl.t * pl.speed) / pl.range * Math.PI + pl.offset * Math.PI * 2)); }
       else if (pl.mode === 'phase') {
         const cyc = pl.speed, ph = ((pl.t / cyc + pl.offset) % 1 + 1) % 1;
@@ -448,6 +454,11 @@ export class World {
     for (const c of rt.cables) {
       if (c.hidden && !c.revealed) { if (inp.pressed.interact && Math.abs(c.tx * TILE + 16 - cx) < 56 && Math.abs(c.ty * TILE - feet) < 80) this.revealCable(c); continue; }
       const ccx = c.tx * TILE + 16;
+      if (c.face === 'door') {   // drzwi pełnej wielkości: stań przed nimi i naciśnij ↑ / „użyj”
+        if (Math.abs(ccx - cx) > 26 || Math.abs(feet - (c.ty + 1) * TILE) > 8 || !(inp.pressed.up || inp.pressed.interact)) continue;
+        if (c.locked || c.color === 'black') { this.say('toast.locked'); this.sfx('warn'); return; }
+        this.enterCable(p, c.dest ?? null, c.warp ?? null); return;
+      }
       if (Math.abs(ccx - cx) > 18) continue;
       const okUp = c.face === 'up' && Math.abs(feet - c.ty * TILE) < 6 && wantsDown;
       const okDown = c.face === 'down' && Math.abs(b.y - (c.ty + 1) * TILE) < 6 && wantsUp;
