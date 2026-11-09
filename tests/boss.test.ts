@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import type { PlayerInput } from '../src/engine/input';
 import { defaultSettings } from '../src/engine/settings';
 import { World } from '../src/game/world';
@@ -229,7 +229,9 @@ describe('Ceratopsor v0.4 (pieczęć, kolumny, galeria)', () => {
     const w = arenaC(); const p = w.players[0]; const b = w.rt.boss!; const m = p.mv.body;
     m.x = 18.5 * TILE - m.w / 2; m.y = 20 * TILE - m.h; m.vx = m.vy = 0; p.safe = { x: m.x + m.w / 2, y: 20 * TILE };
     b.started = true; b.b.x = 27 * TILE; let stuck = false, xmin = 1e9;
+    const rnd = vi.spyOn(Math, 'random').mockReturnValue(0.99);   // kamienie sufitowe lecą na wschodni kraniec areny (deterministycznie)
     for (let i = 0; i < 60 * 25; i++) { step(w, 1); m.x = 18.5 * TILE - m.w / 2; m.vx = 0; if (b.st === 'stuck') stuck = true; xmin = Math.min(xmin, b.b.x); }
+    rnd.mockRestore();
     expect(stuck).toBe(true); expect(p.hp).toBe(MAX_HP);
     expect(xmin).toBeGreaterThanOrEqual(24 * TILE - 2);       // nie przeszedł przez kolumnę (22–23)
   });
