@@ -42,7 +42,7 @@ it('grawitacja planet: wyspa za przerwą 5 kafli (W6-L1) dostępna na Vesperze (
   expect(probe(5, 'M')).toEqual({ exit: true, island: false }); expect(probe(5, 'D')).toEqual({ exit: true, island: false });
 }, 600000);
 
-it('W5-L1 (Skaltria 1,14 g): trasa główna z przerwą 3 kafli przejezdna dla obu braci', () => {
+it('W5-L1 (Skaltria 1,14 g): wyjście osiągalne dla obu braci', () => {
   const L = getLevel('W5-L1'); const exit = L.rooms[0].specs.find((s) => s.t === 'exit')!;
   for (const b of ['M', 'D'] as const) expect(analyze(L, b).reaches(0, exit.x, exit.y, 40, 10), b).toBe(true);
 }, 200000);
@@ -91,4 +91,20 @@ it('negatywny W3-L4: bez dźwigni l1 (galeria) lub l2 (półka) brama areny jest
     const kp = L.rooms[0].specs.filter((s): s is Extract<Spec, { t: 'checkpoint' }> => s.t === 'checkpoint').find((s) => s.x > 99 * 32)!;
     expect(analyze(L, 'M').reaches(0, kp.x, kp.y, 40, 10), sw).toBe(false);
   }
+}, 400000);
+it('negatywny W5-L2: brama rozdzielni wymaga DWÓCH z trzech zasilań — brak jednego nie przeszkadza, brak dwóch zamyka wyjście', () => {
+  const sws = ['a', 'b', 'c'];
+  const reach = (L: ReturnType<typeof getLevel>) => { const e = exitOfLevel(L); return analyze(L, 'M').reaches(0, e.x, e.y, 40, 10); };
+  for (const drop of [['a', 'b'], ['a', 'c'], ['b', 'c']]) { const L = without('W5-L2', (s) => s.t === 'switch' && drop.some((d) => s.id.endsWith(':' + d))); expect(reach(L), drop.join('')).toBe(false); }
+  expect(sws.length).toBe(3);
+  const L1 = without('W5-L2', (s) => s.t === 'switch' && s.id.endsWith(':b')); expect(reach(L1)).toBe(true);
+}, 590000);
+it('negatywny W5-L2: bez kolejki kopalniana wschodnia sztolnia (przekaźnik) jest nieosiągalna', () => {
+  const L = without('W5-L2', (s) => s.t === 'platform'); const sw = L.rooms[0].specs.find((s) => s.t === 'switch' && s.id.endsWith(':b'))!;
+  expect(analyze(L, 'D').switchesOn.has(`0:${sw.t === 'switch' ? sw.id : ''}`)).toBe(false);
+}, 300000);
+it('negatywny W5-L3: bez zwrotnicy (dźwigni na tarasie) rumowisko nie otwiera się; bez windy taras jest nieosiągalny', () => {
+  const reach = (L: ReturnType<typeof getLevel>) => { const e = exitOfLevel(L); return analyze(L, 'D').reaches(0, e.x, e.y, 40, 10); };
+  expect(reach(without('W5-L3', (s) => s.t === 'switch'))).toBe(false);
+  expect(reach(without('W5-L3', (s) => s.t === 'platform'))).toBe(false);
 }, 400000);

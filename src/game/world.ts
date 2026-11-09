@@ -74,7 +74,7 @@ export class World {
     const grid: Grid = { w: room.w, h: room.h, tiles };
     const rt: RoomRT = {
       room, tiles, grid, enemies: [], items: [], crates: [], cables: [], statues: [], switches: [], gates: [], plats: [], checkpoints: [], exits: [], ecos: [],
-      lamps: [], lanterns: [], hints: [], currents: [], rains: [], decor: [], signs: [], crumble: new Map(), boss: null,
+      lamps: [], lanterns: [], hints: [], currents: [], rains: [], slides: [], boulders: [], decor: [], signs: [], crumble: new Map(), boss: null,
       water: room.water.slice(), floods: [], spans: [],
     };
     const S = this.session;
@@ -105,6 +105,8 @@ export class World {
         case 'lantern': rt.lanterns.push({ id: s.id, x: s.x, y: s.y, lit: false }); break;
         case 'hint': rt.hints.push({ x: s.x, w: s.w, key: s.key, shown: false }); break;
         case 'rain': rt.rains.push({ x0: s.x0, x1: s.x1, interval: s.interval }); break;
+        case 'boulder': rt.boulders.push({ spec: s, t: s.every - (s.offset ?? 0), warned: false, roll: null }); break;
+        case 'slide': rt.slides.push({ x0: s.x0, x1: s.x1, y: s.y, interval: s.interval, warn: s.warn ?? 1.8, t: s.interval - (s.offset ?? 0), warned: false }); break;
         case 'span': rt.spans.push({ gate: s.gate, cells: s.cells, done: false }); break;
         case 'flood': rt.floods.push({ x0: s.x0, x1: s.x1, y0: s.y0 ?? 0, y1: s.y1 ?? 9999, from: s.from, to: s.to, speed: s.speed, gate: s.gate, cur: s.from }); break;
         case 'current': rt.currents.push({ x: s.x, y: s.y, w: s.w, h: s.h, fx: s.fx, fy: s.fy }); break;
@@ -172,7 +174,7 @@ export class World {
     this.session.run.time += dt;
     const rt = this.rt; const ctx = this.aiCtx();
     this.updatePlatforms(dt);
-    this.updateSwitchesGates(dt); this.updateFloods(dt);
+    this.updateSwitchesGates(dt); this.updateFloods(dt); this.updateSlides(dt); this.updateBoulders(dt);
     this.updateCrumble(dt);
     this.players.forEach((p, i) => this.updatePlayer(p, inputs[i] ?? inputs[0], dt));
     this.coopSafety();
@@ -258,6 +260,53 @@ export class World {
       f.cur += Math.sign(d) * Math.min(Math.abs(d), f.speed * dt); f.applied = true;
       const top = Math.ceil(f.cur - 1e-6);
       for (let y = Math.max(0, f.y0); y <= Math.min(rt.grid.h - 1, f.y1); y++) for (let x = f.x0; x <= f.x1; x++) rt.water[y * rt.grid.w + x] = y >= top ? 1 : 0;
+    }
+  }
+  /** osuwy skalne: ostrzeżenie (dźwięk, kurz, drżenie) → po `warn` s spada rząd kamieni; osłania lity nawis */
+  private updateSlides(dt: number): void {
+    const rt = this.rt;
+    for (const sl of rt.slides) {
+      const near = this.activePlayers.some((p) => p.mv.body.x > sl.x0 - 420 && p.mv.body.x < sl.x1 + 420);
+      if (!near) continue;
+      sl.t -= dt;
+      if (sl.t <= sl.warn && !sl.warned) { sl.warned = true; this.sfx('warn'); this.say('toast.slide'); }
+      if (sl.warned && sl.t > 0 && Math.random() < dt * 30) this.parts.push({ x: sl.x0 + Math.random() * (sl.x1 - sl.x0), y: sl.y + 10, vx: (Math.random() - 0.5) * 20, vy: 40 + Math.random() * 60, life: 0.8, max: 0.8, color: '#b9a98a', size: 2, grav: 120 });
+      if (sl.warned && sl.t > 0 && Math.random() < dt * 5) this.shake(1);
+      if (sl.t <= 0) {
+        sl.t = sl.interval; sl.warned = false; this.sfx('rock'); this.shake(4);
+        for (let x = sl.x0 + 10; x < sl.x1; x += 28) this.projs.push({ kind: 'rock', x: x + (Math.random() - 0.5) * 8, y: sl.y - Math.random() * 60, vx: 0, vy: 0, life: 6, bounces: 0, owner: -1, r: 12, grav: 650 });
+      }
+    }
+  }
+  /** kule na torach: zapowiedź (dudnienie, kurz) → toczenie po torze; zwrotnica na punkcie rozwidlenia; kula z odnogi `alt` otwiera bramę `hit` */
+  private updateBoulders(dt: number): void {
+    const rt = this.rt;
+    for (const bd of rt.boulders) {
+      const sp = bd.spec; const xs = sp.path.map((q) => q[0]); const x0 = Math.min(...xs) - 480, x1 = Math.max(...xs) + 480;
+      if (!bd.roll) {
+        if (!this.activePlayers.some((p) => p.mv.body.x > x0 && p.mv.body.x < x1)) continue;
+        bd.t -= dt; const st = sp.path[0];
+        if (bd.t <= (sp.warn ?? 3) && !bd.warned) { bd.warned = true; this.sfx('warn'); this.say('toast.boulder'); }
+        if (bd.warned && Math.random() < dt * 14) this.parts.push({ x: st[0] + (Math.random() - 0.5) * 30, y: st[1] - sp.r, vx: (Math.random() - 0.5) * 30, vy: -20 - Math.random() * 40, life: 0.7, max: 0.7, color: '#b9a98a', size: 2, grav: 60 });
+        if (bd.t <= 0) { bd.t = sp.every; bd.warned = false; bd.roll = { x: st[0], y: st[1], pts: sp.path, i: 1, alt: false, rot: 0 }; this.sfx('rock'); }
+        continue;
+      }
+      const r = bd.roll; let move = sp.speed * dt;
+      while (move > 0 && r.i < r.pts.length) {
+        const tg = r.pts[r.i]; const dx = tg[0] - r.x, dy = tg[1] - r.y; const d = Math.hypot(dx, dy);
+        if (d <= move) {
+          r.x = tg[0]; r.y = tg[1]; move -= d; r.rot += d / sp.r;
+          if (sp.fork && r.i === sp.fork.i && !r.alt && rt.switches.filter((s) => s.gate === sp.fork!.select).every((s) => s.on) && rt.switches.some((s) => s.gate === sp.fork!.select)) { r.pts = sp.fork.alt; r.alt = true; }
+          r.i++;
+        } else { r.x += dx / d * move; r.y += dy / d * move; r.rot += move / sp.r; move = 0; }
+      }
+      if (Math.random() < dt * 20) this.parts.push({ x: r.x - 8 + Math.random() * 16, y: r.y + sp.r - 4, vx: (Math.random() - 0.5) * 40, vy: -20 - Math.random() * 30, life: 0.5, max: 0.5, color: '#b9a98a', size: 2, grav: 80 });
+      for (const p of this.activePlayers) { const b = p.mv.body; if (p.invuln <= 0 && rectsOverlap(b.x, b.y, b.w, b.h, r.x - sp.r * 0.85, r.y - sp.r * 0.85, sp.r * 1.7, sp.r * 1.7)) this.hurtPlayer(p, r.x); }
+      if (r.i >= r.pts.length) {
+        bd.roll = null; this.burst(r.x, r.y, '#b9a98a', 14, 130, 40); this.sfx('break'); this.shake(6);
+        if (r.alt && sp.hit) { const g = rt.gates.find((q) => q.id === sp.hit); if (g && !g.open) { g.open = true; for (const [gx, gy] of g.cells) if (rt.tiles[gy * rt.grid.w + gx] === T.GATE) rt.tiles[gy * rt.grid.w + gx] = T.EMPTY; this.say('toast.gateOpen'); }
+        }
+      }
     }
   }
   private updateSwitchesGates(dt: number): void {

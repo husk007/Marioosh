@@ -6,25 +6,6 @@
 import { AuthoredRoom, Canvas, assemble } from '../authored';
 import type { LevelData } from '../types';
 
-/** W5-L1 „Kamienne Wydmy” (fragment): półka skalna, schody w górę, przerwa 3 kafle, schody w dół, wyjście */
-export function buildW5L1(): LevelData {
-  const c = new Canvas(70, 16);
-  c.ground(0, 69, 12);
-  c.set(12, 11, '#');                                    // głaz 0,8 m (przeskok)
-  c.rampUp(18, 12, 1);                                   // → 20
-  c.rect(20, 11, 29, 11, '#'); c.ground(20, 29, 11);      // półka skalna, powierzchnia: wiersz 11
-  c.rect(30, 11, 32, 15, '.');                           // przerwa 3 kafli (96 px)
-  c.ground(33, 45, 11);
-  c.rampDown(46, 11, 1);                                 // → 48
-  c.set(3, 11, 'S'); c.set(69 - 3, 11, 'X'); c.set(36, 10, 'K');
-  for (const x of [6, 9, 15]) c.set(x, 11, 'p');
-  c.set(24, 10, 'p'); c.set(27, 10, 'k'); c.set(31, 9, 'k'); c.set(40, 10, 'p'); c.set(43, 10, 'k'); c.set(55, 11, 'k'); c.set(60, 11, 'p');
-  c.set(8, 11, 'r'); c.set(38, 10, 'r');
-  const room = new AuthoredRoom('W5-L1:main', c.rows(), { name: 'main', world: 5 });
-  room.autoSpecs('W5-L1');
-  return assemble({ id: 'W5-L1', world: 5, stage: 1, proto: true, budget: { pet: 6, cans: 4, golden: 0 } }, [room]);
-}
-
 /** W6-L1 „Nocne Dachy” (fragment): dachy z przerwami 3 kafli (trasa główna), schody pożarowe oraz opcjonalna wyspa dachowa za przerwą 5 kafli (4 m) — do przeskoczenia tylko przy lekkiej grawitacji Vespery */
 export function buildW6L1(): LevelData {
   const c = new Canvas(84, 18);

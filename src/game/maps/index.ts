@@ -16,7 +16,10 @@ import { buildW4L1 } from './w4l1';
 import { buildW4L2 } from './w4l2';
 import { buildW4L3 } from './w4l3';
 import { buildW4L4 } from './w4l4';
-import { buildW5L1, buildW6L1 } from './proto';
+import { buildW5L1 } from './w5l1';
+import { buildW5L2 } from './w5l2';
+import { buildW5L3 } from './w5l3';
+import { buildW6L1 } from './proto';
 
 export const AUTHORED: Record<string, () => LevelData> = {
   'W1-L1': buildW1L1,
@@ -36,6 +39,8 @@ export const AUTHORED: Record<string, () => LevelData> = {
   'W4-L3': buildW4L3,
   'W4-L4': buildW4L4,
   'W5-L1': buildW5L1,
+  'W5-L2': buildW5L2,
+  'W5-L3': buildW5L3,
   'W6-L1': buildW6L1,
 };
 export const isPorted = (id: string): boolean => id in AUTHORED;

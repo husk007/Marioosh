@@ -250,6 +250,10 @@ export function analyze(level: LevelData, brother: Brother, opt: { maxNodes?: nu
         const n = r.specs.filter((q) => q.t === 'switch' && q.gate === s.id && switchesOn.has(`${ri}:${q.id}`)).length;
         if (n >= s.need) { openGates.add(`${ri}:${s.id}`); changed = true; }
       }
+      for (const s of r.specs) if (s.t === 'boulder' && s.fork && s.hit && !openGates.has(`${ri}:${s.hit}`)) {
+        const all = r.specs.filter((q): q is Extract<Spec, { t: 'switch' }> => q.t === 'switch' && q.gate === s.fork!.select);
+        if (all.length && all.every((q) => switchesOn.has(`${ri}:${q.id}`))) { openGates.add(`${ri}:${s.hit}`); changed = true; }
+      }
       for (const s of r.specs) if ((s.t === 'flood' || s.t === 'span') && !openFloods.has(`${ri}:${s.gate}`)) {
         const all = r.specs.filter((q): q is Extract<Spec, { t: 'switch' }> => q.t === 'switch' && q.gate === s.gate);
         if (all.length && all.every((q) => switchesOn.has(`${ri}:${q.id}`))) { openFloods.add(`${ri}:${s.gate}`); changed = true; }

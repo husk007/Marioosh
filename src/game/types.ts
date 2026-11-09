@@ -62,6 +62,11 @@ export type Spec =
   | { t: 'lantern'; x: number; y: number; id: string }
   | { t: 'hint'; x: number; y: number; w: number; key: string }
   | { t: 'rain'; x0: number; x1: number; interval: number }
+  /** osuw skalny: co `interval` s (z ostrzeżeniem `warn` s) z wysokości `y` spadają kamienie na odcinku x0..x1 (px); chroni nawis (lity kafel nad graczem) */
+  /** kula kamienna na torze (punkty w px — środek kuli): co `every` s (zapowiedź `warn` s) wtacza się po `path`; na punkcie `fork.i` zwrotnica (wszystkie przełączniki bramy `fork.select` włączone) kieruje ją po `fork.alt`.
+   *  Kula, która dotoczy się do końca `alt`, otwiera bramę `hit`. Rani graczy, z którymi się zetknie. */
+  | { t: 'boulder'; r: number; path: [number, number][]; fork?: { i: number; alt: [number, number][]; select: string }; speed: number; every: number; offset?: number; warn?: number; hit?: string }
+  | { t: 'slide'; x0: number; x1: number; y: number; interval: number; warn?: number; offset?: number }
   | { t: 'span'; gate: string; cells: [number, number][] }
   | { t: 'flood'; x0: number; x1: number; /** opcjonalne ograniczenie wierszy [y0,y1] */ y0?: number; y1?: number; from: number; to: number; speed: number; gate: string }
   | { t: 'current'; x: number; y: number; w: number; h: number; fx: number; fy: number }

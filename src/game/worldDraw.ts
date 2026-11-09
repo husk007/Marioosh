@@ -156,6 +156,13 @@ export function drawWorld(w: World, g: Gfx): void {
 
   // elementy tła
   for (const d of rt.decor) { const im = decorImg(d.k, d.state); if (im) g.spr(im, d.x - lw(im) / 2, d.y - lh(im)); }
+  for (const bd of rt.boulders) {   // tory kul (zwrotnica podświetla aktywną odnogę) i kula
+    const sp = bd.spec; const sel = !!sp.fork && rt.switches.filter((q) => q.gate === sp.fork!.select).length > 0 && rt.switches.filter((q) => q.gate === sp.fork!.select).every((q) => q.on);
+    const rail = (pts: [number, number][], col: string, a: number, from = 0): void => { for (let i = Math.max(1, from); i < pts.length; i++) { const [ax, ay] = pts[i - 1], [bx, by] = pts[i]; const n = Math.ceil(Math.hypot(bx - ax, by - ay) / 6); for (let k = 0; k <= n; k++) g.rect(Math.round(ax + (bx - ax) * k / n) - 1, Math.round(ay + (by - ay) * k / n) + sp.r - 2, 3, 3, col, a); } };
+    rail(sp.path, '#3a3640', 0.9); if (sp.fork) { rail(sp.fork.alt, sel ? '#ffd23f' : '#3a3640', sel ? 1 : 0.9, sp.fork.i + 1); }
+    if (!bd.roll) { const st = sp.path[0]; g.rect(st[0] - sp.r - 6, st[1] - sp.r - 10, 10, sp.r * 2 + 14, '#4a4650'); if (bd.warned) g.rect(st[0] - sp.r - 4, st[1] - sp.r - 6, 6, 8, '#ff6a8a', 0.5 + 0.5 * Math.sin(w.time * 20)); }
+    else g.spr(rockSprite(), bd.roll.x - sp.r, bd.roll.y - sp.r, { w: sp.r * 2, h: sp.r * 2, rot: bd.roll.rot });
+  }
   for (const s of rt.signs) g.spr(signSprite(s.symbol), s.x - 12, s.y - 32);
   for (const l of rt.lamps) g.spr(lampSprite(fr), l.x - 8, l.y - 40);
   for (const l of rt.lanterns) g.spr(lanternSprite(l.lit), l.x - 10, l.y - 28);
