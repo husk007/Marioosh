@@ -283,7 +283,7 @@ export class World {
       a.live = !a.stopped && ph < a.on;
       a.warning = !a.stopped && !a.live && ph >= a.period - a.warn;
       const near = this.activePlayers.some((p) => p.mv.body.x > a.x0 - 360 && p.mv.body.x < a.x1 + 360);
-      if (a.live && !wasLive && near) { this.sfx(a.kind === 'bolt' ? 'hit' : 'rock'); this.shake(a.kind === 'bolt' ? 3 : 2); }
+      if (a.live && !wasLive && near) { this.sfx(a.kind === 'bolt' ? 'hit' : 'rock'); this.shake(a.kind === 'bolt' ? 3 : a.kind === 'rock' ? 4 : 2); }
       if (a.warning && near && Math.random() < dt * 8) this.parts.push({ x: a.x0 + Math.random() * (a.x1 - a.x0), y: a.y0 + Math.random() * (a.y1 - a.y0), vx: 0, vy: -20, life: 0.4, max: 0.4, color: '#ffd24a', size: 2, grav: 0 });
       if (!a.live) continue;
       for (const p of this.activePlayers) { const b = p.mv.body; if (p.invuln <= 0 && rectsOverlap(b.x, b.y, b.w, b.h, a.x0, a.y0, a.x1 - a.x0, a.y1 - a.y0)) this.hurtPlayer(p, (a.x0 + a.x1) / 2, true); }
@@ -419,7 +419,7 @@ export class World {
     // atak kluczem
     this.updateAttack(p, inp, dt, prm);
     // interakcje
-    if (inp.pressed.interact || (inp.pressed.down && b.onGround)) this.tryInteract(p, inp);
+    if (inp.pressed.interact || ((inp.pressed.down || inp.pressed.up) && b.onGround)) this.tryInteract(p, inp);   // ↑ wchodzi w drzwi pełnej wielkości (tak mówi podpowiedź), ↓ w przewody
     // zagrożenia kafelkowe
     if (touchesTile(rt.grid, b.x + 3, b.y + 3, b.w - 6, b.h - 4, T.HAZARD) && U.star <= 0 && U.gloves <= 0) this.hurtPlayer(p, px(b) + (this.rng.chance(0.5) ? 1 : -1), true);
     // przepaść

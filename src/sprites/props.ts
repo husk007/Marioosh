@@ -157,12 +157,12 @@ export function drawSign(symbol: number): Img {
   shape(g, lin(g, 11, 0, 14, 0, '#8a6a48', '#c09a68', '#6a4a2c'), () => { g.roundRect(10.6, 14, 3.2, 18, 1); }, 0.9);
   shape(g, lin(g, 0, 2, 0, 18, '#6a6082', '#3a3450'), () => { g.roundRect(2, 2, 20, 16, 3); }, 1.2);
   g.strokeStyle = 'rgba(255,255,255,0.25)'; g.lineWidth = 0.7; g.strokeRect(3.6, 3.6, 16.8, 12.8);
-  const gl = ['#ffd23f', '#7fd6ff', '#ff6a8a', '#8aff9a'][symbol % 4]; g.fillStyle = gl; g.strokeStyle = gl; g.lineWidth = 1.8; g.shadowColor = gl; g.shadowBlur = 4;
-  switch (symbol % 4) {
-    case 0: g.beginPath(); g.arc(12, 10, 3.8, 0, TAU); g.fill(); break;
-    case 1: g.beginPath(); g.moveTo(12, 5); g.lineTo(12, 15); g.moveTo(7, 10); g.lineTo(17, 10); g.stroke(); break;
-    case 2: g.beginPath(); g.moveTo(12, 4.6); g.lineTo(18.6, 15); g.lineTo(5.4, 15); g.closePath(); g.fill(); break;
-    default: g.beginPath(); g.roundRect(6.4, 5.6, 11.2, 8.8, 1.2); g.fill(); g.shadowBlur = 0; g.fillStyle = '#3a3450'; g.fillRect(10, 8.6, 4, 3); break;
+  const gl = ['#ffd23f', '#7fd6ff', '#8aff9a', '#ff6a8a'][symbol % 4]; g.fillStyle = gl; g.strokeStyle = gl; g.lineWidth = 1.8; g.shadowColor = gl; g.shadowBlur = 4;
+  switch (symbol % 4) {   // 0 błyskawica, 1 księżyc, 2 liść, 3 gwiazda (kolejność odklęcia z W8-L2)
+    case 0: g.beginPath(); g.moveTo(13.5, 3.6); g.lineTo(7.2, 11); g.lineTo(11.4, 11); g.lineTo(9.6, 16.4); g.lineTo(16.8, 8.4); g.lineTo(12.4, 8.4); g.closePath(); g.fill(); break;
+    case 1: g.beginPath(); g.arc(12, 10, 5.2, 0.5 * Math.PI, 1.5 * Math.PI, true); g.arc(14.2, 10, 4, 1.5 * Math.PI, 0.5 * Math.PI, false); g.closePath(); g.fill(); break;
+    case 2: g.beginPath(); g.moveTo(12, 4); g.quadraticCurveTo(19, 8, 12, 16); g.quadraticCurveTo(5, 8, 12, 4); g.fill(); g.shadowBlur = 0; g.strokeStyle = '#3a3450'; g.lineWidth = 0.9; g.beginPath(); g.moveTo(12, 6); g.lineTo(12, 15); g.stroke(); break;
+    default: g.beginPath(); for (let i = 0; i < 10; i++) { const r = i % 2 ? 2.4 : 5.6, a = -Math.PI / 2 + i * Math.PI / 5; g.lineTo(12 + Math.cos(a) * r, 10 + Math.sin(a) * r); } g.closePath(); g.fill(); break;
   }
   g.shadowBlur = 0; return c;
 }

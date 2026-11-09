@@ -177,7 +177,11 @@ export function drawWorld(w: World, g: Gfx): void {
   }
   for (const s of rt.switches) g.spr(switchSprite(s.style, s.on), s.x - 19, s.y - 48, { w: 38, h: 48 });
   for (const c of rt.cables) if (c.revealed) {
-    if (c.face === 'door') { drawDoor(g, c.tx * TILE + 16, (c.ty + 1) * TILE, c.color, c.locked, w.time); continue; }
+    if (c.face === 'door') {
+      drawDoor(g, c.tx * TILE + 16, (c.ty + 1) * TILE, c.color, c.locked, w.time);
+      if (c.symbol !== undefined) g.spr(signSprite(c.symbol), c.tx * TILE + 4, (c.ty + 1) * TILE - 100 - 40, { w: 24, h: 32 });   // znak portalu nad drzwiami (sieć W8-L2)
+      continue;
+    }
     g.spr(cableSprite(c.color, c.face, fr), c.tx * TILE, c.ty * TILE - (c.face === 'up' ? 6 : 0));
     if (c.symbol !== undefined) g.spr(signSprite(c.symbol), c.tx * TILE + 4, c.ty * TILE - 42, { w: 24, h: 32 });
     if (c.locked || c.color === 'black') { g.rect(c.tx * TILE + 12, c.ty * TILE - 14, 8, 8, '#e0443a'); }
@@ -240,6 +244,13 @@ export function drawWorld(w: World, g: Gfx): void {
   for (const a of rt.arcs) {
     if (a.x1 < g.camX - 40 || a.x0 > g.camX + VW + 40) continue;
     const w0 = a.x1 - a.x0, h0 = a.y1 - a.y0, cxm = (a.x0 + a.x1) / 2;
+    if (a.kind === 'rock') {   // deszcz kamieni: cień na ziemi rośnie w czasie ostrzeżenia, potem spada głaz
+      const gy = a.y1;
+      if (a.live) { g.rect(cxm - 1, a.y0, 2, h0 - 64, '#b9a98a', 0.25); g.rect(a.x0 + 2, gy - 64, w0 - 4, 64, '#8d8478', 1); g.rect(a.x0 + 2, gy - 64, w0 - 4, 6, '#b9ad9c', 1); g.rect(cxm - 1, gy - 60, 3, 40, '#4a443c', 1); g.rect(a.x0 + 10, gy - 36, w0 - 20, 3, '#4a443c', 1); }
+      else if (a.warning) { const sh = 4 + (Math.floor(w.time * 12) % 2) * 2; g.rect(a.x0 + 2, gy - 3, w0 - 4, 3, '#000', 0.55); g.rect(a.x0 + 8, gy - 3 - sh, w0 - 16, sh, '#000', 0.25); g.rect(cxm - 1, gy - 10, 2, 8, '#8d8478', 0.9); }
+      else g.rect(cxm - 7, gy - 2, 14, 1, '#3a3630', 0.5);
+      continue;
+    }
     if (a.kind === 'bolt') {
       if (a.live) { g.rect(a.x0, a.y0, w0, h0, '#bfe6ff', 0.25); let xx = cxm; for (let y = a.y0; y < a.y1; y += 12) { const nx = cxm + Math.sin(y * 0.7 + w.time * 60) * (w0 * 0.3); g.rect(Math.min(xx, nx) - 1, y, Math.abs(nx - xx) + 3, 13, '#fff', 0.95); xx = nx; } }
       else if (a.warning) { if (Math.floor(w.time * 10) % 2 === 0) { g.rect(a.x0, a.y0, w0, 3, '#ffd24a', 0.9); g.rect(a.x0, a.y1 - 3, w0, 3, '#ffd24a', 0.9); } g.rect(a.x0, a.y0, w0, h0, '#ffd24a', 0.07); }

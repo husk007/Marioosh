@@ -205,3 +205,17 @@ it('negatywny W7-L4: bez dźwigni testu 1, 2 lub 3 arena Rogodrona jest nieosią
   // droga: lewy podest → drabina (4 wiersze) → podłoga → środek (drabina) → podłoga → prawy podest; marsz ≈ dystans poziomy + 3 × 3 s na drabiny
   const t = (g[2].x - g[0].x) / BROTHERS.M.run + 3 * 3; expect(t).toBeLessThan(24);
 }, 900000);
+
+it('W8-L1: bez zaworu w piwnicy rumowisko (brama g1) blokuje ulicę — wyjście nieosiągalne; z zaworem osiągalne dla obu braci, piwnica i półka sekretna dostępne', () => {
+  const L = without('W8-L1', (s) => s.t === 'switch'); const e = exitOfLevel(L);
+  expect(analyze(L, 'M').reaches(0, e.x, e.y, 40, 10)).toBe(false);
+  const L0 = getLevel('W8-L1'); const e0 = exitOfLevel(L0);
+  for (const b of ['M', 'D'] as const) expect(analyze(L0, b).reaches(0, e0.x, e0.y, 40, 10), b).toBe(true);
+}, 400000);
+
+it('W8-L2: bez przekaźników rozdzielni grodź (zamknięte drzwi do hali wyjściowej) odcina wyjście; z nimi osiągalne dla obu braci, wszystkie stacje dostępne', () => {
+  const L = structuredClone(getLevel('W8-L2')); for (const r of L.rooms) r.specs = r.specs.filter((s) => s.t !== 'switch'); const e = exitOfLevel(L);
+  expect(analyze(L, 'M').reaches(0, e.x, e.y, 40, 10)).toBe(false);
+  const L0 = getLevel('W8-L2'); const e0 = exitOfLevel(L0);
+  for (const b of ['M', 'D'] as const) expect(analyze(L0, b).reaches(0, e0.x, e0.y, 40, 10), b).toBe(true);
+}, 400000);

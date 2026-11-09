@@ -93,3 +93,54 @@ describe('reaktor (W7-L3): most na czas i przekaźniki w kolejności', () => {
     expect(w.rt.gates.find((g) => g.id === 'ordA')!.open).toBe(true); step(w, 60 * 6); expect(lift.y).toBeGreaterThan(y0);
   });
 });
+
+describe('deszcz kamieni (W8-L1)', () => {
+  it('14 kolumn upadku z ostrzeżeniem 1,2 s (cień) i przerwą ≥ 2,5 s; głaz rani w kolumnie, a pod łukiem-schronem (x 34–41) i w schronie z punktem kontrolnym gracz przez 40 s nie traci zdrowia', () => {
+    const w = mk('W8-L1'); const rocks = w.rt.arcs.filter((a) => a.kind === 'rock'); expect(rocks.length).toBe(14);
+    for (const a of rocks) { expect(a.warn).toBeGreaterThanOrEqual(1.2); expect(a.period - a.on - a.warn).toBeGreaterThanOrEqual(2.5); }
+    let hit = false; const z = rocks[0];
+    for (let i = 0; i < 60 * 10 && !hit; i++) { step(w, 1); if (z.live) { put(w, Math.floor(z.x0 / TILE), 28); step(w, 2); hit = w.players[0].hp < MAX_HP; } else put(w, 3, 28); }
+    expect(hit).toBe(true);
+    for (const tx of [37, 133]) { const w2 = mk('W8-L1'); for (let i = 0; i < 60 * 40; i++) { step(w2, 1); put(w2, tx, 28); w2.players[0].invuln = 0; } expect(w2.players[0].hp, 'x' + tx).toBe(MAX_HP); }
+  });
+  it('kule na ulicy ostrzegają 3 s i mają schronienie na półkach (3 drabiny)', () => {
+    const w = mk('W8-L1'); expect(w.rt.boulders.length).toBe(2); for (const b of w.rt.boulders) expect(b.spec.warn).toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe('Wielki Przewód (W8-L2): sieć portali i kolejność przekaźników', () => {
+  const goto = (w: World, i: number) => { (w as unknown as { changeRoom(i: number): void }).changeRoom(i); step(w, 2); };
+  it('pięć pokoi; błędne portale prowadzą do pokoi z JEDNYMI drzwiami z powrotem (bez labiryntu), właściwe — po kolei: węzeł → stacja pośrednia → rozdzielnia', () => {
+    const L = getLevel('W8-L2'); expect(L.rooms.length).toBe(5);
+    const doors = (ri: number) => L.rooms[ri].specs.filter((s) => s.t === 'cable' && s.face === 'door') as Extract<(typeof L.rooms)[0]['specs'][number], { t: 'cable' }>[];
+    expect(doors(0).map((d) => d.dest!.room)).toEqual([1, 2, 3]);
+    expect(doors(1).length).toBe(1); expect(doors(1)[0].dest!.room).toBe(0);
+    expect(doors(3).length).toBe(1); expect(doors(3)[0].dest!.room).toBe(0);
+    expect(doors(2).map((d) => d.dest!.room).sort()).toEqual([0, 1, 4]);
+    expect(doors(4).map((d) => d.dest!.room).sort()).toEqual([0, 2]);
+    // znaki na portalach węzła: błyskawica, księżyc, liść
+    expect(doors(0).map((d) => d.symbol)).toEqual([0, 1, 2]);
+  });
+  it('tablica rozdzielni pokazuje znaki w kolejności błyskawica → księżyc → liść → gwiazda, a przekaźniki stoją w innej kolejności', () => {
+    const L = getLevel('W8-L2'); const signs = L.rooms[4].specs.filter((s) => s.t === 'sign') as { x: number; symbol: number }[];
+    const board = signs.filter((s) => s.x > 15 * TILE && s.x < 25 * TILE).sort((a, b) => a.x - b.x).map((s) => s.symbol); expect(board).toEqual([0, 1, 2, 3]);
+    const sw = L.rooms[4].specs.filter((s) => s.t === 'switch') as { x: number; symbol: number }[];
+    const spatial = [...sw].sort((a, b) => a.x - b.x).map((s) => s.symbol); expect(spatial).not.toEqual([0, 1, 2, 3]); expect(spatial.slice().sort()).toEqual([0, 1, 2, 3]);
+  });
+  it('zła kolejność zeruje komplet; dobra otwiera bramę i odblokowuje drzwi do hali wyjściowej (przedtem „zablokowane”)', () => {
+    const w = mk('W8-L2'); goto(w, 4);
+    const sw = w.rt.switches.slice().sort((a, b) => a.symbol - b.symbol); expect(sw.length).toBe(4);
+    const door = w.rt.cables.find((c) => c.id === 'W8-L2:out')!; expect(door.locked).toBe(true);
+    const press = (q: (typeof sw)[number]) => { const p = w.players[0], b = p.mv.body; b.x = q.x - b.w / 2; b.y = q.y - b.h; b.vx = b.vy = 0; p.safe = { x: q.x, y: q.y }; const i = idle(); i.pressed.interact = true; w.update(1 / 60, [i, idle()]); step(w, 2); };
+    press(sw[1]); expect(sw.every((q) => !q.on)).toBe(true);                       // księżyc przed błyskawicą
+    press(sw[0]); press(sw[1]); press(sw[3]); expect(sw.every((q) => !q.on)).toBe(true);   // gwiazda przed liściem
+    press(sw[0]); press(sw[1]); press(sw[2]); expect(door.locked).toBe(true); press(sw[3]); step(w, 3);
+    expect(sw.every((q) => q.on)).toBe(true); expect(w.rt.gates.find((g) => g.id === 'ord:warpgate')!.open).toBe(true); expect(door.locked).toBe(false);
+  });
+  it('wejście w portal przenosi do właściwego pokoju (księżyc → stacja pośrednia), a błędny portal ze stacji (liść) wraca do stacji bezpiecznej', () => {
+    const w = mk('W8-L2'); put(w, 90, 28); const i = idle(); i.pressed.up = true; w.update(1 / 60, [i, idle()]); step(w, 60);
+    expect((w as unknown as { ri: number }).ri).toBe(2);
+    put(w, 22, 18); const j = idle(); j.pressed.up = true; w.update(1 / 60, [j, idle()]); step(w, 60);
+    expect((w as unknown as { ri: number }).ri).toBe(1);
+  });
+});

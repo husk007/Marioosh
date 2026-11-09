@@ -189,8 +189,10 @@ export function analyze(level: LevelData, brother: Brother, opt: { maxNodes?: nu
       for (let y = Math.max(0, ty0); y <= Math.min(r.h - 1, ty1); y++) for (let x = Math.max(0, tx0); x <= Math.min(r.w - 1, tx1); x++) if (w[y * r.w + x]) return true;
       return false;
     };
-    const doors: { ri: number; x: number; fy: number; dest: { room: number; x: number; y: number } | null; locked?: boolean }[] = [];
-    rooms.forEach((r, ri) => r.specs.forEach((s: Spec) => { if (s.t === 'cable' && s.face === 'door' && s.dest && !s.locked) doors.push({ ri, x: s.x, fy: s.y, dest: s.dest }); }));
+    const doors: { ri: number; x: number; fy: number; dest: { room: number; x: number; y: number } | null; lockGate?: string }[] = [];
+    // drzwi zamknięte (locked) otwiera brama „…:warpgate” z tego samego pokoju (np. kolejność przekaźników W8-L2)
+    const warpGate = (ri: number): string => { for (const q of rooms[ri].specs) if (q.t === 'gate' && q.id.endsWith(':warpgate')) return q.id; return '#never'; };
+    rooms.forEach((r, ri) => r.specs.forEach((s: Spec) => { if (s.t === 'cable' && s.face === 'door' && s.dest) doors.push({ ri, x: s.x, fy: s.y, dest: s.dest, lockGate: s.locked ? warpGate(ri) : undefined }); }));
     const lifts: { ri: number; x0: number; y0: number; x1: number; y1: number; w: number; power?: string }[] = [];
     rooms.forEach((r, ri) => r.specs.forEach((s: Spec) => {
       if (s.t === 'platform' && (s.mode === 'v' || s.mode === 'h')) {
@@ -228,7 +230,7 @@ export function analyze(level: LevelData, brother: Brother, opt: { maxNodes?: nu
       // pływanie z miejsca stania w wodzie (brodzenie) lub na brzegu
       if (hasWater[n.ri] && nearWater(n)) { swim(n); for (const dir of [-1, 0, 1] as const) surfaceJump(n, dir); }
       // drzwi
-      for (const d of doors) if (d.ri === n.ri && Math.abs(d.x - n.x) < 26 && Math.abs(d.fy - n.fy) < 8 && d.dest) addNode({ ri: d.dest.room, x: d.dest.x, fy: d.dest.y, wet: 0 });
+      for (const d of doors) if (d.ri === n.ri && Math.abs(d.x - n.x) < 26 && Math.abs(d.fy - n.fy) < 8 && d.dest && (!d.lockGate || openGates.has(`${d.ri}:${d.lockGate}`))) addNode({ ri: d.dest.room, x: d.dest.x, fy: d.dest.y, wet: 0 });
       // windy: koniec ruchu osiągalny z drugiego końca
       for (const l of lifts) if (l.ri === n.ri && (!l.power || openGates.has(`${l.ri}:${l.power}`))) {
         const onA = Math.abs(n.x - l.x0) < l.w / 2 + 22 && Math.abs(n.fy - l.y0) < 6, onB = Math.abs(n.x - l.x1) < l.w / 2 + 22 && Math.abs(n.fy - l.y1) < 6;

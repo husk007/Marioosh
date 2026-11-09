@@ -68,7 +68,7 @@ export interface RoomRT {
   spans: { gate: string; cells: [number, number][]; done: boolean; timed?: boolean; warned?: boolean }[];
   floods: { x0: number; x1: number; y0: number; y1: number; from: number; to: number; speed: number; gate: string; cur: number; open?: boolean; applied?: boolean }[];
   boulders: { spec: Extract<import('./types').Spec, { t: 'boulder' }>; t: number; warned: boolean; roll: { x: number; y: number; pts: [number, number][]; i: number; alt: boolean; rot: number } | null }[];
-  arcs: { x0: number; y0: number; x1: number; y1: number; period: number; on: number; warn: number; offset: number; stop?: string; kind: 'piston' | 'bolt' | 'press'; live: boolean; warning: boolean; stopped: boolean }[];
+  arcs: { x0: number; y0: number; x1: number; y1: number; period: number; on: number; warn: number; offset: number; stop?: string; kind: 'piston' | 'bolt' | 'press' | 'rock'; live: boolean; warning: boolean; stopped: boolean }[];
   slides: { x0: number; x1: number; y: number; interval: number; warn: number; t: number; warned: boolean }[];
   /** kafle zajęte przez promień światła (rysowanie) */
   beamCells?: [number, number, number, number][];

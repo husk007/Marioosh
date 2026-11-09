@@ -67,7 +67,7 @@ export type Spec =
    *  Kula, która dotoczy się do końca `alt`, otwiera bramę `hit`. Rani graczy, z którymi się zetknie. */
   | { t: 'boulder'; r: number; path: [number, number][]; fork?: { i: number; alt: [number, number][]; select: string }; speed: number; every: number; offset?: number; warn?: number; hit?: string }
   | { t: 'slide'; x0: number; x1: number; y: number; interval: number; warn?: number; offset?: number }
-  | { t: 'arc'; x0: number; y0: number; x1: number; y1: number; period: number; on: number; warn?: number; offset?: number; stop?: string; kind?: 'piston' | 'bolt' | 'press' }
+  | { t: 'arc'; x0: number; y0: number; x1: number; y1: number; period: number; on: number; warn?: number; offset?: number; stop?: string; kind?: 'piston' | 'bolt' | 'press' | 'rock' }
   | { t: 'span'; gate: string; cells: [number, number][]; /** most na czas: chowa się, gdy przekaźnik (zatrzask 8 s) wygaśnie */ timed?: boolean }
   | { t: 'flood'; x0: number; x1: number; /** opcjonalne ograniczenie wierszy [y0,y1] */ y0?: number; y1?: number; from: number; to: number; speed: number; gate: string }
   | { t: 'current'; x: number; y: number; w: number; h: number; fx: number; fy: number }
