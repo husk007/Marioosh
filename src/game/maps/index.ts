@@ -2,6 +2,7 @@
 import type { LevelData } from '../types';
 import { buildW1L1 } from './w1l1';
 import { buildW1L2 } from './w1l2';
+import { buildW1L3 } from './w1l3';
 import { buildW1L4 } from './w1l4';
 import { buildW4L1 } from './w4l1';
 import { buildW4L2 } from './w4l2';
@@ -12,6 +13,7 @@ import { buildW5L1, buildW6L1 } from './proto';
 export const AUTHORED: Record<string, () => LevelData> = {
   'W1-L1': buildW1L1,
   'W1-L2': buildW1L2,
+  'W1-L3': buildW1L3,
   'W1-L4': buildW1L4,
   'W4-L1': buildW4L1,
   'W4-L2': buildW4L2,

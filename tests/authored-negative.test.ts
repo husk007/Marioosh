@@ -60,3 +60,7 @@ it('negatywny W4-L2: bez któregokolwiek z trzech bezpieczników śluza zostaje 
 it('negatywny W4-L3: bez zaworu A (spust) dolny korytarz jest za długi na jeden oddech; bez zaworu B nie da się wypłynąć do wysokich drzwi', () => {
   for (const sw of ['vA', 'vB']) { const L = without('W4-L3', (s) => s.t === 'switch' && s.id.endsWith(':' + sw)); const e = exitOfLevel(L); expect(analyze(L, 'M').reaches(0, e.x, e.y, 40, 10), sw).toBe(false); }
 }, 300000);
+it('negatywny W1-L3: bez wciągarki mostu 1 (w1), bez wagonika nad kanionem 2 i bez rozdzielnicy na słupie (w3) wyjście jest nieosiągalne', () => {
+  for (const sw of ['w1', 'w3']) { const L = without('W1-L3', (s) => s.t === 'switch' && s.id.endsWith(':' + sw)); const e = exitOfLevel(L); expect(analyze(L, 'M').reaches(0, e.x, e.y, 40, 10), sw).toBe(false); }
+  const L = without('W1-L3', (s) => s.t === 'platform'); const e = exitOfLevel(L); expect(analyze(L, 'D').reaches(0, e.x, e.y, 40, 10), 'wagonik').toBe(false);
+}, 400000);

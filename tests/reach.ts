@@ -19,7 +19,7 @@ interface Node { ri: number; x: number; fy: number; wet: number; sw?: boolean }
 interface Pt { ri: number; x: number; fy: number }
 
 export interface Analysis {
-  nodes: Node[]; points: Pt[]; openGates: Set<string>; switchesOn: Set<string>;
+  nodes: Node[]; points: Pt[]; openGates: Set<string>; switchesOn: Set<string>; openFloods?: Set<string>;
   reaches(ri: number, x: number, fy: number, dx?: number, dy?: number): boolean;
   /** czy środek postaci mógł znaleźć się w odległości `r` od punktu (np. przedmiot) */
   touches(ri: number, x: number, y: number, r: number): boolean;
@@ -231,7 +231,7 @@ export function analyze(level: LevelData, brother: Brother, opt: { maxNodes?: nu
       for (const d of doors) if (d.ri === n.ri && Math.abs(d.x - n.x) < 26 && Math.abs(d.fy - n.fy) < 8 && d.dest) addNode({ ri: d.dest.room, x: d.dest.x, fy: d.dest.y, wet: 0 });
       // windy: koniec ruchu osiągalny z drugiego końca
       for (const l of lifts) if (l.ri === n.ri) {
-        const onA = Math.abs(n.x - l.x0) < l.w / 2 + 14 && Math.abs(n.fy - l.y0) < 6, onB = Math.abs(n.x - l.x1) < l.w / 2 + 14 && Math.abs(n.fy - l.y1) < 6;
+        const onA = Math.abs(n.x - l.x0) < l.w / 2 + 22 && Math.abs(n.fy - l.y0) < 6, onB = Math.abs(n.x - l.x1) < l.w / 2 + 22 && Math.abs(n.fy - l.y1) < 6;
         if (onA) addNode({ ri: l.ri, x: l.x1, fy: l.y1, wet: n.wet });
         if (onB) addNode({ ri: l.ri, x: l.x0, fy: l.y0, wet: n.wet });
       }
@@ -258,7 +258,7 @@ export function analyze(level: LevelData, brother: Brother, opt: { maxNodes?: nu
     if (!changed) break;
   }
   return {
-    nodes, points, openGates, switchesOn, maxWet,
+    nodes, points, openGates, switchesOn, openFloods, maxWet,
     reaches: (ri, x, fy, dx = 36, dy = 24) => points.some((p) => p.ri === ri && Math.abs(p.x - x) < dx && Math.abs(p.fy - fy) < dy),
     touches: (ri, x, y, r) => points.some((p) => p.ri === ri && Math.hypot(p.x - x, p.fy - bp.hitH / 2 - y) < r),
   };
