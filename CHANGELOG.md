@@ -1,5 +1,14 @@
 # Zmiany
 
+## Niewydane — v0.4 „platformer w ludzkiej skali” (prototyp, gałąź `v0.4-human-scale`)
+- **Nowa skala i fizyka:** 40 px = 1 m, skok 0,6–0,9 m, auto-krok 0,3 m, przeskok i chwyt krawędzi, drabiny, upadki z progami (potknięcie / rana), kucanie. Usunięto szybowanie, odbicie od ściany, toczenie, uderzenie w ziemię i sprężyny.
+- **Grawitacja per planeta** (0,86–1,14 g, `PLANET_PHYSICS`).
+- **Zasady gry:** HP 3 + tarcza, **bez żyć, game over i zegara**, bez przeskoku na głowę wrogów; przepaść = −1 HP i powrót na ostatnie bezpieczne miejsce; kaucja tylko z opakowań. HUD z trzema sercami.
+- **Poziomy projektowane ręcznie** (ASCII + logika): drzwi i terminale pełnej wielkości, windy z postojem, schody 26°. Gotowe: **W1-L1, W1-L2, W1-L4**. Pozostałe 29 oznaczone WIP na mapie.
+- **Rogomir** przeprojektowany: trzy generatory zdejmują pancerz, szarża wolniejsza od biegu, pomosty-schrony, skala ×1,5.
+- **Testy:** nowy analizator przejezdności oparty na prawdziwym kontrolerze ruchu (bez trybu „god”) dla obu braci, testy negatywne, testy walki z Rogomirem; testy v0.3 przeniesione do `tests/legacy/`.
+- Dokumentacja: `docs/design/08–12` (specyfikacja v0.4 i stan implementacji), `07` oznaczony jako historyczny.
+
 ## 0.3.0 — przebudowa pionowa („Sonic / Rayman”)
 - **Płaski bieg w prawo zastąpiono wysokimi poziomami z ruchem w górę i w dół.** Wszystkie 32 poziomy zaprojektowano od nowa nowym generatorem (`levelgen2.ts`): zbocza 45° i 26°, rozpęd i skocznie, wspinaczka po kratkach i linach, sprężyny, zrzuty i zjazdy, lód/olej/piasek, trasy górne.
 - **Nowa fizyka braci:** szybowanie, ślizg po ścianie, łapanie krawędzi, toczenie, pływanie w 8 kierunkach, pionowa kamera. Marioosh: uderzenie w ziemię (rozbija pęknięte posadzki), kratka męczy go po ok. 3 s. Darioosh: odbicie od ściany, dłuższe szybowanie, kratka bez limitu.

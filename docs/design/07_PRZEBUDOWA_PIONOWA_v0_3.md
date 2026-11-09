@@ -1,3 +1,5 @@
+> **DOKUMENT HISTORYCZNY (v0.3).** Zastąpiony przez v0.4 (`08_NOWA_KONCEPCJA_FIZYKA_v0_4.md`): szybowanie, odbicie od ściany, toczenie, uderzenie w ziemię, sprężyny i przeskok na głowę wrogów zostały usunięte. Kod v0.3 jest na gałęzi `main` / tagu v0.3.0; testy v0.3 w `tests/legacy/`.
+
 # Przebudowa pionowa v0.3 — „Sonic / Rayman” dla Marioosha i Darioosha
 
 Dokument opisuje, co zmieniło się względem GDD v0.2 (`01_GDD_mechanika_v0_2.md`): gra przestała być płaskim biegiem w prawo, a stała się wysokim, wielopoziomowym platformerem z ruchem w górę i w dół. Fizyka bohaterów pozostaje spójna z v0.2 (coyote 0,1 s, bufor skoku 0,12 s, skok o zmiennej wysokości, grawitacja bohatera 1600 px/s²).

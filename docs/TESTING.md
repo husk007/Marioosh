@@ -7,6 +7,9 @@ npm run build && npm run test:e2e   # Playwright (Chromium) — zrzuty w e2e/out
 ```
 Własna przeglądarka dla e2e: `PW_CHROMIUM=/ścieżka/do/chrome npm run test:e2e`; w CI: `npx playwright-core install --with-deps chromium`.
 
+## v0.4 (gałąź `v0.4-human-scale`)
+Testy v0.3 (bot „god”, generator, wieża, zbocza, sekrety) są w `tests/legacy/` i **nie są uruchamiane** (`vite.config.ts` → `exclude`). Aktualne: `movement` (kontroler w skali ludzkiej), `authored` (przejezdność ręcznych poziomów **bez trybu god**, osobno M i D, plus budżet opakowań), `authored-negative` (analizator odrzuca niedozwolone trasy), `boss` (walka z Rogomirem), `world`, `session`, `hints`, `i18n`. Analizator: `tests/reach.ts` (BFS po stanach z makrami wykonywanymi przez prawdziwy `stepMovement`, ok. 30 s na poziom i brata). Tabela poniżej opisuje v0.3.
+
 ## Co pokrywają testy
 | Plik | Zakres |
 |---|---|

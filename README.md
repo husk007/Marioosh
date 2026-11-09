@@ -35,7 +35,7 @@ Dwuwymiarowa platformówka o dwóch braciach, ośmiu planetach, jednym przedłu�
 | Pauza | `Esc` / `P` | | Start |
 | Pełny ekran | `F` w menu / `F11` (desktop) | | |
 
-**Ruch (v0.3):** `↑` na kratce/linie — wspinaczka; skok w powietrzu — szybowanie; w powietrzu przy ścianie — ślizg, a **Darioosh** odbija się od niej skokiem; `↓` w powietrzu — **Marioosh** uderza w ziemię (rozbija pęknięte posadzki); `↓` w biegu — toczenie na zboczu; w wodzie 8 kierunków, skok = kopnięcie/dash.
+**Ruch (v0.4, skala ludzka):** niskie progi (do 0,3 m) pokonujesz sam; wyższą krawędź przeskakujesz albo chwytasz i wciągasz się (skok przy krawędzi); `↑`/`↓` na drabinie; `↓` — kucanie (niskie tunele); `↑`/`E` przy drzwiach i terminalach; w wodzie powoli. Nie ma szybowania, toczenia, odbicia od ściany, uderzenia w ziemię, sprężyn ani skakania po głowach wrogów — wrogów obserwuj i omijaj, klucz służy do obrony.
 
 Na telefonach pojawiają się przyciski dotykowe (rozmiar w ustawieniach). Klawisze można przypisać w *Ustawienia → Klawisze*.
 
@@ -85,6 +85,8 @@ tests/ e2e/   testy                   .github/    CI, Pages, Release
 [Architektura](docs/ARCHITECTURE.md) · [Budowanie](docs/BUILDING.md) · [Platformy](docs/PLATFORMS.md) · [Testowanie](docs/TESTING.md) · [Lokalizacja](docs/LOCALIZATION.md) · [Licencje](docs/LICENSES.md) · [Zmiany](CHANGELOG.md) · [Projekt gry (GDD itd.)](docs/design/README.md)
 
 ## Stan i ograniczenia
+**Gałąź `v0.4-human-scale` (prototyp):** gra jest przebudowywana na „platformer w ludzkiej skali” (zob. [`docs/design/12_IMPLEMENTACJA_v0_4.md`](docs/design/12_IMPLEMENTACJA_v0_4.md)). Grywalne są na razie **W1-L1, W1-L2 i W1-L4** (z Rogomirem); pozostałe poziomy czekają na akceptację prototypu, a opis poniżej (generator, szybowanie itd.) dotyczy v0.3 z `main`.
+
 **Migracja grafiki HD:** dostępna jest pierwsza seria 12 przeciwników i 9 teł planet w SVG. Wcześniejsze portrety referencyjne braci i bossów oraz pełne animacje nie są jeszcze zastąpione finalnymi ilustracjami; trwa stopniowa wymiana assetów. Grafiki pochodzące od użytkownika służą za wzorce kierunku artystycznego, ale nie są jeszcze częścią repozytorium.
 
 Wersja **0.1.0** — pierwsza kompletna, grywalna implementacja projektu z etapu 2. Uczciwie:

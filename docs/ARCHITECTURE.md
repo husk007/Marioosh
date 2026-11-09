@@ -22,6 +22,9 @@ main.ts → App (pętla, skalowanie, nakładka dotykowa, przełączanie scen)
 ```
 Zależności idą tylko w dół: `game/*` nie zna DOM-u; audio jest wstrzykiwane (`AudioEngine`), więc testy używają atrapy.
 
+## v0.4 (gałąź `v0.4-human-scale`)
+Skala 40 px = 1 m (`constants.ts`), grawitacja = `BASE_GRAVITY × PLANET_PHYSICS[świat]`. Kontroler bohaterów (`movement.ts`) to maszyna stanów: chód/bieg, skok, auto-krok, przeskok/chwyt krawędzi, drabina, kucanie, pływanie, upadki z progami. Poziomy z `maps/` są ręcznie projektowane przez `authored.ts` (ASCII + specyfikacje w kodzie) i mają pierwszeństwo przed generatorem v0.3 (`levels.ts`); poziomy spoza rejestru `AUTHORED` są WIP. Poniższy opis pętli dotyczy też v0.4, ale fragment o ruchu bohaterów to v0.3.
+
 ## Pętla i fizyka
 - Rozdzielczość wirtualna **640×360**, skalowanie całkowite z letterboxem; stały krok **60 Hz** (akumulator) niezależny od odświeżania ekranu.
 - `moveBody` (wrogowie, bossowie): ruch osiami osobno, kolizje z kafelkami (pełne, jednostronne, **zbocza z profilem wysokości**, kolce, drabiny/kratki/liny, taśmy, kruszące, bramy) oraz ruchomymi platformami (`carryOnPlatforms`/`landOnPlatforms`).
