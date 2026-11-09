@@ -69,6 +69,8 @@ function decorImg(k: string, state: number): Img | null {
   switch (k) {
     case 'root': p = new Pix(36, 52); if (state === 0) { p.r(14, 6, 8, 46, '#2f7a3c').e(18, 8, 14, 8, '#3e8f4a').r(4, 24, 12, 5, '#2f7a3c').r(22, 32, 12, 5, '#2f7a3c').e(18, 6, 4, 4, '#e8507a'); } else { p.r(10, 40, 16, 12, '#4a3a22').r(8, 46, 20, 6, '#2f7a3c'); } break;
     case 'mirror': p = new Pix(36, 52); p.r(16, 24, 4, 28, '#6a707c').r(8, 48, 20, 4, '#6a707c'); p.poly([[18, 2], [32, 20], [18, 40], [4, 20]], state ? '#bfe6f6' : '#6a8aa0'); p.l(18, 4, 18, 38, state ? '#ffffff' : '#a0c0d0'); if (state) p.e(18, 20, 4, 4, '#fff'); break;
+    case 'lmirror': p = new Pix(36, 64); p.r(16, 30, 4, 30, '#6a707c').r(8, 58, 20, 4, '#6a707c').e(18, 30, 5, 5, '#8a909c'); if (state) { p.l(8, 4, 28, 28, '#bfe6f6').l(9, 4, 29, 28, '#eaf8ff').l(8, 5, 28, 29, '#8fc4dc'); } else { p.l(8, 28, 28, 4, '#bfe6f6').l(9, 28, 29, 4, '#eaf8ff').l(8, 29, 28, 5, '#8fc4dc'); } break;
+    case 'sun_r': case 'sun_l': case 'sun_u': case 'sun_d': p = new Pix(32, 32); p.e(16, 16, 11, 11, '#ffe27a').e(16, 16, 6, 6, '#fff6c8'); break;
     case 'pillar': p = new Pix(36, 96); if (state === 0) { p.r(6, 8, 24, 88, '#8a8498').r(2, 0, 32, 10, '#a09ab0').r(2, 86, 32, 10, '#a09ab0'); for (let y = 14; y < 84; y += 14) p.r(6, y, 24, 2, '#6a647a'); } else { p.r(2, 78, 32, 18, '#7a7488'); p.r(8, 70, 10, 10, '#8a8498').r(20, 74, 8, 8, '#6a647a'); } break;
     case 'guard': p = new Pix(28, 44); p.r(4, 38, 20, 6, '#6a6a72').e(14, 24, 8, 12, '#8f8f98').e(14, 10, 7, 7, '#8f8f98').poly([[8, 5], [11, 5], [9, -1]], '#d8d0c0'); break;
     case 'statue': p = new Pix(32, 44); p.r(6, 38, 20, 6, '#6a6a72').e(16, 26, 9, 12, '#7a7a84').e(16, 10, 8, 8, '#7a7a84').poly([[10, 6], [13, 6], [11, 0]], '#c0b8a8').poly([[19, 6], [22, 6], [21, 0]], '#c0b8a8'); break;
@@ -219,6 +221,7 @@ export function drawWorld(w: World, g: Gfx): void {
     if (b.warn) { if (Math.floor(w.time * 16) % 2 === 0) g.rect(x0, b.y - 1, b.len, 2, '#ff6a8a', 0.8); }
     else { const col = b.owner === -2 ? '#7fd6ff' : '#c8a0ff'; g.rect(x0, b.y - 7, b.len, 14, col, 0.35); g.rect(x0, b.y - 3, b.len, 6, '#fff', 0.85); }
   }
+  if (rt.beamCells) for (const [bx, by, bdx] of rt.beamCells) { const fl = 0.55 + 0.15 * Math.sin(w.time * 9 + bx + by); if (bdx !== 0) { g.rect(bx * TILE, by * TILE + 11, TILE, 10, '#ffe27a', 0.28 * fl); g.rect(bx * TILE, by * TILE + 14, TILE, 4, '#fff6c8', 0.9 * fl); } else { g.rect(bx * TILE + 11, by * TILE, 10, TILE, '#ffe27a', 0.28 * fl); g.rect(bx * TILE + 14, by * TILE, 4, TILE, '#fff6c8', 0.9 * fl); } }
   for (const m of rt.decor) if (m.k === 'mirror' && m.state === 1) g.rect(m.x - 2, m.y - 60, 4, 4, '#fff', 0.8 + 0.2 * Math.sin(w.time * 10));
   for (const pt of w.parts) g.rect(pt.x, pt.y, pt.size, pt.size, pt.color, Math.min(1, pt.life / pt.max * 1.5));
 

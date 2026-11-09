@@ -22,7 +22,7 @@ describe('poziomy v0.4: osiągalność bez trybu god (obaj bracia solo)', () => 
             for (const s of r.specs) {
               if (s.t === 'checkpoint' && !a.reaches(ri, s.x, s.y, 40, 10)) missing.push(`checkpoint@${s.x},${s.y} r${ri}`);
               if (s.t === 'exit' && !a.reaches(ri, s.x, s.y, 40, 10)) missing.push(`exit@${s.x},${s.y} r${ri}`);
-              if (s.t === 'switch' && !a.switchesOn.has(`${ri}:${s.id}`)) missing.push(`switch ${s.id}`);
+              if (s.t === 'switch' && !s.id.endsWith(':sun') && !a.switchesOn.has(`${ri}:${s.id}`)) missing.push(`switch ${s.id}`);
               if (s.t === 'statue' && !a.reaches(ri, s.x, s.y, 44, 12)) missing.push(`statue ${s.id}`);
               if (s.t === 'item' && ['pet', 'can', 'golden', 'battery', 'xl'].includes(s.k) && !a.touches(ri, s.x, s.y, 24)) missing.push(`item ${s.id}@${Math.round(s.x / TILE)},${Math.round(s.y / TILE)}`);
               if (s.t === 'gate' && !a.openGates.has(`${ri}:${s.id}`)) missing.push(`gate ${s.id}`);

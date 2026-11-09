@@ -1,4 +1,5 @@
 /** Świat gry: runtime poziomu — gracze, wrogowie, przedmioty, przewody, bossowie, kamera. Logika w stałym kroku 60 Hz. */
+import { traceBeams } from './beam';
 import type { AudioEngine, SfxName } from '../engine/audio';
 import type { PlayerInput } from '../engine/input';
 import { Rng } from '../engine/rng';
@@ -261,6 +262,10 @@ export class World {
   }
   private updateSwitchesGates(dt: number): void {
     const rt = this.rt;
+    if (rt.decor.some((d) => d.k.startsWith('sun_'))) {   // promień światła: panel słoneczny włącza się, gdy dosięgnie go promień
+      const bm = traceBeams({ w: rt.grid.w, h: rt.grid.h, tiles: rt.tiles, decor: rt.decor }); rt.beamCells = bm.cells;
+      for (const s of rt.switches) if (s.id.endsWith(':sun') && !s.on && bm.hit.has(Math.floor((s.y - 1) / 32) * rt.grid.w + Math.floor(s.x / 32))) this.activateSwitch(s);
+    }
     for (const s of rt.switches) if (s.on && s.latch > 0) { s.latch -= dt; if (s.latch <= 0) s.on = false; }
     for (const g of rt.gates) {
       if (g.open) continue;
@@ -499,7 +504,8 @@ export class World {
     // posągi mieszkańców
     for (const s of rt.statues) if (!s.freed && Math.abs(s.x - cx) < 44 && Math.abs(s.y - feet) < 50 && inp.pressed.interact) { this.freeStatue(s, p); return; }
     // przełączniki, lustra, EcoPort, latarnie
-    for (const s of rt.switches) if (Math.abs(s.x - cx) < 34 && Math.abs(s.y - feet) < 44 && inp.pressed.interact) { if (!s.on || s.latch > 0) this.activateSwitch(s); return; }
+    for (const s of rt.switches) if (!s.id.endsWith(':sun') && Math.abs(s.x - cx) < 34 && Math.abs(s.y - feet) < 44 && inp.pressed.interact) { if (!s.on || s.latch > 0) this.activateSwitch(s); return; }
+    for (const d of rt.decor) if (d.k === 'lmirror' && Math.abs(d.x - cx) < 46 && Math.abs(d.y - feet) < 50 && inp.pressed.interact) { d.state = d.state ? 0 : 1; this.sfx('switch'); this.say('toast.lmirror'); return; }
     for (const d of rt.decor) if (d.k === 'mirror' && Math.abs(d.x - cx) < 46 && Math.abs(d.y - feet) < 50 && inp.pressed.interact) { d.state = d.state ? 0 : 1; this.sfx('switch'); if (d.state) this.say('toast.mirror'); return; }
     for (const e of rt.ecos) if (Math.abs(e.x - cx) < 46 && Math.abs(e.y - feet) < 60 && inp.pressed.interact) { this.useEcoport(e); return; }
     for (const l of rt.lanterns) if (!l.lit && Math.abs(l.x - cx) < 50 && Math.abs(l.y - feet) < 70 && inp.pressed.interact) { l.lit = true; this.sfx('switch'); this.say('toast.light'); return; }

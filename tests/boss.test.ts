@@ -176,3 +176,32 @@ describe('Złomotaur v0.4 (dwie suwnice, okno 14 s)', () => {
     expect(pl.range / pl.speed + 2 * (pl.dwell ?? 0)).toBeLessThan(11);
   });
 });
+
+describe('Kaktogór v0.4 (korzenie odrastają po każdym trafieniu)', () => {
+  const arenaK = (): World => {
+    const s = new Session(newSave('solo', 'M'), 0);
+    const w = new World(getLevel('W3-L4'), s, { audio: stubAudio, settings: defaultSettings(), night: false });
+    w.readyT = 0; w.rt.enemies.length = 0; step(w, 3); return w;
+  };
+  const roots = (w: World) => w.rt.decor.filter((d) => d.k === 'root');
+  const cut = (w: World) => { for (const r of roots(w)) r.state = 1; };
+  it('trzy korzenie (w tym jeden na półce); pancerz na starcie, dwa korzenie nie wystarczą, trzy zdejmują pancerz', () => {
+    const w = arenaK(); const b = w.rt.boss!; b.started = true;
+    expect(roots(w).length).toBe(3); expect(roots(w).some((r) => r.y < 25 * TILE)).toBe(true); expect(b.armor).toBe(true);
+    roots(w)[0].state = 1; roots(w)[1].state = 1; step(w, 2); expect(b.armor).toBe(true); expect(hitBoss(b, 'key')).toBe(false);
+    roots(w)[2].state = 1; step(w, 2); expect(b.armor).toBe(false); b.hurt = 0; expect(hitBoss(b, 'key')).toBe(true);
+  });
+  it('po trafieniu pancerz wraca, a korzenie odrastają; trzy trafienia pokonują bossa; skok na głowę nie rani', () => {
+    const w = arenaK(); const b = w.rt.boss!; b.started = true; expect(b.hp).toBe(3);
+    for (let i = 0; i < 3; i++) {
+      cut(w); step(w, 2); expect(b.armor, 'pancerz zdjęty ' + i).toBe(false); expect(hitBoss(b, 'stomp')).toBe(false);
+      b.hurt = 0; expect(hitBoss(b, 'key')).toBe(true); step(w, 2);
+      if (i < 2) { expect(b.armor).toBe(true); expect(roots(w).every((r) => r.state === 0)).toBe(true); expect(hitBoss(b, 'key')).toBe(false); }
+    }
+    expect(b.dead).toBe(true);
+  });
+  it('korzenie po ścięciu w jednym cyklu nie dają drugiego trafienia bez ponownego odcięcia', () => {
+    const w = arenaK(); const b = w.rt.boss!; b.started = true; cut(w); step(w, 2); b.hurt = 0; expect(hitBoss(b, 'key')).toBe(true); step(w, 2); b.hurt = 0;
+    expect(hitBoss(b, 'key')).toBe(false); expect(b.hp).toBe(2);
+  });
+});

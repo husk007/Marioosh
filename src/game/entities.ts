@@ -67,6 +67,8 @@ export interface RoomRT {
   /** mosty zwodzone / pomosty: kafle pojawiają się, gdy wszystkie przełączniki bramy `gate` są włączone */
   spans: { gate: string; cells: [number, number][]; done: boolean }[];
   floods: { x0: number; x1: number; y0: number; y1: number; from: number; to: number; speed: number; gate: string; cur: number; open?: boolean; applied?: boolean }[];
+  /** kafle zajęte przez promień światła (rysowanie) */
+  beamCells?: [number, number, number, number][];
   boss: BossRT | null;
 }
 

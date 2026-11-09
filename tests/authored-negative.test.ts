@@ -85,3 +85,10 @@ it('negatywny W2-L4: bez żaluzji (w), bez wyłącznika A albo B arena jest nieo
 it('negatywny W3-L2: bez dźwigni l1 (taras 2) i bez dźwigni l2 (taras 4) wyjście jest nieosiągalne', () => {
   for (const sw of ['l1', 'l2']) { const L = without('W3-L2', (s) => s.t === 'switch' && s.id.endsWith(':' + sw)); const e = exitOfLevel(L); expect(analyze(L, 'M').reaches(0, e.x, e.y, 40, 10), sw).toBe(false); }
 }, 400000);
+it('negatywny W3-L4: bez dźwigni l1 (galeria) lub l2 (półka) brama areny jest zamknięta i arena nieosiągalna', () => {
+  for (const sw of ['l1', 'l2']) {
+    const L = without('W3-L4', (s) => s.t === 'switch' && s.id.endsWith(':' + sw));
+    const kp = L.rooms[0].specs.filter((s): s is Extract<Spec, { t: 'checkpoint' }> => s.t === 'checkpoint').find((s) => s.x > 99 * 32)!;
+    expect(analyze(L, 'M').reaches(0, kp.x, kp.y, 40, 10), sw).toBe(false);
+  }
+}, 400000);

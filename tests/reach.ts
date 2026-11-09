@@ -243,7 +243,7 @@ export function analyze(level: LevelData, brother: Brother, opt: { maxNodes?: nu
     run();
     let changed = false;
     rooms.forEach((r, ri) => {
-      for (const s of r.specs) if (s.t === 'switch' && !switchesOn.has(`${ri}:${s.id}`)) {
+      for (const s of r.specs) if (s.t === 'switch' && !s.id.endsWith(':sun') && !switchesOn.has(`${ri}:${s.id}`)) {
         if (points.some((p) => p.ri === ri && Math.abs(p.x - s.x) < 34 && Math.abs(p.fy - s.y) < 44)) { switchesOn.add(`${ri}:${s.id}`); changed = true; }
       }
       for (const s of r.specs) if (s.t === 'gate' && !openGates.has(`${ri}:${s.id}`)) {

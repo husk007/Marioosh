@@ -18,7 +18,7 @@ export interface BossCtx extends AICtx {
   breakPillar(i: number): void;
 }
 
-export const BOSS_HITS: Record<BossId, number> = { '': 0, rogomir: 3, zlomotaur: 3, kaktogor: 6, rogopletw: 3, ceratopsor: 3, krukorog: 3, rogodron: 3, katoblepas: 14 };
+export const BOSS_HITS: Record<BossId, number> = { '': 0, rogomir: 3, zlomotaur: 3, kaktogor: 3, rogopletw: 3, ceratopsor: 3, krukorog: 3, rogodron: 3, katoblepas: 14 };
 
 export function makeBoss(id: BossId, cx: number, groundY: number, x0: number, x1: number): BossRT {
   const s = BOSS_SIZE[id]; const w = Math.round(s.w * 0.78 * BOSS_SCALE), h = Math.round(s.h * 0.86 * BOSS_SCALE);
@@ -124,7 +124,10 @@ export function updateBoss(b: BossRT, dt: number, c: BossCtx): void {
       break;
     }
     case 'kaktogor': {
+      // v0.4: trzy korzenie (dwa przy ziemi, jeden na półce) odcięte kluczem zdejmują pancerz. Trafienie w serce sprawia, że korzenie odrastają — za każdym razem trzeba je odciąć na nowo.
       const roots = c.decorOf('root'); b.data.roots = roots.filter((r) => r.state === 1).length;
+      if (b.data.hp0 === undefined) b.data.hp0 = b.hp;
+      if (b.hp < b.data.hp0) { b.data.hp0 = b.hp; for (const r of roots) { r.state = 0; r.hits = 0; } b.data.roots = 0; b.armor = true; b.st = 'idle'; c.shake(6); }
       if (b.armor && b.data.roots >= 3) { b.armor = false; c.say('toast.root'); c.sfx('break'); }
       grav(b, c, dt);
       b.data.shoot = (b.data.shoot ?? 1.5) - dt;
