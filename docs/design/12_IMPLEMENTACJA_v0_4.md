@@ -18,7 +18,7 @@ Dokument opisuje, co z `08–11` jest w kodzie, jak to sprawdzono i gdzie implem
 | System poziomów ręcznych (ASCII + logika w kodzie): drzwi/terminale pełnej wielkości, windy z postojem, przełączniki/bramy w pokoju, rampy 26° jako schody | ✔ | `authored.ts`, `maps/` |
 | **W1-L1, W1-L2, W1-L4** (z bossem Rogomirem) | ✔ | `maps/w1l1.ts`, `w1l2.ts`, `w1l4.ts` |
 | Wrogowie ×1,4 (hitbox i sprite), telegrafy ataku 0,5 s (Roguś, Gekoróg-typ) | ✔ częściowo | `enemies.ts`, `worldDraw.ts` |
-| Fragmenty grawitacji: **W5-L1** (Skaltria 1,14 g) i **W6-L1** (Vespera 0,86 g, opcjonalna wyspa za przerwą 5 kafli) | ✔ (prototypy, tylko tryb testera) | `maps/proto.ts`, `tests/authored-negative.test.ts` |
+| Fragment grawitacji: Vespera 0,86 g, opcjonalna wyspa za przerwą 5 kafli (`buildW6Gravity`, tylko test) | ✔ (prototyp, tylko testy) | `maps/proto.ts`, `tests/authored-negative.test.ts` |
 | Rogomir bez stompa: 3 generatory (okno 28 s), pancerz, szarża wolniejsza od biegu, ciągły pomost-schron (przejście nad bossem, drabiny przy ścianach, utknięcie 5,5 s), skala bossa ×1,5 | ✔ | `bosses.ts`, `maps/w1l4.ts`, `tests/boss.test.ts` |
 
 ## 2. Jak sprawdzono przejezdność
@@ -38,12 +38,12 @@ Dokument opisuje, co z `08–11` jest w kodzie, jak to sprawdzono i gdzie implem
 - W1-L2: „górny skrót” z atlasu nie jest osobną trasą — rolę skrótu pełni szyb 1 (galeria zachodnia) i drabina 2.
 - Tryb „Nocna Zmiana” nie ma jeszcze sensu bez zegara (na poziomach ręcznych nie działa) — do decyzji projektowej.
 - W Aqualis (W4) uproszczone względem atlasu: ryby nie wyskakują zza burty w L1 (pływają w basenach i grożą wpadającym), L2 nie ma „czterech przewodów” z przejściem na Vesperę (jest sekretna komora z 12 puszkami), prądów wodnych nie ma (L3 opiera się na poziomie wody), w L4 brak luster (zastąpione osuszaniem basenów).
-- 13 pozostałych poziomów (W5-L4, W6, W7, W8) jest oznaczonych WIP na mapie i nie da się ich uruchomić do czasu akceptacji prototypu (zgodnie z `10_ROADMAP`). Fragment W6-L1 jest prototypem grawitacji (poza główną ścieżką; uruchamiane przez `?debug=1` + `window.__play('W6-L1')`).
+- 8 pozostałych poziomów (W7, W8) jest oznaczonych WIP na mapie i nie da się ich uruchomić (zgodnie z `10_ROADMAP`). Fragment grawitacji Vespery jest tylko w testach (`maps/proto.ts`).
 
 ## 4. Następne kroki
 1. Ręczny playtest W1-L1/L2/L4 (czucie skoku, szarży Rogomira, 28 s okna generatorów) — wartości w `constants.ts` i `bosses.ts` to nastawy startowe.
 2. Strojenie wrogów: prędkości, zasięgi, telegrafy (Etap D).
-3. Po akceptacji: portowanie 13 pozostałych poziomów (W5-L4, W6, W7, W8) według atlasu (każdy świat z inną główną mechaniką: Złomaria — taśmociągi i dźwigi, Florion — światło i lustra, Skaltria — głazy na torach, Vespera — lampy i ptaki, Ferroks — burza i maszyny, Katoblis — sieć portali).
+3. Po akceptacji: portowanie 8 pozostałych poziomów (W7, W8) według atlasu (każdy świat z inną główną mechaniką: Złomaria — taśmociągi i dźwigi, Florion — światło i lustra, Skaltria — głazy na torach, Vespera — lampy i ptaki, Ferroks — burza i maszyny, Katoblis — sieć portali).
 
 ## 5. Wnioski z pomiarów fizyki (analizator z chwytem krawędzi)
 Maksymalna przerwa z rozbiegu (z chwytem krawędzi): 4 kafle wszędzie; 5 kafli — tylko Vespera (obaj) i Prądowo (tylko Darioosh); Skaltria — nigdy. Dlatego trasa główna używa przerw ≤ 3 kafle (2,4 m), a przerwy 5-kaflowe są wyłącznie opcjonalnym bonusem zależnym od planety.

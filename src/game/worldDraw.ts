@@ -164,6 +164,8 @@ export function drawWorld(w: World, g: Gfx): void {
     else g.spr(rockSprite(), bd.roll.x - sp.r, bd.roll.y - sp.r, { w: sp.r * 2, h: sp.r * 2, rot: bd.roll.rot });
   }
   for (const s of rt.signs) g.spr(signSprite(s.symbol), s.x - 12, s.y - 32);
+  // strefa światła (bezpieczna przed nurkującymi ptakami) — miękka poświata o promieniu 120 px
+  if (!room.dark) { const gl = glowImage(); for (const l of rt.lamps) g.spr(gl, l.x - 120, l.y - 34 - 120, { w: 240, h: 240, alpha: 0.28 }); for (const l of rt.lanterns) if (l.lit) g.spr(gl, l.x - 120, l.y - 14 - 120, { w: 240, h: 240, alpha: 0.28 }); }
   for (const l of rt.lamps) g.spr(lampSprite(fr), l.x - 8, l.y - 40);
   for (const l of rt.lanterns) g.spr(lanternSprite(l.lit), l.x - 10, l.y - 28);
   for (const c of rt.checkpoints) g.spr(checkpointSprite(c.on, fr), c.x - 17, c.y - 80, { w: 34, h: 78 });
@@ -184,8 +186,10 @@ export function drawWorld(w: World, g: Gfx): void {
   for (const pl of rt.plats) {
     if (!pl.solid && pl.mode === 'phase') { g.rect(pl.x, pl.y, pl.w, 8, '#9ad0ff', 0.12); continue; }
     if (!pl.solid) continue;
+    const dead = !!pl.power && !rt.gates.some((q) => q.id === pl.power && q.open);   // winda bez zasilania: przyciemniona, czerwona lampka
     const blink = pl.warn && Math.floor(w.time * 14) % 2 === 0;
-    if (ts.plat) { g.spr(ts.plat, pl.x, pl.y - 4, { w: pl.w, h: 18, alpha: blink ? 0.45 : 1 }); continue; }
+    if (dead) g.rect(pl.x + pl.w / 2 - 3, pl.y - 10, 6, 6, '#e0443a', 0.5 + 0.5 * Math.sin(w.time * 5));
+    if (ts.plat) { g.spr(ts.plat, pl.x, pl.y - 4, { w: pl.w, h: 18, alpha: blink ? 0.45 : dead ? 0.55 : 1 }); continue; }
     g.rect(pl.x, pl.y, pl.w, 10, blink ? '#fff' : '#8d93a0'); g.rect(pl.x, pl.y, pl.w, 3, '#c9ced6'); g.rect(pl.x, pl.y + 10, pl.w, 2, '#2a2c3a');
     for (let i = 6; i < pl.w; i += 14) g.rect(pl.x + i, pl.y + 4, 4, 3, '#ffd23f');
   }

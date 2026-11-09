@@ -64,7 +64,7 @@ export function bossVulnerable(b: BossRT): boolean {
 
 export function hitBoss(b: BossRT, how: 'key' | 'spark' | 'stomp'): boolean {
   if (!bossVulnerable(b)) return false;
-  if (how === 'stomp' && b.id !== 'krukorog') return false;
+  if (how === 'stomp') return false;          // v0.4: brak skakania po głowie
   b.hp -= 1; b.hurt = 0.9; b.stun = 0.4;
   if (b.hp <= 0) { b.dead = true; b.deadT = 2.4; }
   else if (b.st === 'stuck') { b.st = 'recover'; b.t = 1.0; b.cycle++; }

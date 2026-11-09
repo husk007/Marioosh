@@ -54,7 +54,7 @@ export type Spec =
   | { t: 'statue'; idx: number; x: number; y: number; id: string }
   | { t: 'switch'; id: string; x: number; y: number; gate: string; style: SwitchStyle; symbol: number }
   | { t: 'gate'; id: string; cells: [number, number][]; need: number }
-  | { t: 'platform'; x: number; y: number; w: number; mode: 'h' | 'v' | 'phase' | 'crumble'; range: number; speed: number; offset: number; /** winda: postój na każdym końcu (s); ruch ze stałą prędkością `speed` px/s */ dwell?: number }
+  | { t: 'platform'; x: number; y: number; w: number; mode: 'h' | 'v' | 'phase' | 'crumble'; range: number; speed: number; offset: number; /** winda: postój na każdym końcu (s); ruch ze stałą prędkością `speed` px/s */ dwell?: number; /** winda zasilana: rusza dopiero po otwarciu tej bramy (przełączniki-bezpieczniki) */ power?: string }
   | { t: 'checkpoint'; x: number; y: number }
   | { t: 'exit'; x: number; y: number }
   | { t: 'ecoport'; x: number; y: number; broken: boolean; id: string; fuses: string[] }

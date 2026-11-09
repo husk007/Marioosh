@@ -21,6 +21,8 @@ export interface AICtx {
   grid: Grid; players: PlayerEnt[]; time: number;
   proj(p: Pick<Projectile, 'kind' | 'x' | 'y' | 'vx' | 'vy'> & Partial<Projectile>): void;
   beam(b: Beam): void; sfx(n: SfxName): void; water(x: number, y: number): boolean;
+  /** Czy punkt (x,y) leży w świetle latarni (ptaki nie nurkują w światło). range = tolerancja w pionie. */
+  lit?(x: number, y: number, range?: number): boolean;
 }
 
 let nextId = 1;
@@ -134,8 +136,8 @@ export function updateEnemy(e: Enemy, dt: number, ctx: AICtx): void {
       if (e.st === 'patrol') {
         e.hornsUp = true; e.b.x += e.dir * S * 0.7 * dt; e.b.y = e.hy + Math.sin(e.f * 2.4) * 14;
         if (Math.abs(cx(e.b) - e.hx) > 120) e.dir = (e.dir * -1) as 1 | -1;
-        if (e.t <= 0 && p && Math.abs(cx(p.mv.body) - cx(e.b)) < 130 && p.mv.body.y > e.b.y) { e.st = 'alert'; e.t = 0.5; faceTo(e, p); ctx.sfx('warn'); }
-      } else if (e.st === 'alert') { if (e.t <= 0) { e.st = 'dive'; e.t = 1.4; } }
+        if (e.t <= 0 && p && Math.abs(cx(p.mv.body) - cx(e.b)) < 130 && p.mv.body.y > e.b.y && !ctx.lit?.(cx(p.mv.body), cy(p.mv.body))) { e.st = 'alert'; e.t = 0.5; faceTo(e, p); ctx.sfx('warn'); }
+      } else if (e.st === 'alert') { if (p && ctx.lit?.(cx(p.mv.body), cy(p.mv.body))) { e.st = 'patrol'; e.t = 1.5; } else if (e.t <= 0) { e.st = 'dive'; e.t = 1.4; } }
       else if (e.st === 'dive') {
         e.b.vx = e.dir * 150; e.b.vy = 210; moveBody(g, e.b, dt);
         if (e.b.onGround || e.t <= 0) { e.st = 'land'; e.t = 1.1; e.hornsUp = false; e.b.vx = 0; }
@@ -150,15 +152,15 @@ export function updateEnemy(e: Enemy, dt: number, ctx: AICtx): void {
       break;
     }
     case 'rogowrobel': {
-      if (e.st === 'patrol') { e.hornsUp = true; e.b.x += e.dir * S * 0.7 * dt; e.b.y = e.hy + Math.sin(e.f * 4) * 10; if (Math.abs(cx(e.b) - e.hx) > 110) e.dir = (e.dir * -1) as 1 | -1; if (e.t <= 0) { e.st = 'down'; } }
+      if (e.st === 'patrol') { e.hornsUp = true; e.b.x += e.dir * S * 0.7 * dt; e.b.y = e.hy + Math.sin(e.f * 4) * 10; if (Math.abs(cx(e.b) - e.hx) > 110) e.dir = (e.dir * -1) as 1 | -1; if (e.t <= 0) { if (ctx.lit?.(cx(e.b), e.b.y + 150, 150)) e.t = 0.6; else e.st = 'down'; } }
       else if (e.st === 'down') { e.b.vy = 160; e.b.vx = 0; moveBody(g, e.b, dt); if (e.b.onGround) { e.st = 'land'; e.t = 1.3; e.hornsUp = false; } }
       else if (e.st === 'land') { e.b.vx = 0; gravity(e, g, dt); if (e.t <= 0) e.st = 'rise'; }
       else if (e.st === 'rise') { e.b.y -= 120 * dt; if (e.b.y <= e.hy) { e.st = 'patrol'; e.t = 3.2; e.hornsUp = true; } }
       break;
     }
     case 'krukorog': {
-      if (e.st === 'patrol') { e.hornsUp = true; e.b.x += e.dir * S * dt; e.b.y = e.hy + Math.sin(e.f * 1.6) * 20; if (Math.abs(cx(e.b) - e.hx) > 160) e.dir = (e.dir * -1) as 1 | -1; if (e.t <= 0 && sees(e, p, 250, 260, false)) { e.st = 'alert'; e.t = 0.5; faceTo(e, p); ctx.sfx('warn'); } }
-      else if (e.st === 'alert') { if (e.t <= 0) { e.st = 'swoop'; e.t = 1.5; } }
+      if (e.st === 'patrol') { e.hornsUp = true; e.b.x += e.dir * S * dt; e.b.y = e.hy + Math.sin(e.f * 1.6) * 20; if (Math.abs(cx(e.b) - e.hx) > 160) e.dir = (e.dir * -1) as 1 | -1; if (e.t <= 0 && sees(e, p, 250, 260, false) && !(p && ctx.lit?.(cx(p.mv.body), cy(p.mv.body)))) { e.st = 'alert'; e.t = 0.5; faceTo(e, p); ctx.sfx('warn'); } }
+      else if (e.st === 'alert') { if (p && ctx.lit?.(cx(p.mv.body), cy(p.mv.body))) { e.st = 'patrol'; e.t = 1.5; } else if (e.t <= 0) { e.st = 'swoop'; e.t = 1.5; } }
       else if (e.st === 'swoop') { e.b.vx = e.dir * 185; e.b.vy = 170; moveBody(g, e.b, dt); if (e.b.onGround || e.t <= 0) { e.st = 'land'; e.t = 1.5; e.hornsUp = false; e.b.vx = 0; } }
       else if (e.st === 'land') { e.b.vx = 0; gravity(e, g, dt); if (e.t <= 0) e.st = 'rise'; }
       else if (e.st === 'rise') { e.b.y -= 110 * dt; if (e.b.y <= e.hy) { e.st = 'patrol'; e.t = 2.6; } }

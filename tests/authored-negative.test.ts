@@ -1,6 +1,8 @@
 import { it, expect } from 'vitest';
 import { getLevel } from '../src/game/levels';
+import { buildW6Gravity } from '../src/game/maps/proto';
 import { T, type Spec } from '../src/game/types';
+import { BROTHERS } from '../src/game/constants';
 import { analyze } from './reach';
 it('negatywny: bez drabiny taras jest nieosiągalny; bez przełącznika brama zamknięta', () => {
   const L = structuredClone(getLevel('W1-L1'));
@@ -33,8 +35,8 @@ it('negatywny W1-L2: bez windy chodnik górny i wyjście są nieosiągalne; bez 
   expect(a3.reaches(0, exitOf(L3).x, exitOf(L3).y, 40, 10)).toBe(false);
 }, 240000);
 
-it('grawitacja planet: wyspa za przerwą 5 kafli (W6-L1) dostępna na Vesperze (0,86 g) dla obu braci, na Prądowie tylko dla Darioosha, na Skaltrii dla nikogo; trasa główna wszędzie', () => {
-  const L0 = getLevel('W6-L1'); const exit = L0.rooms[0].specs.find((s) => s.t === 'exit')!;
+it('grawitacja planet: wyspa za przerwą 5 kafli (fragment testowy) dostępna na Vesperze (0,86 g) dla obu braci, na Prądowie tylko dla Darioosha, na Skaltrii dla nikogo; trasa główna wszędzie', () => {
+  const L0 = buildW6Gravity(); const exit = L0.rooms[0].specs.find((s) => s.t === 'exit')!;
   const island = (L0.rooms[0].specs.filter((s) => s.t === 'item') as Extract<Spec, { t: 'item' }>[]).find((s) => s.k === 'pet' && s.x > 77 * 32)!;
   const probe = (planet: number, b: 'M' | 'D') => { const L = structuredClone(L0); L.planet = planet; const a = analyze(L, b); return { exit: a.reaches(0, exit.x, exit.y, 40, 10), island: a.touches(0, island.x, island.y, 24) }; };
   expect(probe(6, 'M')).toEqual({ exit: true, island: true }); expect(probe(6, 'D')).toEqual({ exit: true, island: true });
@@ -115,3 +117,49 @@ it('negatywny W5-L4: bez dźwigni a (brama g1) lub b (brama g2) arena jest nieos
     expect(analyze(L, 'M').touches(0, can.x, can.y, 24), sw).toBe(false);
   }
 }, 590000);
+
+it('W6-L1: obie trasy prowadzą do wyjścia niezależnie — dolna (parter i mieszkania) bez schodów pożarowych, górna (dachy i pomosty) bez przejść przez parter', () => {
+  const E = T.EMPTY;
+  const lower = structuredClone(getLevel('W6-L1')); const r1 = lower.rooms[0];
+  for (let y = 0; y < r1.h; y++) for (const x of [41, 44]) if (r1.tiles[y * r1.w + x] === T.LADDER || (r1.tiles[y * r1.w + x] === T.ONEWAY)) r1.tiles[y * r1.w + x] = E;
+  const upper = structuredClone(getLevel('W6-L1')); const r2 = upper.rooms[0];
+  for (const [x0, x1] of [[45, 76], [101, 130], [151, 182]]) for (let y = 24; y <= 27; y++) for (let x = x0; x <= x1; x++) r2.tiles[y * r2.w + x] = T.SOLID;
+  for (const L of [lower, upper]) { const e = exitOfLevel(L); for (const b of ['M', 'D'] as const) expect(analyze(L, b).reaches(0, e.x, e.y, 40, 10), b).toBe(true); }
+  // sanity: bez obu tras (zasypane parterowe przejścia i zdjęte drabiny) wyjścia nie ma
+  const none = structuredClone(upper); const r3 = none.rooms[0];
+  for (let y = 0; y < r3.h; y++) for (const x of [41, 44]) if (r3.tiles[y * r3.w + x] === T.LADDER || r3.tiles[y * r3.w + x] === T.ONEWAY) r3.tiles[y * r3.w + x] = E;
+  expect(analyze(none, 'M').reaches(0, exitOfLevel(none).x, exitOfLevel(none).y, 40, 10)).toBe(false);
+}, 400000);
+
+it('negatywny W6-L2: bez któregokolwiek z dwóch bezpieczników winda szczytowa stoi i wyjście jest nieosiągalne; bez windy E1 piętra od 2 wzwyż są odcięte; z kompletem — osiągalne', () => {
+  for (const sw of ['f1', 'f2']) { const L = without('W6-L2', (s) => s.t === 'switch' && s.id.endsWith(':' + sw)); const e = exitOfLevel(L); expect(analyze(L, 'M').reaches(0, e.x, e.y, 40, 10), sw).toBe(false); }
+  const L1 = without('W6-L2', (s) => s.t === 'platform' && !s.power); const e1 = exitOfLevel(L1); expect(analyze(L1, 'D').reaches(0, e1.x, e1.y, 40, 10), 'E1').toBe(false);
+  const L = getLevel('W6-L2'); const e = exitOfLevel(L);
+  for (const b of ['M', 'D'] as const) expect(analyze(L, b).reaches(0, e.x, e.y, 40, 10), b).toBe(true);
+}, 400000);
+
+it('W6-L3: bez ruchomego pomostu (pętla B) albo bez windy szczytowej (pętla C) wyjście jest nieosiągalne; dach gniazda A dostępny zarówno windą, jak i klatką schodową', () => {
+  const plats = getLevel('W6-L3').rooms[0].specs.filter((s): s is Extract<Spec, { t: 'platform' }> => s.t === 'platform');
+  const hOnly = (keep: (p: Extract<Spec, { t: 'platform' }>) => boolean) => without('W6-L3', (s) => s.t === 'platform' && !keep(s));
+  expect(plats.length).toBe(3);
+  for (const drop of plats.filter((p) => p.mode === 'h' || p.x > 150 * 32)) { const L = hOnly((p) => p !== drop && !(p.x === drop.x && p.y === drop.y)); const e = exitOfLevel(L); expect(analyze(L, 'M').reaches(0, e.x, e.y, 40, 10), `${drop.mode}@${drop.x}`).toBe(false); }
+  const nest = (L: ReturnType<typeof getLevel>) => L.rooms[0].specs.find((s): s is Extract<Spec, { t: 'item' }> => s.t === 'item' && s.k === 'can' && s.x > 49 * 32 && s.x < 52 * 32)!;
+  const noLift = without('W6-L3', (s) => s.t === 'platform' && s.mode === 'v' && s.x < 40 * 32);
+  expect(analyze(noLift, 'D').touches(0, nest(noLift).x, nest(noLift).y, 24), 'klatka schodowa').toBe(true);
+  const noStairs = structuredClone(getLevel('W6-L3')); const r = noStairs.rooms[0];
+  for (let y = 28; y <= 37; y++) for (const x of [36, 39]) if (r.tiles[y * r.w + x] === T.LADDER) r.tiles[y * r.w + x] = T.EMPTY;
+  expect(analyze(noStairs, 'M').touches(0, nest(noStairs).x, nest(noStairs).y, 24), 'winda').toBe(true);
+}, 500000);
+
+it('negatywny W6-L4: bez któregokolwiek z dwóch bezpieczników brama areny pozostaje zamknięta; trzy reflektory da się zapalić solo w oknie 8 s (bieg ≤ 6 s)', () => {
+  for (const sw of ['f1', 'f2']) {
+    const L = without('W6-L4', (s) => s.t === 'switch' && s.id.endsWith(':' + sw));
+    const arenaFloor = L.rooms[0].specs.find((s) => s.t === 'boss')!;
+    expect(analyze(L, 'M').reaches(0, arenaFloor.x, arenaFloor.y, 40, 10), sw).toBe(false);
+  }
+  const L0 = getLevel('W6-L4'); const boss = L0.rooms[0].specs.find((s) => s.t === 'boss')!;
+  for (const b of ['M', 'D'] as const) expect(analyze(L0, b).reaches(0, boss.x, boss.y, 40, 10), b).toBe(true);
+  const sp = L0.rooms[0].specs.filter((s): s is Extract<Spec, { t: 'switch' }> => s.t === 'switch' && s.gate === 'spot'); const xs = sp.map((s) => s.x);
+  expect(sp.length).toBe(3);
+  expect((Math.max(...xs) - Math.min(...xs)) / BROTHERS.M.run).toBeLessThan(6);
+}, 400000);

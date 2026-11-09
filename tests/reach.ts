@@ -191,12 +191,12 @@ export function analyze(level: LevelData, brother: Brother, opt: { maxNodes?: nu
     };
     const doors: { ri: number; x: number; fy: number; dest: { room: number; x: number; y: number } | null; locked?: boolean }[] = [];
     rooms.forEach((r, ri) => r.specs.forEach((s: Spec) => { if (s.t === 'cable' && s.face === 'door' && s.dest && !s.locked) doors.push({ ri, x: s.x, fy: s.y, dest: s.dest }); }));
-    const lifts: { ri: number; x0: number; y0: number; x1: number; y1: number; w: number }[] = [];
+    const lifts: { ri: number; x0: number; y0: number; x1: number; y1: number; w: number; power?: string }[] = [];
     rooms.forEach((r, ri) => r.specs.forEach((s: Spec) => {
       if (s.t === 'platform' && (s.mode === 'v' || s.mode === 'h')) {
         const w = s.w * TILE;
-        if (s.mode === 'v') lifts.push({ ri, x0: s.x + w / 2, y0: s.y, x1: s.x + w / 2, y1: s.y + s.range, w });
-        else lifts.push({ ri, x0: s.x + w / 2, y0: s.y, x1: s.x + s.range + w / 2, y1: s.y, w });
+        if (s.mode === 'v') lifts.push({ ri, x0: s.x + w / 2, y0: s.y, x1: s.x + w / 2, y1: s.y + s.range, w, power: s.power });
+        else lifts.push({ ri, x0: s.x + w / 2, y0: s.y, x1: s.x + s.range + w / 2, y1: s.y, w, power: s.power });
       }
     }));
 
@@ -230,7 +230,7 @@ export function analyze(level: LevelData, brother: Brother, opt: { maxNodes?: nu
       // drzwi
       for (const d of doors) if (d.ri === n.ri && Math.abs(d.x - n.x) < 26 && Math.abs(d.fy - n.fy) < 8 && d.dest) addNode({ ri: d.dest.room, x: d.dest.x, fy: d.dest.y, wet: 0 });
       // windy: koniec ruchu osiągalny z drugiego końca
-      for (const l of lifts) if (l.ri === n.ri) {
+      for (const l of lifts) if (l.ri === n.ri && (!l.power || openGates.has(`${l.ri}:${l.power}`))) {
         const onA = Math.abs(n.x - l.x0) < l.w / 2 + 22 && Math.abs(n.fy - l.y0) < 6, onB = Math.abs(n.x - l.x1) < l.w / 2 + 22 && Math.abs(n.fy - l.y1) < 6;
         if (onA) addNode({ ri: l.ri, x: l.x1, fy: l.y1, wet: n.wet });
         if (onB) addNode({ ri: l.ri, x: l.x0, fy: l.y0, wet: n.wet });

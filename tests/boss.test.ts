@@ -234,3 +234,37 @@ describe('Ceratopsor v0.4 (pieczęć, kolumny, galeria)', () => {
     expect(xmin).toBeGreaterThanOrEqual(24 * TILE - 2);       // nie przeszedł przez kolumnę (22–23)
   });
 });
+
+describe('Krukoróg Królewski v0.4 (trzy reflektory, lądowanie, trafienia kluczem)', () => {
+  const arenaK = (): World => {
+    const s = new Session(newSave('solo', 'M'), 0);
+    const w = new World(getLevel('W6-L4'), s, { audio: stubAudio, settings: defaultSettings(), night: false });
+    w.readyT = 0; w.rt.enemies.length = 0; step(w, 3); return w;
+  };
+  const spots = (w: World) => w.rt.switches.filter((s) => s.gate === 'spot');
+  const lightAll = (w: World, n = 3) => spots(w).slice(0, n).forEach((s) => { s.on = true; s.latch = 8; });
+  const safe = (w: World) => { const p = w.players[0]; const m = p.mv.body; m.x = 118.5 * TILE - m.w / 2; m.y = 25 * TILE - m.h; m.vx = m.vy = 0; p.safe = { x: m.x + m.w / 2, y: 25 * TILE }; };   // wysoko nad areną: nic nie dosięga
+  it('trzy reflektory; boss nie ma pancerza i bez oślepienia jest nietykalny', () => {
+    const w = arenaK(); const b = w.rt.boss!; b.started = true; step(w, 200);
+    expect(spots(w).length).toBe(3); expect(b.armor).toBe(false); expect(bossVulnerable(b)).toBe(false); expect(hitBoss(b, 'key')).toBe(false);
+  });
+  it('dwa reflektory nie wystarczą: boss przez 20 s nie ląduje', () => {
+    const w = arenaK(); const b = w.rt.boss!; b.started = true; step(w, 60); let landed = false;
+    for (let i = 0; i < 60 * 20; i++) { lightAll(w, 2); safe(w); step(w, 1); if (b.st === 'landed' || b.st === 'dazed') landed = true; }
+    expect(landed).toBe(false);
+  });
+  it('reflektor gaśnie po 8 s, więc trzeba zapalić wszystkie trzy w jednym oknie', () => {
+    const w = arenaK(); const b = w.rt.boss!; b.started = true; step(w, 60); const s = spots(w);
+    s[0].on = true; s[0].latch = 8; safe(w); step(w, 60 * 7); expect(s[0].on).toBe(true); step(w, 60 * 2); expect(s[0].on).toBe(false);
+  });
+  it('trzy reflektory → boss ląduje, jest podatny na klucz (nie na skok na głowę); trzy trafienia go pokonują, reflektory gasną po każdym lądowaniu', () => {
+    const w = arenaK(); const b = w.rt.boss!; b.started = true; step(w, 60);
+    for (let hit = 0; hit < 3; hit++) {
+      let guard = 0; while (b.st !== 'landed' && guard++ < 60 * 25) { lightAll(w); safe(w); step(w, 1); }
+      expect(b.st).toBe('landed'); expect(spots(w).every((s) => !s.on)).toBe(true);
+      expect(bossHarmful(b)).toBe(false); expect(hitBoss(b, 'stomp')).toBe(false);
+      b.hurt = 0; expect(hitBoss(b, 'key')).toBe(true); expect(b.hp).toBe(2 - hit); for (let i = 0; i < 180; i++) { safe(w); step(w, 1); }
+    }
+    expect(b.dead).toBe(true);
+  });
+});

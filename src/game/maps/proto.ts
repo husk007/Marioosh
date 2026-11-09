@@ -7,7 +7,7 @@ import { AuthoredRoom, Canvas, assemble } from '../authored';
 import type { LevelData } from '../types';
 
 /** W6-L1 „Nocne Dachy” (fragment): dachy z przerwami 3 kafli (trasa główna), schody pożarowe oraz opcjonalna wyspa dachowa za przerwą 5 kafli (4 m) — do przeskoczenia tylko przy lekkiej grawitacji Vespery */
-export function buildW6L1(): LevelData {
+export function buildW6Gravity(): LevelData {
   const c = new Canvas(84, 18);
   c.ground(0, 20, 12);                                   // dach A
   c.ground(24, 40, 12);                                  // dach B (przerwa 3 kafli: 21–23)

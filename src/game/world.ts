@@ -97,7 +97,7 @@ export class World {
         case 'statue': rt.statues.push({ id: s.id, idx: s.idx, x: s.x, y: s.y, freed: S.freed.has(s.id), t: 0, ghost: S.freed.has(s.id) }); break;
         case 'switch': rt.switches.push({ id: s.id, x: s.x, y: s.y, gate: s.gate, style: s.style, symbol: s.symbol, on: false, latch: 0 }); break;
         case 'gate': rt.gates.push({ id: s.id, cells: s.cells, need: s.need, open: false, openT: 0 }); break;
-        case 'platform': rt.plats.push({ x: s.x, y: s.y, w: s.w * TILE, mode: s.mode, range: s.range, speed: s.speed, offset: s.offset, dwell: s.dwell, x0: s.x, y0: s.y, dx: 0, dy: 0, solid: true, t: 0, fall: 0, warn: false }); break;
+        case 'platform': rt.plats.push({ x: s.x, y: s.y, w: s.w * TILE, mode: s.mode, range: s.range, speed: s.speed, offset: s.offset, dwell: s.dwell, power: s.power, x0: s.x, y0: s.y, dx: 0, dy: 0, solid: true, t: 0, fall: 0, warn: false }); break;
         case 'checkpoint': rt.checkpoints.push({ x: s.x, y: s.y, on: false }); break;
         case 'exit': rt.exits.push({ x: s.x, y: s.y }); break;
         case 'ecoport': rt.ecos.push({ id: s.id, x: s.x, y: s.y, broken: s.broken, fuses: s.fuses, used: false, flash: 0 }); break;
@@ -153,6 +153,7 @@ export class World {
       grid: this.grid, players: this.activePlayers, time: this.time,
       proj: (p) => { this.projs.push({ life: 3, bounces: 0, owner: -1, r: 6, grav: 0, ...p }); },
       beam: (b) => { this.beams.push(b); }, sfx: this.sfx, water: (x, y) => this.waterAt(x, y),
+      lit: (x, y, range = 90) => this.rt.lamps.some((l) => Math.abs(l.x - x) < 120 && Math.abs(l.y - y) < range) || this.rt.lanterns.some((l) => l.lit && Math.abs(l.x - x) < 120 && Math.abs(l.y - y) < range),
       switchesFor: (g) => self.rt.switches.filter((s) => s.gate === g),
       decorOf: (k) => self.rt.decor.filter((d) => d.k === k),
       spawnEnemy: (k, x, y) => { const e = makeEnemy(k, x, y); e.b.y = y - e.b.h / 2; e.hy = e.b.y; self.rt.enemies.push(e); },
@@ -207,7 +208,9 @@ export class World {
   // ------------------------------------------------------------------ platformy / mechanizmy
   private updatePlatforms(dt: number): void {
     for (const pl of this.rt.plats) {
-      const ox = pl.x, oy = pl.y; pl.t += dt;
+      const ox = pl.x, oy = pl.y;
+      if (pl.power && !this.rt.gates.some((g) => g.id === pl.power && g.open)) { pl.dx = 0; pl.dy = 0; continue; }   // winda bez zasilania stoi
+      pl.t += dt;
       if (pl.dwell !== undefined && (pl.mode === 'h' || pl.mode === 'v')) {
         // winda / ruchomy pomost: ruch ze stałą prędkością, postój na obu końcach
         const mv = pl.range / pl.speed, cyc = 2 * (mv + pl.dwell); const u = ((pl.t + pl.offset * cyc) % cyc + cyc) % cyc;
@@ -321,7 +324,7 @@ export class World {
       const n = rt.switches.filter((s) => s.gate === g.id && s.on).length;
       if (n >= g.need) {
         g.open = true; for (const [cx, cy] of g.cells) { if (rt.tiles[cy * rt.grid.w + cx] === T.GATE) rt.tiles[cy * rt.grid.w + cx] = T.EMPTY; }
-        this.say('toast.gateOpen'); this.sfx('switch'); this.shake(3);
+        this.say(rt.plats.some((q) => q.power === g.id) ? 'toast.power' : 'toast.gateOpen'); this.sfx('switch'); this.shake(3);
         if (g.id.endsWith(':warpgate')) for (const c of rt.cables) if (c.locked) c.locked = false;
       }
     }
@@ -561,7 +564,7 @@ export class World {
   }
   private activateSwitch(s: SwitchEnt): void {
     s.on = true; this.sfx('switch'); this.say('toast.switchOn'); this.burst(s.x, s.y - 20, '#ffd23f', 8, 90, 0);
-    if (s.gate === 'crane') s.latch = 14; else if (s.gate === 'spot') s.latch = 7; else if (s.gate === 'seal') s.latch = 16; else if (s.gate === 'gen') s.latch = 28; else if (s.gate.startsWith('pool')) s.latch = 16;
+    if (s.gate === 'crane') s.latch = 14; else if (s.gate === 'spot') s.latch = 8; else if (s.gate === 'seal') s.latch = 16; else if (s.gate === 'gen') s.latch = 28; else if (s.gate.startsWith('pool')) s.latch = 16;
   }
   private revealCable(c: { hidden: boolean; revealed: boolean; tx: number; ty: number; id: string }): void {
     if (c.revealed) return; c.revealed = true; this.sfx('crate'); this.say('toast.secret'); this.session.secrets.add(c.id);

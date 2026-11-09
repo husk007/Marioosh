@@ -29,6 +29,6 @@ export function nextLevelId(id: string): string | null {
   return null;
 }
 /** fragmenty testowe (prototypy fizyki planet) nie wchodzą do głównej ścieżki */
-export const AUTHORED_PROTO = new Set<string>(['W6-L1']);
+export const AUTHORED_PROTO = new Set<string>([]);
 export { isPorted };
 export function levelId(world: number, stage: number): string { return `W${world}-L${stage}`; }
