@@ -113,3 +113,5 @@ export const PICKUP_RADIUS = 24;
 
 /** boss w skali ludzkiej: hitbox i sprite ×1,5 względem v0.3 (Rogomir ≈ 2,1 m wysokości) */
 export const BOSS_SCALE = 1.5;
+/** wrogowie w skali ludzkiej: hitbox i sprite ×1,4 względem v0.3 (Roguś ≈ 1,1 m) */
+export const ENEMY_SCALE = 1.4;

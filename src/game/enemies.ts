@@ -5,7 +5,7 @@ import { isSolidTile, moveBody, newBody, tileAt, type Grid } from './physics';
 import { ENEMY_CLASS, T, type EnemyKind } from './types';
 import type { Beam, Enemy, PlayerEnt, Projectile } from './entities';
 import type { SfxName } from '../engine/audio';
-import { TILE } from './constants';
+import { ENEMY_SCALE, TILE } from './constants';
 
 export const STATS: Record<EnemyKind, { hp: number; speed: number; score: number }> = {
   rogus: { hp: 1, speed: 55, score: 100 }, baranitor: { hp: 2, speed: 45, score: 250 }, bykobieg: { hp: 3, speed: 40, score: 400 },
@@ -25,7 +25,7 @@ export interface AICtx {
 
 let nextId = 1;
 export function makeEnemy(kind: EnemyKind, cx: number, groundY: number): Enemy {
-  const L = LOOK[kind]; const w = L.w - 4, h = L.h - 2; const cls = ENEMY_CLASS[kind];
+  const L = LOOK[kind]; const w = Math.round((L.w - 4) * ENEMY_SCALE), h = Math.round((L.h - 2) * ENEMY_SCALE); const cls = ENEMY_CLASS[kind];
   const flying = cls === 'air' || cls === 'water';
   const b = newBody(cx - w / 2, flying ? groundY - h - 56 : groundY - h, w, h);
   const st = STATS[kind];
@@ -82,7 +82,7 @@ export function updateEnemy(e: Enemy, dt: number, ctx: AICtx): void {
   const g = ctx.grid, S = STATS[e.kind].speed, p = nearest(e, ctx);
   switch (e.kind) {
     case 'rogus': {
-      if (e.st === 'patrol') { e.hornsUp = false; walk(e, S, g, dt, 140); if (e.t <= 0 && sees(e, p, 150, 50)) { e.st = 'alert'; e.t = 0.3; e.hornsUp = true; e.b.vx = 0; ctx.sfx('warn'); } }
+      if (e.st === 'patrol') { e.hornsUp = false; walk(e, S, g, dt, 140); if (e.t <= 0 && sees(e, p, 150, 50)) { e.st = 'alert'; e.t = 0.5; e.hornsUp = true; e.b.vx = 0; ctx.sfx('warn'); } }
       else if (e.st === 'alert') { e.b.vx = 0; gravity(e, g, dt); if (e.t <= 0) { e.st = 'lunge'; e.t = 0.45; } }
       else if (e.st === 'lunge') { e.b.vx = e.dir * 135; gravity(e, g, dt); if (e.b.hitWall || e.t <= 0) { e.st = 'patrol'; e.t = 1.2; e.hornsUp = false; } }
       break;
@@ -134,7 +134,7 @@ export function updateEnemy(e: Enemy, dt: number, ctx: AICtx): void {
       if (e.st === 'patrol') {
         e.hornsUp = true; e.b.x += e.dir * S * 0.7 * dt; e.b.y = e.hy + Math.sin(e.f * 2.4) * 14;
         if (Math.abs(cx(e.b) - e.hx) > 120) e.dir = (e.dir * -1) as 1 | -1;
-        if (e.t <= 0 && p && Math.abs(cx(p.mv.body) - cx(e.b)) < 130 && p.mv.body.y > e.b.y) { e.st = 'alert'; e.t = 0.4; faceTo(e, p); ctx.sfx('warn'); }
+        if (e.t <= 0 && p && Math.abs(cx(p.mv.body) - cx(e.b)) < 130 && p.mv.body.y > e.b.y) { e.st = 'alert'; e.t = 0.5; faceTo(e, p); ctx.sfx('warn'); }
       } else if (e.st === 'alert') { if (e.t <= 0) { e.st = 'dive'; e.t = 1.4; } }
       else if (e.st === 'dive') {
         e.b.vx = e.dir * 150; e.b.vy = 210; moveBody(g, e.b, dt);
@@ -172,7 +172,7 @@ export function updateEnemy(e: Enemy, dt: number, ctx: AICtx): void {
     // ----- woda
     case 'rogopletw': {
       e.hornsUp = true;
-      if (e.st === 'patrol') { e.b.x += e.dir * S * 0.5 * dt; e.b.y = e.hy + Math.sin(e.f * 2) * 12; if (Math.abs(cx(e.b) - e.hx) > 150) e.dir = (e.dir * -1) as 1 | -1; if (e.t <= 0 && sees(e, p, 230, 120, false)) { e.st = 'alert'; e.t = 0.4; faceTo(e, p); ctx.sfx('warn'); } }
+      if (e.st === 'patrol') { e.b.x += e.dir * S * 0.5 * dt; e.b.y = e.hy + Math.sin(e.f * 2) * 12; if (Math.abs(cx(e.b) - e.hx) > 150) e.dir = (e.dir * -1) as 1 | -1; if (e.t <= 0 && sees(e, p, 230, 120, false)) { e.st = 'alert'; e.t = 0.5; faceTo(e, p); ctx.sfx('warn'); } }
       else if (e.st === 'alert') { if (e.t <= 0) { e.st = 'dash'; e.t = 0.6; if (p) { const dx = cx(p.mv.body) - cx(e.b), dy = cy(p.mv.body) - cy(e.b); const d = Math.hypot(dx, dy) || 1; e.b.vx = (dx / d) * 200; e.b.vy = (dy / d) * 200; } } }
       else if (e.st === 'dash') { e.b.x += e.b.vx * dt; e.b.y += e.b.vy * dt; if (e.t <= 0) { e.st = 'patrol'; e.t = 1.6; e.hy = e.b.y; e.hx = cx(e.b); } }
       break;

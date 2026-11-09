@@ -1,6 +1,6 @@
 import { it, expect } from 'vitest';
 import { getLevel } from '../src/game/levels';
-import { T } from '../src/game/types';
+import { T, type Spec } from '../src/game/types';
 import { analyze } from './reach';
 it('negatywny: bez drabiny taras jest nieosiągalny; bez przełącznika brama zamknięta', () => {
   const L = structuredClone(getLevel('W1-L1'));
@@ -32,3 +32,17 @@ it('negatywny W1-L2: bez windy chodnik górny i wyjście są nieosiągalne; bez 
   const a3 = analyze(L3, 'M');
   expect(a3.reaches(0, exitOf(L3).x, exitOf(L3).y, 40, 10)).toBe(false);
 }, 240000);
+
+it('grawitacja planet: wyspa za przerwą 5 kafli (W6-L1) dostępna na Vesperze (0,86 g) dla obu braci, na Prądowie tylko dla Darioosha, na Skaltrii dla nikogo; trasa główna wszędzie', () => {
+  const L0 = getLevel('W6-L1'); const exit = L0.rooms[0].specs.find((s) => s.t === 'exit')!;
+  const island = (L0.rooms[0].specs.filter((s) => s.t === 'item') as Extract<Spec, { t: 'item' }>[]).find((s) => s.k === 'pet' && s.x > 77 * 32)!;
+  const probe = (planet: number, b: 'M' | 'D') => { const L = structuredClone(L0); L.planet = planet; const a = analyze(L, b); return { exit: a.reaches(0, exit.x, exit.y, 40, 10), island: a.touches(0, island.x, island.y, 24) }; };
+  expect(probe(6, 'M')).toEqual({ exit: true, island: true }); expect(probe(6, 'D')).toEqual({ exit: true, island: true });
+  expect(probe(0, 'M')).toEqual({ exit: true, island: false }); expect(probe(0, 'D')).toEqual({ exit: true, island: true });
+  expect(probe(5, 'M')).toEqual({ exit: true, island: false }); expect(probe(5, 'D')).toEqual({ exit: true, island: false });
+}, 600000);
+
+it('W5-L1 (Skaltria 1,14 g): trasa główna z przerwą 3 kafli przejezdna dla obu braci', () => {
+  const L = getLevel('W5-L1'); const exit = L.rooms[0].specs.find((s) => s.t === 'exit')!;
+  for (const b of ['M', 'D'] as const) expect(analyze(L, b).reaches(0, exit.x, exit.y, 40, 10), b).toBe(true);
+}, 200000);

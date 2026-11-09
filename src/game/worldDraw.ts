@@ -7,7 +7,7 @@ import {
   freedSprite, glowImage, heroSprite, itemSprite, lampSprite, lanternSprite, parallaxLayer, pulseSprite, rockSprite, shieldSprite, signSprite, skyImage, sparkSprite,
   statueSprite, switchSprite, tileset, type HeroFrame,
 } from '../sprites/art';
-import { BOSS_SCALE, TILE, VH, VW } from './constants';
+import { BOSS_SCALE, ENEMY_SCALE, TILE, VH, VW } from './constants';
 import type { Enemy, PlayerEnt } from './entities';
 import { T } from './types';
 import type { World } from './world';
@@ -262,8 +262,9 @@ function drawEnemy(g: Gfx, e: Enemy, w: World): void {
   let img = enemySprite(e.kind, Math.floor(e.f * 6), state);
   if (e.hurt > 0 && Math.floor(w.time * 30) % 2 === 0) img = tint(img, '#ffffff', 0.9);
   if (e.stun > 0) img = tint(img, '#7fd6ff', 0.5);
-  const x = e.b.x + e.b.w / 2 - lw(img) / 2, y = e.b.y + e.b.h - lh(img) + 3;
-  g.spr(img, x, y, { flip: e.dir < 0, alpha: e.dead ? Math.max(0, e.deadT / 0.8) : 1, rot: e.dead ? e.deadT * 6 : 0 });
+  const ew = lw(img) * ENEMY_SCALE, eh = lh(img) * ENEMY_SCALE;
+  const x = e.b.x + e.b.w / 2 - ew / 2, y = e.b.y + e.b.h - eh + 3;
+  g.spr(img, x, y, { w: ew, h: eh, flip: e.dir < 0, alpha: e.dead ? Math.max(0, e.deadT / 0.8) : 1, rot: e.dead ? e.deadT * 6 : 0 });
   if (e.st === 'alert' || e.st === 'flash' || e.st === 'open') g.rect(e.b.x + e.b.w / 2 - 2, y - 12, 4, 8, '#ff4a3a'), g.rect(e.b.x + e.b.w / 2 - 2, y - 2, 4, 3, '#ff4a3a');
   void L;
 }
