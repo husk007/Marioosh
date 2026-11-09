@@ -2,7 +2,7 @@
  * Ręcznie projektowane poziomy v0.4 (docs/design/09, 10): graf pokoi opisanych ASCII-art + logika w kodzie.
  * Jedna litera = jeden kafel (32 px = 0,8 m). Zasada: geometria w ASCII, zachowania (przełączniki, bramy, windy, drzwi) w kodzie mapy.
  *
- * Kafle:  # lity · = platforma jednokierunkowa · H drabina · ^ kolce · C pękająca ściana (klucz Marioosha) · i lód · o olej · n piasek
+ * Kafle:  c kruchy konar (opada 0,5 s po stanięciu, wraca po 3 s) · # lity · = platforma jednokierunkowa · H drabina · ^ kolce · C pękająca ściana (klucz Marioosha) · i lód · o olej · n piasek
  *         < > taśmociąg · ( ) rampa 26° w prawo (dolna/górna połowa) · [ ] rampa 26° w lewo (górna/dolna połowa) · ~ woda · 1–9 komórki bramy
  * Znaczniki (puste kafle z pozycją): S start · K checkpoint · X wyjście · p PET · k puszka · * złota puszka · r Roguś · z Żukoróg · a Baranitor
  *         m Ćmoróg · T posąg mieszkańca · E EcoPort · pozostałe litery — własne (odczyt przez room.at('A'))
@@ -14,7 +14,7 @@ import type { BossId } from '../data/worlds';
 
 const TILE_CHARS: Record<string, number> = {
   '#': T.SOLID, '=': T.ONEWAY, H: T.LADDER, '^': T.HAZARD, C: T.CRACKED, i: T.ICE, o: T.OIL, n: T.SAND, '<': T.CONVL, '>': T.CONVR,
-  '(': T.SL_R26A, ')': T.SL_R26B, '[': T.SL_L26A, ']': T.SL_L26B,
+  c: T.CRUMBLE, '(': T.SL_R26A, ')': T.SL_R26B, '[': T.SL_L26A, ']': T.SL_L26B,
 };
 const ENEMY_CHARS: Record<string, EnemyKind> = { r: 'rogus', z: 'zukorog', a: 'baranitor', m: 'cmorog', y: 'bykobieg' };
 const ITEM_CHARS: Record<string, ItemKind> = { p: 'pet', k: 'can', '*': 'golden', B: 'battery', x: 'xl' };
