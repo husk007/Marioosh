@@ -13,5 +13,6 @@
     "noEmit": true,
     "types": ["vite/client", "node"]
   },
-  "include": ["src", "tests"]
+  "include": ["src", "tests"],
+  "exclude": ["tests/legacy"]
 }
