@@ -23,7 +23,7 @@ const T: Record<string, Track> = {
 };
 export const TRACKS = Object.keys(T);
 
-declare global { interface Window { __NO_FILE_MUSIC?: boolean } }
+declare global { interface Window { __NO_FILE_MUSIC?: boolean; __MUSIC_EXT?: string } }   // __MUSIC_EXT: rozszerzenie plików muzyki (hosty bez .m4a serwują ten sam kontener AAC jako .mp4)
 /** utwory, które mają pliki (public/audio/music); pozostałe zawsze grają z syntezatora */
 const FILE_MUSIC = new Set(['title', 'map', 'w0', 'w1', 'w2', 'w3', 'w4', 'w5', 'w6', 'w7', 'w8', 'boss', 'star']);
 const FILE_GAIN = 0.55, XFADE = 3, FADE_IN = 0.9, FADE_OUT = 0.7;
@@ -117,7 +117,7 @@ export class AudioEngine {
   }
   private play(sl: Slot, name: string, fade: number): boolean {
     this.attach(sl);
-    const url = new URL('audio/music/' + name + '.m4a', document.baseURI).toString();
+    const url = new URL('audio/music/' + name + '.' + (window.__MUSIC_EXT ?? 'm4a'), document.baseURI).toString();
     sl.name = name; sl.el.src = url; sl.el.currentTime = 0; sl.lvl = 0; sl.rate = 1 / fade; this.applyFileVol(sl);
     const p = sl.el.play(); if (p) p.catch(() => { this.pendingFile = true; });   // autoodtwarzanie wymaga gestu — ponowimy po unlock()
     return true;
