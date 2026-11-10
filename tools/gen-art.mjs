@@ -70,8 +70,7 @@ const POSE_EXTRAS = {   // poza → dodatkowy obiekt/postać, którego użycie p
 // nowe pozy pionowej przebudowy: referencje do elementów mechanik (tools/add-vertical-art.mjs → art-mechanics.json)
 try {
   const MK = JSON.parse(readFileSync(join(root, 'tools', 'art-mechanics.json'), 'utf8'));
-  for (const c of ['CHARACTERS-001', 'CHARACTERS-002']) Object.assign(POSE_EXTRAS[c], { climb_grate: [MK.grate, 'item'], spring_launch: [MK.spring, 'item'] });
-  POSE_EXTRAS['CHARACTERS-001'].ground_pound = [MK.crack, 'item'];
+    for (const [state, id] of Object.entries(MK.pose_refs ?? {})) for (const c of ['CHARACTERS-001', 'CHARACTERS-002']) POSE_EXTRAS[c][state] = [id, 'item'];   // v0.4: drabina / winda / drzwi
 } catch { /* biblioteka bez mechanics */ }
 const ICON_REFS = { 'PET Counter Icon': 'COLLECTIBLES-001', 'Can Counter Icon': 'COLLECTIBLES-003', 'Lives Icon': 'COLLECTIBLES-012' };
 function mentioned(a) {   // bohaterowie wymienieni w opisie (dla ilustracji fabularnych i menu)
@@ -198,6 +197,9 @@ if (opt('plan', false)) {
   const push = (a, state, refs, text, frames, done) => items.push({ skip: !done && skipped(a, state), seq: items.length + 1, kind: state === 'base' ? 'base' : 'pose', asset_id: a.asset_id, name: a.name, category: a.category, state, frames, inbox_name: `${a.asset_id}__${state}.png`, repo_file: `${a.category}/${basename(fileOf(a, state))}`, size: sizeFor(a), transparent: wantsAlpha(a), refs: refInfo(refs), done, prompt: refPrompt(refs) + text + AVOID(a) });
   for (const a of ordered) push(a, 'base', baseRefs(a), a.prompt_en, 1, !baseNeeded(a));
   for (const a of ordered) for (const j of poseJobs.filter((j) => j.asset_id === a.asset_id)) push(a, j.state, poseRefs(a, j.state), j.prompt_en, j.target_frames, !poseNeeded(a, j.state));
+  // v0.4: najpierw pozy braci (definiują skalę i animację całej gry), potem elementy human-scale (mechanics), reszta bez zmian
+  const tier = (i) => (i.kind === 'pose' && (i.asset_id === 'CHARACTERS-001' || i.asset_id === 'CHARACTERS-002') ? 0 : i.category === 'mechanics' ? 1 : 2);
+  items.sort((x, y) => tier(x) - tier(y) || x.seq - y.seq); items.forEach((it, i) => { it.seq = i + 1; });
   writeFileSync(String(opt('plan', '')), JSON.stringify(items));
   console.log(`Plan: ${items.length} pozycji, gotowych ${items.filter((i) => i.done).length}`); process.exit(0);
 }

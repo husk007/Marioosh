@@ -7,7 +7,7 @@ import {
   freedSprite, glowImage, heroSprite, itemSprite, lampSprite, lanternSprite, parallaxLayer, pulseSprite, rockSprite, shieldSprite, signSprite, skyImage, sparkSprite,
   statueSprite, switchSprite, tileset, type HeroFrame,
 } from '../sprites/art';
-import { BOSS_SCALE, ENEMY_SCALE, TILE, VH, VW } from './constants';
+import { BOSS_SCALE, ENEMY_SCALE, FALL_DAMAGE, TILE, VH, VW } from './constants';
 import type { Enemy, PlayerEnt } from './entities';
 import { T } from './types';
 import type { World } from './world';
@@ -313,15 +313,25 @@ function drawEnemy(g: Gfx, e: Enemy, w: World): void {
 export const HERO_SCALE = 1.55;
 
 export function heroFrameFor(p: PlayerEnt): HeroFrame {
-  const mv = p.mv, b = mv.body;
+  const mv = p.mv, b = mv.body, alt = Math.floor(p.anim * 7) % 2 === 1;
   if (p.dead || p.hurtT > 0) return 'hurt';
   if (p.atk.phase !== 'none') return 'attack';
-  if (mv.hang || mv.ledge) return 'hang';
-  if (mv.climbing) return Math.abs(b.vy) < 5 && Math.abs(b.vx) < 5 ? 'climb0' : Math.floor(p.anim * 7) % 2 ? 'climb1' : 'climb0';
-  if (mv.swimming) return 'swim';
+  if (mv.ledge) return mv.ledge.kind === 'vault' ? 'vault' : 'pullUp';
+  if (mv.hang) return 'hang';
+  if (mv.climbing) { if (Math.abs(b.vy) < 5) return 'ladIdle'; return b.vy < 0 ? (alt ? 'ladUp1' : 'ladUp0') : (alt ? 'ladDn1' : 'ladDn0'); }
+  if (mv.swimming) {
+    if (b.onGround) return Math.abs(b.vx) > 8 ? (alt ? 'wade1' : 'wade0') : 'idle';
+    if (b.vy > 60) return 'dive'; if (b.vy < -60) return 'swimUp';
+    return Math.abs(b.vx) < 25 ? 'tread' : 'swim';
+  }
   if (!b.onGround) return b.vy > 90 ? 'fall' : 'jump';
+  if (mv.lock > 0) return mv.fallDist >= FALL_DAMAGE ? 'hardLand' : 'stumble';
   if (mv.duck) return 'crouch';
-  if (Math.abs(b.vx) > 12) return Math.floor(p.anim * (Math.abs(b.vx) > 120 ? 9 : 6)) % 2 ? 'walk1' : 'walk0';
+  if (Math.abs(b.vx) > 12) {
+    const run = Math.abs(b.vx) > 120, cyc = Math.floor(p.anim * (run ? 9 : 6)) % 2 === 1;
+    if (mv.angle !== 0) { const up = mv.angle * b.vx > 0; return up ? (cyc ? 'up1' : 'up0') : (cyc ? 'down1' : 'down0'); }
+    return run ? (cyc ? 'run1' : 'run0') : (cyc ? 'walk1' : 'walk0');
+  }
   return 'idle';
 }
 

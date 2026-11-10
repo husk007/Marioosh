@@ -1,7 +1,20 @@
 {
   "_opis": "Zakres produkcji. Pozycje spoza zakresu dostają status SKIP (nie trafiają do kolejki). Edytuj i uruchom: node tools/art-roadmap.mjs (albo wrzuć dowolny plik do art-inbox/).",
-  "skip_categories": ["effects"],
-  "skip_pose_categories": ["collectibles", "conduits", "interactables"],
-  "skip_ids": [],
-  "skip_states": []
+  "skip_categories": [
+    "effects"
+  ],
+  "skip_pose_categories": [
+    "collectibles",
+    "conduits",
+    "interactables"
+  ],
+  "skip_ids": [
+    "MECHANICS-003",
+    "MECHANICS-004",
+    "MECHANICS-005",
+    "MECHANICS-009",
+    "MECHANICS-010"
+  ],
+  "skip_states": [],
+  "_v04": "v0.4: pominięte zasoby v0.3 niezgodne z fizyką v0.4 (sprężyna, kratka, łańcuch, wywietrznik, pęknięta posadzka). Pozy braci: patrz tools/add-v04-art.mjs."
 }

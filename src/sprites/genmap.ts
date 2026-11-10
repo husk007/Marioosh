@@ -31,12 +31,34 @@ export function genHero(brother: 'M' | 'D', frame: HeroFrame, _big: boolean, nig
     case 'hurt': key = S('hurt'); if (!key) { key = S('base'); o.tint = ['#ff3a3a', 0.4]; } break;
     case 'crouch': key = S('crouch'); if (!key) { key = S('base'); o.sx = 1.1; o.sy = 0.84; } break;
     case 'victory': key = S('victory', 'base'); break;
-    case 'swim': key = S('base'); o.rot = 72; break;
+    case 'swim': key = S('swim'); if (!key) { key = S('base'); o.rot = 72; } break;
     case 'glide': key = S('glide', 'glide_umbrella'); if (!key) { key = S('base'); o.sx = 1.08; o.sy = 0.96; } break;
     case 'hang': key = S('ledge_hang', 'hang'); if (!key) { key = S('climb_wire', 'base'); } break;
     case 'wall': key = S('wall_slide'); if (!key) { key = S('base'); o.rot = -6; } break;
     case 'pound': key = S('ground_pound'); if (!key) { key = S('base'); o.sx = 0.92; o.sy = 1.12; } break;
     case 'roll0': case 'roll1': case 'roll2': case 'roll3': key = S('roll'); if (!key) { key = S('crouch', 'base'); o.sx = 1.18; o.sy = 0.62; o.rot = 0; } o.rot = (o.rot ?? 0) + (['roll0', 'roll1', 'roll2', 'roll3'].indexOf(frame)) * 90; break;
+    // v0.4 — każda poza ma awaryjny zamiennik, dopóki grafika nie powstanie
+    case 'run0': key = S('run', 'walk', 'base'); break;
+    case 'run1': key = S('idle', 'base'); o.sy = 0.985; break;
+    case 'up0': key = S('walk_uphill', 'run_uphill', 'walk', 'base'); break;
+    case 'up1': key = S('idle', 'base'); o.sy = 0.985; break;
+    case 'down0': key = S('walk_downhill', 'run_downhill', 'walk', 'base'); break;
+    case 'down1': key = S('idle', 'base'); o.sy = 0.985; break;
+    case 'ladUp0': key = S('ladder_climb_up', 'ladder_idle', 'ledge_hang', 'base'); break;
+    case 'ladUp1': key = S('ladder_climb_up', 'ladder_idle', 'ledge_hang', 'base'); o.flip = true; break;
+    case 'ladDn0': key = S('ladder_climb_down', 'ladder_climb_up', 'ladder_idle', 'ledge_hang', 'base'); break;
+    case 'ladDn1': key = S('ladder_climb_down', 'ladder_climb_up', 'ladder_idle', 'ledge_hang', 'base'); o.flip = true; break;
+    case 'ladIdle': key = S('ladder_idle', 'ledge_hang', 'base'); break;
+    case 'tread': key = S('swim_tread', 'swim', 'base'); if (!key) { key = S('base'); } break;
+    case 'dive': key = S('swim_dive', 'swim', 'base'); if (key === k(id, 'base')) o.rot = 72; break;
+    case 'swimUp': key = S('swim_up', 'swim', 'base'); if (key === k(id, 'base')) o.rot = -72; break;
+    case 'wade0': key = S('wade', 'walk', 'base'); break;
+    case 'wade1': key = S('wade', 'idle', 'base'); o.sy = 0.985; break;
+    case 'stumble': key = S('land_stumble', 'crouch', 'base'); if (key === k(id, 'base')) { o.sx = 1.1; o.sy = 0.84; } break;
+    case 'hardLand': key = S('land_hard', 'land_stumble', 'crouch', 'base'); if (key === k(id, 'base')) { o.sx = 1.12; o.sy = 0.78; } break;
+    case 'vault': key = S('vault', 'jump_apex', 'base'); break;
+    case 'pullUp': key = S('ledge_pull_up', 'ledge_hang', 'base'); break;
+    case 'lift': key = S('lift_ride', 'idle', 'base'); break;
     default: key = S('idle', 'base');
   }
   if (!key) return undefined;

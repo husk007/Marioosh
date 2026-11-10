@@ -7,9 +7,14 @@
 import { hiCanvas, shade, type Img } from '../engine/gfx';
 
 export type HeroFrame = 'idle' | 'walk0' | 'walk1' | 'jump' | 'attack' | 'climb0' | 'climb1' | 'swim' | 'hurt' | 'fall' | 'crouch' | 'victory'
-  | 'glide' | 'hang' | 'wall' | 'pound' | 'roll0' | 'roll1' | 'roll2' | 'roll3';
+  | 'glide' | 'hang' | 'wall' | 'pound' | 'roll0' | 'roll1' | 'roll2' | 'roll3'
+  // v0.4: pozy ruchu w skali człowieka (bez własnego rysunku proceduralnego używają najbliższej istniejącej)
+  | 'run0' | 'run1' | 'up0' | 'up1' | 'down0' | 'down1' | 'ladUp0' | 'ladUp1' | 'ladDn0' | 'ladDn1' | 'ladIdle' | 'tread' | 'dive' | 'swimUp' | 'wade0' | 'wade1'
+  | 'stumble' | 'hardLand' | 'vault' | 'pullUp' | 'lift';
 /** pozy bez własnego rysunku proceduralnego korzystają z najbliższej istniejącej */
-const ALIAS: Partial<Record<HeroFrame, HeroFrame>> = { glide: 'jump', hang: 'climb0', wall: 'climb1', pound: 'fall', roll0: 'crouch', roll1: 'crouch', roll2: 'crouch', roll3: 'crouch' };
+const ALIAS: Partial<Record<HeroFrame, HeroFrame>> = { glide: 'jump', hang: 'climb0', wall: 'climb1', pound: 'fall', roll0: 'crouch', roll1: 'crouch', roll2: 'crouch', roll3: 'crouch',
+  run0: 'walk0', run1: 'walk1', up0: 'walk0', up1: 'walk1', down0: 'walk0', down1: 'walk1', ladUp0: 'climb0', ladUp1: 'climb1', ladDn0: 'climb1', ladDn1: 'climb0', ladIdle: 'climb0',
+  tread: 'swim', dive: 'swim', swimUp: 'swim', wade0: 'walk0', wade1: 'walk1', stumble: 'crouch', hardLand: 'crouch', vault: 'jump', pullUp: 'climb0', lift: 'idle' };
 export const HERO_W = 40, HERO_H = 48;
 
 interface Pal {
@@ -87,13 +92,14 @@ export function drawHero(brother: 'M' | 'D', frame: HeroFrame, big: boolean, nig
   const M = brother === 'M';
   const LL = (big ? 12.5 : 8.2) + (M ? -0.9 : 0.5), TL = (big ? 14 : 9.6) + (M ? -0.6 : 0.8), headH = (big ? 13 : 12.4) + (M ? 0.6 : 0);
   const tw = (M ? 7.3 : 4.7) + (big ? 0.5 : 0), lw = M ? 4.7 : 3.0;
+  const fa = ALIAS[frame] ?? frame;
   const po = pose(frame, LL);
-  const cx = HERO_W / 2 + po.lean * 0.3, hipY = HERO_H - LL - 0.2 - (frame === 'walk0' || frame === 'walk1' ? 0 : 0);
+  const cx = HERO_W / 2 + po.lean * 0.3, hipY = HERO_H - LL - 0.2 - 0;
   const topY = hipY - TL + po.bob;                    // linia barków
-  const climbing = frame === 'climb0' || frame === 'climb1';
+  const climbing = fa === 'climb0' || fa === 'climb1';
 
   // cień kontaktowy
-  if (frame !== 'jump' && !climbing && frame !== 'swim') { g.fillStyle = 'rgba(0,0,0,0.22)'; g.beginPath(); g.ellipse(cx + 0.5, HERO_H - 0.6, 8.5, 1.5, 0, 0, 7); g.fill(); }
+  if (fa !== 'jump' && !climbing && fa !== 'swim') { g.fillStyle = 'rgba(0,0,0,0.22)'; g.beginPath(); g.ellipse(cx + 0.5, HERO_H - 0.6, 8.5, 1.5, 0, 0, 7); g.fill(); }
 
   // tylna ręka i noga
   arm(g, cx - 0.5, topY + 1.8, TL * 0.82, po.farArm, shade(P.coat, 0.78), P.coatHi, shade(P.glove, 0.8));
@@ -144,7 +150,7 @@ export function drawHero(brother: 'M' | 'D', frame: HeroFrame, big: boolean, nig
   g.save(); g.translate(0, po.bob);
   const WL = M ? 11.5 : 9.2, WW = M ? 1.9 : 1.5;
   if (po.wrench === 'belt') {
-    wrench(g, cx + tw * 0.65, hipY - 0.6, 1.9 + (frame === 'walk0' ? 0.12 : frame === 'walk1' ? -0.12 : 0), WL * 0.62, WW * 0.9);
+    wrench(g, cx + tw * 0.65, hipY - 0.6, 1.9 + (fa === 'walk0' ? 0.12 : fa === 'walk1' ? -0.12 : 0), WL * 0.62, WW * 0.9);
   }
   const hand = arm(g, cx + 0.5, topY + 1.8, TL * 0.82, po.nearArm, P.coat, P.coatHi, P.glove);
   if (po.wrench === 'held') wrench(g, hand[0] - 1, hand[1], po.wAng - 0.05, WL * 1.2, WW);

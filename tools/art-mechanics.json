@@ -1,1 +1,1 @@
-{"grate":"MECHANICS-004","spring":"MECHANICS-003","crack":"MECHANICS-010"}
+{"grate":"MECHANICS-004","spring":"MECHANICS-003","crack":"MECHANICS-010","ladder":"MECHANICS-011","door":"MECHANICS-012","lift":"MECHANICS-013","pose_refs":{"ladder_idle":"MECHANICS-011","ladder_climb_up":"MECHANICS-011","ladder_climb_down":"MECHANICS-011","ladder_top_exit":"MECHANICS-011","ladder_jump_off":"MECHANICS-011","lift_ride":"INTERACTABLES-010","door_enter":"MECHANICS-012"}}

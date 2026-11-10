@@ -44,6 +44,7 @@ button.primary:disabled{opacity:.45;cursor:not-allowed}
 .progress i{display:block;height:100%;background:var(--accent);width:0}
 details.how{margin:14px 0 4px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px}
 details.how summary{cursor:pointer;font-weight:600}
+.qchip{font-size:12px;padding:3px 10px;border-radius:999px;margin:2px 2px 0 0}
 details.how ol{margin:8px 0 2px;padding-left:20px}
 details.how li{margin:4px 0}
 a{color:var(--blue)}
@@ -106,6 +107,10 @@ details.pr pre{white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.4 var(--m
 </div></header>
 
 <main class="wrap">
+  <details class="how" open><summary>Nowe w v0.4 — pozy braci dla realistycznej skali (kolejka zaczyna się od nich)</summary>
+    <p>Gra przeszła na skalę człowieka (40 px = 1 m) i realistyczny ruch. Pozy Marioosha i Darioosha obejmują teraz: <b>chód i bieg pod górę / z góry</b> (rampy 26°), <b>skoki</b> (wybicie, wznoszenie, szczyt), <b>spadanie</b> (zwykłe i z dużej wysokości), <b>lądowania</b> (miękkie, potknięcie, twarde), <b>podciąganie na krawędzi i przeskok przeszkody</b>, <b>drabinę</b> (góra, dół, zejście, zeskok), <b>jazdę windą</b>, <b>pływanie</b> (powierzchnia, nurkowanie, wynurzanie, łapanie powietrza, brak tchu, brodzenie), <b>drzwi</b>, <b>niesienie</b> i <b>zasłonę kluczem</b>. Usunięte jako niezgodne z v0.4: szybowanie, ślizg po ścianie, toczenie, odbicie od ściany, sprężyna, uderzenie w ziemię.</p>
+    <p class="chips"><button class="qchip" data-q="CHARACTERS-001">Marioosh</button> <button class="qchip" data-q="CHARACTERS-002">Darioosh</button> <button class="qchip" data-q="swim">pływanie</button> <button class="qchip" data-q="ladder">drabina</button> <button class="qchip" data-q="uphill">pod górę</button> <button class="qchip" data-q="downhill">z góry</button> <button class="qchip" data-q="land">lądowanie</button> <button class="qchip" data-q="MECHANICS">elementy v0.4</button></p>
+  </details>
   <details class="how"><summary>Jak tego używać (4 kroki)</summary>
     <ol>
       <li>Wybierz kategorię i kliknij <b>Pobierz referencje (ZIP)</b>. Rozpakuj do folderu; to obrazy, które dołączasz do promptu, żeby postać wyglądała tak samo.</li>
@@ -347,6 +352,7 @@ $('#bRefresh').addEventListener('click', async () => {
     ITEMS = d; $('#fcat').innerHTML = ''; shown = PAGE; render(); toast(`Lista odświeżona: ${d.length} pozycji do zrobienia.`);
   } catch (e) { toast('Nie udało się pobrać aktualnej listy. Działa wbudowana wersja.'); }
 });
+document.querySelectorAll('.qchip').forEach((b) => b.addEventListener('click', () => { $('#q').value = b.dataset.q; $('#fcat').value = ''; $('#fkind').value = ''; shown = PAGE; render(); scrollTo({ top: 0 }); }));
 ['q', 'fcat', 'fkind', 'fhide'].forEach((id) => $('#' + id).addEventListener('input', () => { shown = PAGE; render(); }));
 
 // motyw
