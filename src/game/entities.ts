@@ -33,7 +33,7 @@ export interface Enemy {
   id: number; kind: EnemyKind; b: Body; hp: number; maxHp: number; dir: 1 | -1;
   st: string; t: number; f: number; hx: number; hy: number;
   stun: number; dead: boolean; deadT: number; hornsUp: boolean; flip: boolean; hurt: number;
-  a: number; c: number; d: number; lastSwing: number; grounded: boolean; flying: boolean;
+  a: number; c: number; d: number; lastSwing: number; turnCd: number; grounded: boolean; flying: boolean;
 }
 
 export interface Item { id: string; kind: ItemKind; x: number; y: number; vy: number; taken: boolean; ghost: boolean; t: number; popT: number; fixed: boolean; vx?: number; home?: { x: number; y: number } }

@@ -33,7 +33,7 @@ export function makeEnemy(kind: EnemyKind, cx: number, groundY: number): Enemy {
   const st = STATS[kind];
   const e: Enemy = {
     id: nextId++, kind, b, hp: st.hp, maxHp: st.hp, dir: -1, st: 'patrol', t: 0, f: 0, hx: cx, hy: b.y,
-    stun: 0, dead: false, deadT: 0, hornsUp: false, flip: false, hurt: 0, a: 0, c: 0, d: 0, lastSwing: -1, grounded: false, flying,
+    stun: 0, dead: false, deadT: 0, hornsUp: false, flip: false, hurt: 0, a: 0, c: 0, d: 0, lastSwing: -1, turnCd: 0, grounded: false, flying,
   };
   if (kind === 'kakturozec' || kind === 'zukorog' || kind === 'slimorog') e.hornsUp = true;
   if (kind === 'rogopnacze') { e.st = 'down'; e.t = 1.2; b.y = groundY - h; }
@@ -63,12 +63,17 @@ function gravity(e: Enemy, g: Grid, dt: number): void {
   e.b.vy = Math.min(700, e.b.vy + GRAVITY * dt);
   moveBody(g, e.b, dt);
 }
-/** Idzie w kierunku e.dir; zawraca na ścianie / krawędzi / poza zasięgiem patrolu. Zwraca true, jeśli zawrócił. */
+/** Poza zasięgiem patrolu I oddala się od punktu startu (zawracanie w stronę domu nie jest już „poza zasięgiem” — to był błąd migania). */
+const awayFromHome = (e: Enemy, range: number): boolean => Math.abs(cx(e.b) - e.hx) > range && Math.sign(e.hx - cx(e.b)) !== e.dir;
+/** Idzie w kierunku e.dir; zawraca na ścianie / krawędzi / poza zasięgiem patrolu. Zwraca true, jeśli zawrócił.
+ *  Po zawróceniu obowiązuje przerwa (turnCd): gdy po drugiej stronie też jest przeszkoda (wąska półka, kąt), mob stoi, zamiast migać lewo-prawo co klatkę. */
 function walk(e: Enemy, spd: number, g: Grid, dt: number, range = 150, turnLedge = true): boolean {
   e.b.vx = e.dir * spd; gravity(e, g, dt); let turned = false;
-  if (e.b.hitWall) { e.dir = (e.dir * -1) as 1 | -1; turned = true; }
-  else if (e.b.onGround && turnLedge && ledgeAhead(e, g)) { e.dir = (e.dir * -1) as 1 | -1; turned = true; }
-  else if (Math.abs(cx(e.b) - e.hx) > range && Math.sign(e.hx - cx(e.b)) === e.dir) { e.dir = (e.dir * -1) as 1 | -1; turned = true; }
+  const blocked = !!e.b.hitWall || (e.b.onGround && turnLedge && ledgeAhead(e, g)) || awayFromHome(e, range);
+  if (blocked) {
+    if (e.turnCd > 0) e.b.vx = 0;
+    else { e.dir = (e.dir * -1) as 1 | -1; e.turnCd = 0.4; turned = true; }
+  }
   return turned;
 }
 const sees = (e: Enemy, p: PlayerEnt | null, rx: number, ry: number, front = true): boolean => {
@@ -76,11 +81,11 @@ const sees = (e: Enemy, p: PlayerEnt | null, rx: number, ry: number, front = tru
   const dx = cx(p.mv.body) - cx(e.b), dy = cy(p.mv.body) - cy(e.b);
   return Math.abs(dx) < rx && Math.abs(dy) < ry && (!front || Math.sign(dx) === e.dir);
 };
-const faceTo = (e: Enemy, p: PlayerEnt | null) => { if (p) e.dir = cx(p.mv.body) >= cx(e.b) ? 1 : -1; };
+const faceTo = (e: Enemy, p: PlayerEnt | null) => { if (p) { const d = cx(p.mv.body) >= cx(e.b) ? 1 : -1; if (d !== e.dir) e.turnCd = Math.max(e.turnCd, 0.4); e.dir = d; } };
 
 export function updateEnemy(e: Enemy, dt: number, ctx: AICtx): void {
   if (e.dead) { e.deadT -= dt; e.b.vy += GRAVITY * dt * 0.8; e.b.y += e.b.vy * dt; e.b.x += e.b.vx * dt; return; }
-  e.f += dt; if (e.hurt > 0) e.hurt -= dt; if (e.stun > 0) e.stun -= dt;
+  e.f += dt; if (e.hurt > 0) e.hurt -= dt; if (e.stun > 0) e.stun -= dt; if (e.turnCd > 0) e.turnCd -= dt;
   e.t -= dt;
   const g = ctx.grid, S = STATS[e.kind].speed, p = nearest(e, ctx);
   switch (e.kind) {
@@ -136,7 +141,7 @@ export function updateEnemy(e: Enemy, dt: number, ctx: AICtx): void {
     case 'cmorog': {
       if (e.st === 'patrol') {
         e.hornsUp = true; e.b.x += e.dir * S * 0.7 * dt; e.b.y = e.hy + Math.sin(e.f * 2.4) * 14;
-        if (Math.abs(cx(e.b) - e.hx) > 120) e.dir = (e.dir * -1) as 1 | -1;
+        if (awayFromHome(e, 120)) e.dir = (e.dir * -1) as 1 | -1;
         if (e.t <= 0 && p && Math.abs(cx(p.mv.body) - cx(e.b)) < 130 && p.mv.body.y > e.b.y && !ctx.lit?.(cx(p.mv.body), cy(p.mv.body))) { e.st = 'alert'; e.t = 0.5; faceTo(e, p); ctx.sfx('warn'); }
       } else if (e.st === 'alert') { if (p && ctx.lit?.(cx(p.mv.body), cy(p.mv.body))) { e.st = 'patrol'; e.t = 1.5; } else if (e.t <= 0) { e.st = 'dive'; e.t = 1.4; } }
       else if (e.st === 'dive') {
@@ -149,18 +154,18 @@ export function updateEnemy(e: Enemy, dt: number, ctx: AICtx): void {
     case 'pszczolrog': {
       e.hornsUp = true;
       if (sees(e, p, 230, 140, false) && p) { const dx = cx(p.mv.body) - cx(e.b), dy = cy(p.mv.body) - cy(e.b) + Math.sin(e.f * 6) * 24; const d = Math.hypot(dx, dy) || 1; e.b.x += (dx / d) * S * dt; e.b.y += (dy / d) * S * dt; e.dir = dx >= 0 ? 1 : -1; }
-      else { e.b.x += e.dir * S * 0.5 * dt; e.b.y = e.hy + Math.sin(e.f * 5) * 18; if (Math.abs(cx(e.b) - e.hx) > 100) e.dir = (e.dir * -1) as 1 | -1; }
+      else { e.b.x += e.dir * S * 0.5 * dt; e.b.y = e.hy + Math.sin(e.f * 5) * 18; if (awayFromHome(e, 100)) e.dir = (e.dir * -1) as 1 | -1; }
       break;
     }
     case 'rogowrobel': {
-      if (e.st === 'patrol') { e.hornsUp = true; e.b.x += e.dir * S * 0.7 * dt; e.b.y = e.hy + Math.sin(e.f * 4) * 10; if (Math.abs(cx(e.b) - e.hx) > 110) e.dir = (e.dir * -1) as 1 | -1; if (e.t <= 0) { if (ctx.lit?.(cx(e.b), e.b.y + 150, 150)) e.t = 0.6; else e.st = 'down'; } }
+      if (e.st === 'patrol') { e.hornsUp = true; e.b.x += e.dir * S * 0.7 * dt; e.b.y = e.hy + Math.sin(e.f * 4) * 10; if (awayFromHome(e, 110)) e.dir = (e.dir * -1) as 1 | -1; if (e.t <= 0) { if (ctx.lit?.(cx(e.b), e.b.y + 150, 150)) e.t = 0.6; else e.st = 'down'; } }
       else if (e.st === 'down') { e.b.vy = 160; e.b.vx = 0; moveBody(g, e.b, dt); if (e.b.onGround) { e.st = 'land'; e.t = 1.3; e.hornsUp = false; } }
       else if (e.st === 'land') { e.b.vx = 0; gravity(e, g, dt); if (e.t <= 0) e.st = 'rise'; }
       else if (e.st === 'rise') { e.b.y -= 120 * dt; if (e.b.y <= e.hy) { e.st = 'patrol'; e.t = 3.2; e.hornsUp = true; } }
       break;
     }
     case 'krukorog': {
-      if (e.st === 'patrol') { e.hornsUp = true; e.b.x += e.dir * S * dt; e.b.y = e.hy + Math.sin(e.f * 1.6) * 20; if (Math.abs(cx(e.b) - e.hx) > 160) e.dir = (e.dir * -1) as 1 | -1; if (e.t <= 0 && sees(e, p, 250, 260, false) && !(p && ctx.lit?.(cx(p.mv.body), cy(p.mv.body)))) { e.st = 'alert'; e.t = 0.5; faceTo(e, p); ctx.sfx('warn'); } }
+      if (e.st === 'patrol') { e.hornsUp = true; e.b.x += e.dir * S * dt; e.b.y = e.hy + Math.sin(e.f * 1.6) * 20; if (awayFromHome(e, 160)) e.dir = (e.dir * -1) as 1 | -1; if (e.t <= 0 && sees(e, p, 250, 260, false) && !(p && ctx.lit?.(cx(p.mv.body), cy(p.mv.body)))) { e.st = 'alert'; e.t = 0.5; faceTo(e, p); ctx.sfx('warn'); } }
       else if (e.st === 'alert') { if (p && ctx.lit?.(cx(p.mv.body), cy(p.mv.body))) { e.st = 'patrol'; e.t = 1.5; } else if (e.t <= 0) { e.st = 'swoop'; e.t = 1.5; } }
       else if (e.st === 'swoop') { e.b.vx = e.dir * 185; e.b.vy = 170; moveBody(g, e.b, dt); if (e.b.onGround || e.t <= 0) { e.st = 'land'; e.t = 1.5; e.hornsUp = false; e.b.vx = 0; } }
       else if (e.st === 'land') { e.b.vx = 0; gravity(e, g, dt); if (e.t <= 0) e.st = 'rise'; }
@@ -170,7 +175,7 @@ export function updateEnemy(e: Enemy, dt: number, ctx: AICtx): void {
     case 'dron': {
       if (e.st === 'patrol' || e.st === 'alert' || e.st === 'dive' || e.st === 'land' || e.st === 'rise') {   // strażnik hali (W7): patroluje pod sufitem, na sygnał nurkuje w miejsce gracza
         if (e.st === 'patrol') {
-          e.hornsUp = true; e.b.x += e.dir * S * 0.8 * dt; e.b.y = e.hy + Math.sin(e.f * 3) * 8; if (Math.abs(cx(e.b) - e.hx) > 150) e.dir = (e.dir * -1) as 1 | -1;
+          e.hornsUp = true; e.b.x += e.dir * S * 0.8 * dt; e.b.y = e.hy + Math.sin(e.f * 3) * 8; if (awayFromHome(e, 150)) e.dir = (e.dir * -1) as 1 | -1;
           if (e.t <= 0 && p && Math.abs(cx(p.mv.body) - cx(e.b)) < 190 && p.mv.body.y > e.b.y + 20 && p.mv.body.y < e.b.y + 340) { e.st = 'alert'; e.t = 0.8; e.c = cx(p.mv.body); faceTo(e, p); ctx.sfx('warn'); }
         } else if (e.st === 'alert') { e.b.y = e.hy + Math.sin(e.f * 40) * 3; if (e.t <= 0) { e.st = 'dive'; e.t = 1.3; e.dir = e.c >= cx(e.b) ? 1 : -1; } }   // cel zapamiętany na początku sygnału
         else if (e.st === 'dive') {
@@ -187,7 +192,7 @@ export function updateEnemy(e: Enemy, dt: number, ctx: AICtx): void {
     // ----- woda
     case 'rogopletw': {
       e.hornsUp = true;
-      if (e.st === 'patrol') { e.b.x += e.dir * S * 0.5 * dt; e.b.y = e.hy + Math.sin(e.f * 2) * 12; if (Math.abs(cx(e.b) - e.hx) > 150) e.dir = (e.dir * -1) as 1 | -1; if (e.t <= 0 && sees(e, p, 230, 120, false)) { e.st = 'alert'; e.t = 0.5; faceTo(e, p); ctx.sfx('warn'); } }
+      if (e.st === 'patrol') { e.b.x += e.dir * S * 0.5 * dt; e.b.y = e.hy + Math.sin(e.f * 2) * 12; if (awayFromHome(e, 150)) e.dir = (e.dir * -1) as 1 | -1; if (e.t <= 0 && sees(e, p, 230, 120, false)) { e.st = 'alert'; e.t = 0.5; faceTo(e, p); ctx.sfx('warn'); } }
       else if (e.st === 'alert') { if (e.t <= 0) { e.st = 'dash'; e.t = 0.6; if (p) { const dx = cx(p.mv.body) - cx(e.b), dy = cy(p.mv.body) - cy(e.b); const d = Math.hypot(dx, dy) || 1; e.b.vx = (dx / d) * 200; e.b.vy = (dy / d) * 200; } } }
       else if (e.st === 'dash') { e.b.x += e.b.vx * dt; e.b.y += e.b.vy * dt; if (e.t <= 0) { e.st = 'patrol'; e.t = 1.6; e.hy = e.b.y; e.hx = cx(e.b); } }
       break;
@@ -195,7 +200,7 @@ export function updateEnemy(e: Enemy, dt: number, ctx: AICtx): void {
     case 'osmiorog': {
       e.hornsUp = false;
       if (p && sees(e, p, 260, 160, false)) { const dx = cx(p.mv.body) - cx(e.b), dy = cy(p.mv.body) - cy(e.b); const d = Math.hypot(dx, dy) || 1; e.b.x += (dx / d) * S * dt; e.b.y += (dy / d) * S * 0.7 * dt; e.dir = dx >= 0 ? 1 : -1; }
-      else { e.b.x += e.dir * 30 * dt; e.b.y = e.hy + Math.sin(e.f * 1.5) * 10; if (Math.abs(cx(e.b) - e.hx) > 120) e.dir = (e.dir * -1) as 1 | -1; }
+      else { e.b.x += e.dir * 30 * dt; e.b.y = e.hy + Math.sin(e.f * 1.5) * 10; if (awayFromHome(e, 120)) e.dir = (e.dir * -1) as 1 | -1; }
       break;
     }
     // ----- rośliny
