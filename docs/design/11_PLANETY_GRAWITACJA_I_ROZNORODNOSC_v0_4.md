@@ -1,7 +1,7 @@
 
 # Marioosh & Darioosh — Planety, grawitacja i różnorodność 32 etapów (v0.4)
 
-**Data:** 2026-11-09. **Status:** obowiązujący kierunek do implementacji, nie gotowa funkcja. Dokument uzupełnia GDD v0.4, Atlas 32 poziomów v0.4 oraz plan migracji v0.4.
+**Data:** 2026-11-09. **Status:** obowiązujący kierunek; zaimplementowany we wszystkich 8 światach (zob. `12_IMPLEMENTACJA_v0_4.md`). Do sprawdzenia ręcznie: balans na różnych grawitacjach; opcjonalne wyspy za przerwą 5 kafli zależne od planety mają na razie tylko prototyp Vespery w testach (`maps/proto.ts`) — patrz `12_IMPLEMENTACJA_v0_4.md` §1 i §5. Dokument uzupełnia GDD v0.4, Atlas 32 poziomów v0.4 oraz plan migracji v0.4.
 
 ## 1. Decyzja: osiem planet ma osiem innych doświadczeń
 

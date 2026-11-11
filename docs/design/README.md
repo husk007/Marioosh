@@ -1,6 +1,8 @@
-# Marioosh & Darioosh – dokumentacja etapu 2
+# Marioosh & Darioosh – dokumentacja projektowa
 
-Ten pakiet rozszerza koncepcję gry „Klątwa Katoblepasa” do postaci dokumentacji do zbudowania prototypu. To **projekt**, nie gotowa grywalna aplikacja.
+Pakiet projektowy gry „Klątwa Katoblepasa”: etap 1–2 (00–06), przebudowa pionowa v0.3 (07, historyczna) i **obowiązująca koncepcja v0.4 (08–12)**. Gra jest zaimplementowana (zob. [`12_IMPLEMENTACJA_v0_4.md`](12_IMPLEMENTACJA_v0_4.md) — co jest zrobione i co czeka); dokumenty poniżej to źródło projektu, nie opis kodu.
+
+**Które dokumenty obowiązują:** koncepcja, fizyka, zasady i poziomy — **08–12** (w razie sprzeczności mają pierwszeństwo przed 01, 02, 06 i 07). Fabuła, bestiariusz (03), kierunek artystyczny (04), dane poziomów (05) i skamienienie/przewody/opakowania z 01 pozostają źródłem. Dokumentacja techniczna (architektura, testy, grafiki, audio): katalog [`docs/`](../) — w szczególności [`ART_PIPELINE.md`](../ART_PIPELINE.md).
 
 ## Kolejność czytania
 
@@ -13,12 +15,12 @@ Ten pakiet rozszerza koncepcję gry „Klątwa Katoblepasa” do postaci dokumen
 7. `06_ROADMAP_v0_2.md` – kolejność implementacji i kryteria odbioru.
 8. `07_PRZEBUDOWA_PIONOWA_v0_3.md` – **v0.3:** przebudowa na wysoki, pionowy platformer (zbocza, wspinaczka, sprężyny, sekrety zależne od brata); uzupełnia i w razie sprzeczności zastępuje fizykę z GDD v0.2. **Od v0.4 dokument historyczny.**
 
-## Ustalenia wymagające dalszego testowania
+## Ustalenia wymagające dalszego testowania (etap 2 — zachowane historycznie)
 
 - Wszystkie prędkości, czasy i statystyki wrogów są propozycją startową do balansowania.
 - Długości plansz w kafelkach oraz pozycje posągów są orientacyjnym blueprintem.
-- Docelowy silnik i platformy wydania należy wybrać przed utworzeniem kodu, choć Godot 4.x jest dobrym punktem startowym.
-- Do **pierwszej grywalnej wersji** wystarczy 1-1, 1-2 i 1-4 oraz minimalna grafika zastępcza.
+- Silnik: wybrano TypeScript + Canvas 2D (uzasadnienie w `docs/ARCHITECTURE.md`); Godot nie jest używany.
+- Pierwszy grywalny wycinek (W1-L1, L2, L4) został zbudowany i rozszerzony do wszystkich 32 poziomów.
 
 ## Spójność z pierwotną historią
 

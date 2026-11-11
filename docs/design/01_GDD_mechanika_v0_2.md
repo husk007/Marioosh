@@ -1,4 +1,6 @@
 # MARIOOSH & DARIOOSH: KLĄTWA KATOBLEPASA
+
+> **Status (v0.4): dokument historyczny — fizyka, życia, zegar, stomp i szybowanie zostały zastąpione przez `08_NOWA_KONCEPCJA_FIZYKA_v0_4.md`. Nadal aktualne: skamienienie, przewody, opakowania i kooperacja (ze zmianami opisanymi w 08 §6 i `12_IMPLEMENTACJA_v0_4.md`).**
 ## Game Design Document (GDD), wersja 0.2 – systemy i parametry
 
 **Status:** dokument projektowy do budowy prototypu; wartości liczbowe są założeniami do testów, nie wynikami gotowego balansu.  

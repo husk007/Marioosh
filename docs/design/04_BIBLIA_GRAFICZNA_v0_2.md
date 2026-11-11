@@ -1,4 +1,6 @@
 # MARIOOSH & DARIOOSH – BIBLIA GRAFICZNA I DŹWIĘKOWA
+
+> **Status (v0.4): nadal obowiązuje jako kierunek artystyczny (postacie, palety, planety). Skala (40 px = 1 m, hitbox 68–72 px) i zestaw póz bohaterów zostały zmienione w `08_NOWA_KONCEPCJA_FIZYKA_v0_4.md` §9; produkcja grafik: `docs/ART_PIPELINE.md`.**
 ## Art direction, zestaw assetów i zasady czytelności, wersja 0.2
 
 ## 1. Założenie artystyczne

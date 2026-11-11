@@ -20,6 +20,12 @@ Dokument opisuje, co z `08–11` jest w kodzie, jak to sprawdzono i gdzie implem
 | Wrogowie ×1,4 (hitbox i sprite), telegrafy ataku 0,5 s (Roguś, Gekoróg-typ) | ✔ częściowo | `enemies.ts`, `worldDraw.ts` |
 | Fragment grawitacji: Vespera 0,86 g, opcjonalna wyspa za przerwą 5 kafli (`buildW6Gravity`, tylko test) | ✔ (prototyp, tylko testy) | `maps/proto.ts`, `tests/authored-negative.test.ts` |
 | **Światy 6–8** (Vespera, Ferroks, Katoblis): 12 poziomów z odrębnymi mechanikami — światło/ptaki, windy zasilane bezpiecznikami, tłoki i burza, przekaźniki w kolejności, mosty na czas, deszcz kamieni, sieć portali, bramy z uwolnionych posągów, boss Katoblepas (filary → lustra → węzły) | ✔ | `maps/w6l1.ts`…`w8l4.ts`, `tests/arc.test.ts`, `tests/authored-negative.test.ts` |
+| Drzwi i portale: ↑ (obok `E`) otwiera drzwi, terminale i portale; symbol (błyskawica, księżyc, liść, gwiazda) nad drzwiami; teleport ustawia punkt odrodzenia | ✔ | `world.ts`, `worldDraw.ts`, `props.ts` |
+| Mechaniki silnika dodane w światach 7–8: bramy uporządkowane `ord…` (zła kolejność zeruje), `…:warpgate` (odblokowuje zamknięte drzwi w pokoju), `free…` (otwiera się po uwolnieniu `need` posągów), `arc` rodzaju `rock`, windy zasilane (`power`) | ✔ | `world.ts`, `authored.ts`, `tests/arc.test.ts` |
+| Naprawa AI wrogów: zawrót „poza zasięgiem patrolu” tylko przy oddalaniu się od punktu startu + przerwa `turnCd` 0,4 s (wcześniej moby migały lewo-prawo i zawieszały się przy ścianach) | ✔ | `enemies.ts` (`walk`, `awayFromHome`, `faceTo`), `tests/enemy-flicker.test.ts` |
+| Dobór póz bohatera: rampa pod górę / z góry, bieg, drabina (stoi / góra / dół), pływanie (tread / dive / up), brodzenie, lądowania (potknięcie / twarde), podciąganie, przeskok — z zamiennikami, gdy obraz jeszcze nie istnieje | ✔ | `worldDraw.ts` (`heroFrameFor`), `sprites/genmap.ts`, `tests/hero-frames.test.ts` |
+| Kolejka grafik pod v0.4 (Art Station): 49 póz na brata (29 nowych), 17 nowych elementów human-scale, usunięte pozy v0.3 | ✔ (kolejka; obrazy czekają na produkcję) | `tools/add-v04-art.mjs`, `docs/ART_PIPELINE.md` |
+| Muzyka: 13 utworów w `public/audio/music`, ładowanie z fallbackiem na syntezator | ✔ (do oceny słuchowej) | `engine/audio.ts`, `docs/PRODUKCJA_AUDIO_WIDEO.md` |
 | Rogomir bez stompa: 3 generatory (okno 28 s), pancerz, szarża wolniejsza od biegu, ciągły pomost-schron (przejście nad bossem, drabiny przy ścianach, utknięcie 5,5 s), skala bossa ×1,5 | ✔ | `bosses.ts`, `maps/w1l4.ts`, `tests/boss.test.ts` |
 
 ## 2. Jak sprawdzono przejezdność
@@ -43,9 +49,12 @@ Dokument opisuje, co z `08–11` jest w kodzie, jak to sprawdzono i gdzie implem
 - W Katoblisie (W8) uproszczone względem atlasu: W8-L1 bez skarbca z kablem i czerwonego sekretu (bateria leży na górnej półce), Bykobieg nie rozbija rumowiska (tylko zawór); W8-L2 bez żółtego kabla ukrytego za symetryczną ścianą (ślepa stacja jest zwykłą odnogą sieci) i bez osobnych „fałszywych przewodów” w rozdzielni W8-L4 (ślepe odnogi to zwykłe korytarze); W8-L3 bez czwartego filaru energii i ukrytej notatki (jest jedna notatka w archiwum); W8-L4 bez niszy sekretnej (bateria na górnym balkonie), Scarlet nie pomaga w walce (fazy 1–3 są mechaniczne). Wnętrza W8 używają tła/kafli świata zewnętrznego (do wymiany na grafiki wnętrz).
 
 ## 4. Następne kroki
-1. Ręczny playtest W1-L1/L2/L4 (czucie skoku, szarży Rogomira, 28 s okna generatorów) — wartości w `constants.ts` i `bosses.ts` to nastawy startowe.
-2. Strojenie wrogów: prędkości, zasięgi, telegrafy (Etap D).
-3. Po akceptacji: polerowanie grafik wnętrz i teł per świat, strojenie wrogów (Etap D) i decyzja o trybie „Nocna Zmiana”. Główne mechaniki światów: Złomaria — taśmociągi i dźwigi, Florion — światło i lustra, Skaltria — głazy na torach, Vespera — lampy i ptaki, Ferroks — burza i maszyny, Katoblis — deszcz kamieni, sieć portali, posągi i obwody, boss Katoblepas.
+1. **Ręczny playtest** wszystkich poziomów (najpierw W1-L1/L2/L4: czucie skoku, szarża Rogomira, okno generatorów 28 s) — wartości w `constants.ts`, `bosses.ts`, `enemies.ts` to nastawy startowe. Ocena słuchowa muzyki.
+2. **Strojenie wrogów** (Etap D): prędkości, zasięgi widzenia i telegrafy (0,4–1,0 s) po przeskalowaniu ×1,4.
+3. **Grafika:** produkcja obrazów z kolejki Art Station (najpierw pozy braci), następnie elementy human-scale, wnętrza (stacje, hale, podziemia) i tła per świat; po powstaniu nowych póz — sprawdzić zamienniki w `genmap.ts`.
+4. **HUD mobilny i dostępność** (Etap D/E): przyciski ruch / skok / interakcja / kucanie, bieg jako przełącznik; test na urządzeniach (Android/iOS) i padzie.
+5. **Decyzje projektowe:** tryb „Nocna Zmiana” (bez zegara), opcjonalne wyspy zależne od grawitacji (poza prototypem Vespery), wideo intro/zakończeń.
+6. Po akceptacji prototypu: aktualizacja wersji w `package.json` (obecnie 0.3.0), przegląd README i scalenie z `main`; osobny wpis w CHANGELOG jako wydanie.
 
 ## 5. Wnioski z pomiarów fizyki (analizator z chwytem krawędzi)
 Maksymalna przerwa z rozbiegu (z chwytem krawędzi): 4 kafle wszędzie; 5 kafli — tylko Vespera (obaj) i Prądowo (tylko Darioosh); Skaltria — nigdy. Dlatego trasa główna używa przerw ≤ 3 kafle (2,4 m), a przerwy 5-kaflowe są wyłącznie opcjonalnym bonusem zależnym od planety.

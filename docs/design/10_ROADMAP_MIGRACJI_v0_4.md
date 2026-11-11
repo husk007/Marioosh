@@ -2,7 +2,7 @@
 # Plan wdrożenia nowej koncepcji v0.4 — instrukcja dla Claude / Codex
 **Data:** 2026-11-09.
 **Obowiązuje równolegle:** [11_PLANETY_GRAWITACJA_I_ROZNORODNOSC_v0_4.md](11_PLANETY_GRAWITACJA_I_ROZNORODNOSC_v0_4.md) — planetarna grawitacja, odrębny charakter ośmiu światów, 32 odmienne topologie i testy balansu. W razie różnicy z wcześniejszymi szablonami poziomów pierwszeństwo mają reguły nowego dokumentu.
- Ten dokument i GDD v0.4 są *specyfikacją zmian*, nie informacją o zaimplementowaniu. Nie wykonywać automatycznego merge zmian mechaniki, zanim nie przejdzie grywalny prototyp.
+ Ten dokument i GDD v0.4 są *specyfikacją zmian*. **Stan wykonania (listopad 2026):** Etapy A–C zrobione (ruch, 32 ręczne poziomy i analizator przejezdności — wykroczyły poza pierwotny wycinek W1), Etap D częściowo (brak stompa, HP/tarcza, brak żyć i zegara, woda i powietrze, telegrafy; **strojenie wrogów, HUD mobilny i dostępność czekają**), Etap E w toku (kolejka grafik — `docs/ART_PIPELINE.md`; muzyka dostarczona; testy na urządzeniach natywnych jeszcze nie). Szczegóły: `12_IMPLEMENTACJA_v0_4.md`. Nie wykonywać merge do `main`, zanim prototyp nie zostanie zaakceptowany po ręcznym playteście.
 
 ## 1. Co jest nie tak w obecnym kodzie
 - docs/design/07_PRZEBUDOWA_PIONOWA_v0_3.md zawiera kierunek Sonic/Rayman; należy go uznać za historyczny i nie rozwijać.

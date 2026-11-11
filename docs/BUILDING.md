@@ -11,6 +11,9 @@ npm run preview
 ```
 `dist/` można wgrać na dowolny hosting statyczny; `base: './'` pozwala na podkatalogi. Workflow **Pages** publikuje `dist/` na GitHub Pages po każdym pushu do `main` (włącz *Settings → Pages → Source: GitHub Actions* i ustaw zmienną repozytorium `PAGES_ENABLED=true`; bez tego job jest pomijany).
 
+## Grafiki i muzyka
+Obrazy i muzyka są plikami w repozytorium (`public/art/`, `public/audio/music/`) i trafiają do `dist/` zwykłym buildem (źródłowa biblioteka `public/art/gen` jest pomijana — gra używa spakowanych kopii z `public/art/game`). Po dodaniu nowych obrazów: `node tools/pack-game-art.mjs`; kolejka i Art Station: `node tools/art-roadmap.mjs` (zob. [`ART_PIPELINE.md`](ART_PIPELINE.md)). Muzyka: pliki `.m4a` w `public/audio/music/` — szczegóły w [`PRODUKCJA_AUDIO_WIDEO.md`](PRODUKCJA_AUDIO_WIDEO.md).
+
 ## Windows / Linux (Electron)
 ```bash
 npm run build
@@ -39,6 +42,6 @@ W Xcode wybierz *Team* i profil, ustaw Bundle Identifier (domyślnie `pl.husk007
 
 ## Wydanie
 ```bash
-git tag v0.1.0 && git push origin v0.1.0
+git tag vX.Y.Z && git push origin vX.Y.Z   # wersja z package.json; gałąź v0.4 wydawaj dopiero po akceptacji prototypu
 ```
 Workflow **Release** zbuduje wszystkie platformy i utworzy wydanie z plikami. Opcjonalne sekrety repozytorium dla podpisanego Androida: `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`.

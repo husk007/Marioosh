@@ -1,4 +1,6 @@
 # MARIOOSH & DARIOOSH – ATLAS 32 POZIOMÓW
+
+> **Status (v0.4): dokument historyczny — poziomy v0.4 opisuje `09_ATLAS_32_POZIOMOW_v0_4.md`, a stan wykonania `12_IMPLEMENTACJA_v0_4.md`. Fabuła, budżety opakowań i sekrety nadal służą jako źródło.**
 ## Plan budowy plansz (level-design blueprint), wersja 0.2
 
 > Każda pozycja zawiera: długość poziomu (kafelki po 32 px), timer, planowane opakowania, obsadę wrogów, cztery odcinki przebiegu, punkt kontrolny, trzy posągi, sekret oraz warunek ukończenia. **To blueprint do wykonania grywalnych map, a nie gotowy plik tilemapy.** Pozycje x są punktami orientacyjnymi dla edytora i podlegają playtestom.

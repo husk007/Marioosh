@@ -1,6 +1,6 @@
 
 # Marioosh & Darioosh — ATLAS 32 POZIOMÓW v0.4
-**Data:** 2026-11-09 · **Status:** kierunek autorski do opracowania map gry.
+**Data:** 2026-11-09 · **Status:** kierunek autorski; **wszystkie 32 poziomy zbudowane** (`src/game/maps/`) — odstępstwa od atlasu (uproszczone sekrety, wnętrza z tłami zewnętrznymi) wymienia `12_IMPLEMENTACJA_v0_4.md` §3.
 Wymóg wspólny: 2–3 połączone kondygnacje, główna ścieżka dostępna solo dla obu braci, skrót i pętla, rozdzielnia/checkpoint, bez absurdalnych skoków i ramp rozpędowych. Każdy etap ma zachować fabularny cel, opakowania, trzech mieszkańców (o ile poziom fabularnie to dopuszcza) i nazwy z pliku levels.json; zmienia się *architektura*, nie tożsamość świata.
 
 **Obowiązuje równolegle:** [11_PLANETY_GRAWITACJA_I_ROZNORODNOSC_v0_4.md](11_PLANETY_GRAWITACJA_I_ROZNORODNOSC_v0_4.md) — planetarna grawitacja, odrębny charakter ośmiu światów, 32 odmienne topologie i testy balansu. W razie różnicy z wcześniejszymi szablonami poziomów pierwszeństwo mają reguły nowego dokumentu.

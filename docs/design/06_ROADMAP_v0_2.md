@@ -1,4 +1,6 @@
 # MARIOOSH & DARIOOSH – ROADMAP PRODUKCJI
+
+> **Status (v0.4): dokument historyczny — plan migracji v0.4 to `10_ROADMAP_MIGRACJI_v0_4.md`, a stan wykonania `12_IMPLEMENTACJA_v0_4.md`.**
 ## Prototyp → vertical slice → pełna kampania
 
 **Cel projektu:** zbudować dopracowaną, oryginalną platformówkę 2D „Klątwa Katoblepasa”, zachowując spójność GDD, atlasu 32 poziomów, bestiariusza i biblii graficznej. Poniższe fazy nie oznaczają, że gra albo repozytorium już istnieją; to plan do wykonania po uruchomieniu projektu.

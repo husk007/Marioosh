@@ -1,6 +1,10 @@
 # Audio i wideo — czego potrzebuje gra i jak to zdobyć
 
-Stan na v0.2.0: cała muzyka i wszystkie dźwięki są **generowane w kodzie** (Web Audio), a intro to statyczne strony z tekstem. Gra działa, więc wszystko poniżej to ulepszenie, nie warunek. Gdy tylko pliki się pojawią, dopiszę warstwę ładowania (plik gdy jest, a gdy go brak — dotychczasowy dźwięk z kodu, tak samo jak przy grafikach).
+**Stan na v0.4 (listopad 2026):**
+- **Muzyka — dostarczona i podpięta:** 13 utworów (`title`, `map`, `w0`…`w8`, `boss`, `star`) leży w `public/audio/music/<klucz>.m4a` (AAC, ok. 20 MB razem) i jest ładowana przez `src/engine/audio.ts`. Gdy plik nie jest dostępny albo nie da się go odtworzyć, ta sama muzyka jest grana z syntezatora WebAudio (zawsze działa). Hosty, które nie serwują `.m4a` (np. podgląd w artefakcie), mogą wystawić te same pliki jako `.mp4` i ustawić `window.__MUSIC_EXT = 'mp4'` przed startem gry; `window.__NO_FILE_MUSIC = true` wyłącza pliki. **Ocena słuchowa (głośność, pętle, dobór do światów) jest jeszcze do zrobienia.**
+- **Efekty dźwiękowe:** nadal w całości syntezowane w kodzie; wymiana na pliki jest opcjonalna (sekcja 2).
+- **Wideo (intro, zakończenia, game over, tło tytułu, wejścia bossów):** nie ma jeszcze — intro to statyczne strony z tekstem. Sekcja 3 to instrukcja produkcji.
+- Sekcje 1 i 2 poniżej zachowano jako **specyfikację** (prompty Suno, lista kluczy) na wypadek wymiany lub uzupełnienia utworów; nazwy plików to klucze z tabeli. Nowy klucz muzyczny wymaga wpisu w `FILE_MUSIC` w `audio.ts`.
 
 ---------------------------------------------------------------------------------------------------
 
@@ -111,6 +115,6 @@ Czego potrzeba, od najważniejszego:
 ---------------------------------------------------------------------------------------------------
 
 ## 4. Jak mi to przekazać
-- Muzykę i dźwięki wrzuć do repo w `audio-inbox/` (albo załącz tutaj): `music/<klucz>.mp3`, `sfx/<klucz>.wav`.
+- Muzykę (wymiana/uzupełnienie) i dźwięki wrzuć do repo w `audio-inbox/` (katalog nie istnieje, dopóki nie jest potrzebny; albo załącz plik w rozmowie): `music/<klucz>.mp3`, `sfx/<klucz>.wav` — konwersja do M4A i podpięcie robi się w `public/audio/music/`.
 - Filmy: `video-inbox/<nazwa>.mp4`.
-- Ja: konwertuję, dopisuję ładowanie z fallbackiem na dźwięk z kodu, podpinam filmy do intro/zakończenia/game over/tytułu i robię nowe wydanie.
+- Dalej: konwersja, ładowanie z fallbackiem na dźwięk z kodu (muzyka już tak działa), podpięcie filmów do intro/zakończenia/game over/tytułu i robię nowe wydanie.
